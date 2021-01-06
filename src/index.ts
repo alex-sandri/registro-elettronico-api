@@ -7,14 +7,19 @@ import * as path from "path";
 const serviceAccount = require("./service-account.json");
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://registro--elettronico.firebaseio.com",
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://registro--elettronico.firebaseio.com",
 });
 
+import User from "./models/User";
+
 const root = {
-    hello: () => {
-      return 'Hello world!';
-    },
+    user: async (args: { id: string }) =>
+    {
+        const user = await User.retrieve(args.id);
+
+        return user;
+    }
 };
 
 const app = express();
