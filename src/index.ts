@@ -1,7 +1,8 @@
 import * as admin from "firebase-admin";
 import * as express from "express";
 import { graphqlHTTP } from "express-graphql";
-import { buildSchema } from "graphql";
+import { loadSchemaSync, GraphQLFileLoader } from "graphql-tools";
+import * as path from "path";
 
 const serviceAccount = require("./service-account.json");
 
@@ -9,13 +10,6 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://registro--elettronico.firebaseio.com",
 });
-
-const schema = buildSchema(`
-    type Query
-    {
-        hello: String
-    }
-`);
 
 const root = {
     hello: () => {
@@ -26,7 +20,7 @@ const root = {
 const app = express();
 
 app.use('/graphql', graphqlHTTP({
-    schema: schema,
+    schema: loadSchemaSync(path.join(__dirname, "../config/schema.graphql"), { loaders: [ new GraphQLFileLoader() ] }),
     rootValue: root,
 }));
 
