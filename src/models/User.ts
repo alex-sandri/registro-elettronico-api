@@ -7,6 +7,16 @@ interface IUser
 {
     firstName: string;
     lastName: string;
+    email: string;
+    password: string;
+}
+
+interface IUpdateUser
+{
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    password?: string;
 }
 
 interface ISerializedUser
@@ -14,6 +24,7 @@ interface ISerializedUser
     id: string;
     firstName: string;
     lastName: string;
+    email: string;
 }
 
 export default class User implements ISerializable
@@ -40,11 +51,14 @@ export default class User implements ISerializable
         return new User(id, snapshot.data() as IUser);
     }
 
-    public async update(data: IUser): Promise<User>
+    public async update(data: IUpdateUser): Promise<User>
     {
-        await db.collection("users").doc(this.id).update(data);
+        this.data.firstName = data.firstName ?? this.data.firstName;
+        this.data.lastName = data.lastName ?? this.data.lastName;
+        this.data.email = data.email ?? this.data.email;
+        this.data.password = data.password ?? this.data.password; // TODO: Encrypt it
 
-        this.data = data;
+        await db.collection("users").doc(this.id).update(this.data);
 
         return this;
     }

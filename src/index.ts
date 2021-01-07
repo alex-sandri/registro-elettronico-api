@@ -23,14 +23,6 @@ const typeDefs = gql`
         grades: [Grade!]!
     }
 
-    input UserInput
-    {
-        firstName: String
-        lastName: String
-        email: String
-        password: String
-    }
-
     type Grade
     {
         id: ID!
@@ -53,8 +45,20 @@ const typeDefs = gql`
 
     type Mutation
     {
-        createUser(data: UserInput!): User
-        updateUser(id: ID!, data: UserInput!): User
+        createUser(
+            firstName: String!,
+            lastName: String!,
+            email: String!,
+            password: String!,
+        ): User
+
+        updateUser(
+            id: ID!,
+            firstName: String,
+            lastName: String,
+            email: String,
+            password: String,
+        ): User
 
         createGrade(data: GradeInput!): Grade
     }
@@ -72,7 +76,7 @@ const resolvers: IResolvers = {
     Mutation: {
         createUser: async (parent, args, context, info) =>
         {
-            const user = await User.create(args.data);
+            const user = await User.create(args);
 
             return user.serialize();
         },
@@ -80,7 +84,12 @@ const resolvers: IResolvers = {
         {
             const user = await User.retrieve(args.id);
 
-            await user.update(args.data);
+            await user.update({
+                firstName: args.firstName,
+                lastName: args.lastName,
+                email: args.email,
+                password: args.password,
+            });
 
             return user.serialize();
         },
