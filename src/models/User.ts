@@ -1,4 +1,5 @@
 import { firestore } from "firebase-admin";
+import ISerializable from "../interfaces/ISerializable";
 
 const db = firestore();
 
@@ -15,7 +16,7 @@ export interface ISerializedUser
     lastName: string;
 }
 
-export default class User
+export default class User implements ISerializable
 {
     private constructor(public id: string, public data: IUser)
     {}
