@@ -11,15 +11,29 @@ admin.initializeApp({
     databaseURL: "https://registro--elettronico.firebaseio.com",
 });
 
-import User from "./models/User";
+import User, { IUser } from "./models/User";
 
 const root = {
-    user: async (args: { id: string }) =>
+    createUser: async (args: { data: IUser }) =>
+    {
+        const user = await User.create(args.data);
+
+        return user;
+    },
+    retrieveUser: async (args: { id: string }) =>
     {
         const user = await User.retrieve(args.id);
 
         return user;
-    }
+    },
+    updateUser: async (args: { id: string, data: IUser }) =>
+    {
+        const user = await User.retrieve(args.id);
+
+        await user.update(args.data);
+
+        return user;
+    },
 };
 
 const app = express();

@@ -1,4 +1,4 @@
-type Name
+type UserName
 {
     first: String!
     last: String!
@@ -6,10 +6,16 @@ type Name
 
 type User
 {
-    name: Name!
+    name: UserName!
 }
 
 type Query
 {
-    user(id: String): User
+    retrieveUser(id: ID!): User
+}
+
+type Mutation
+{
+    createUser(data: User!): User
+    updateUser(id: ID!, data: User!): User
 }
