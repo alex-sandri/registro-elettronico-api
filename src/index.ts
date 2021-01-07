@@ -1,7 +1,5 @@
 import * as admin from "firebase-admin";
-import * as express from "express";
-import { graphqlHTTP } from "express-graphql";
-import { buildSchema } from "graphql";
+import { ApolloServer, gql } from "apollo-server";
 
 const serviceAccount = require("./service-account.json");
 
@@ -12,7 +10,7 @@ admin.initializeApp({
 
 import User, { ISerializedUser, IUser } from "./models/User";
 
-const schema = buildSchema(`
+const typeDefs = gql`
     scalar Date
 
     type User
@@ -59,33 +57,35 @@ const schema = buildSchema(`
 
         createGrade(data: GradeInput!): Grade
     }
-`);
+`;
 
-const root = {
-    createUser: async (args: { data: IUser }): Promise<ISerializedUser> =>
-    {
-        const user = await User.create(args.data);
+const resolvers = {
+    Query: {
+        user: async (args: { id: string }): Promise<ISerializedUser> =>
+        {
+            const user = await User.retrieve(args.id);
 
-        return user.serialize();
+            return user.serialize();
+        },
     },
-    retrieveUser: async (args: { id: string }): Promise<ISerializedUser> =>
-    {
-        const user = await User.retrieve(args.id);
+    Mutation: {
+        createUser: async (args: { data: IUser }): Promise<ISerializedUser> =>
+        {
+            const user = await User.create(args.data);
 
-        return user.serialize();
-    },
-    updateUser: async (args: { id: string, data: IUser }): Promise<ISerializedUser> =>
-    {
-        const user = await User.retrieve(args.id);
+            return user.serialize();
+        },
+        updateUser: async (args: { id: string, data: IUser }): Promise<ISerializedUser> =>
+        {
+            const user = await User.retrieve(args.id);
 
-        await user.update(args.data);
+            await user.update(args.data);
 
-        return user.serialize();
-    },
+            return user.serialize();
+        },
+    }
 };
 
-const app = express();
+const server = new ApolloServer({ typeDefs, resolvers, playground: false });
 
-app.use('/graphql', graphqlHTTP({ schema, rootValue: root }));
-
-app.listen(4000);
+server.listen({ port: 4000 });
