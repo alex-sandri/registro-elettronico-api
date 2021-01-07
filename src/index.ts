@@ -1,5 +1,6 @@
 import * as admin from "firebase-admin";
 import { ApolloServer, gql } from "apollo-server";
+import { GraphQLDate } from "graphql-iso-date";
 
 const serviceAccount = require("./service-account.json");
 
@@ -24,10 +25,10 @@ const typeDefs = gql`
 
     input UserInput
     {
-        firstName: String!
-        lastName: String!
-        email: String!
-        password: String!
+        firstName: String
+        lastName: String
+        email: String
+        password: String
     }
 
     type Grade
@@ -83,7 +84,8 @@ const resolvers = {
 
             return user.serialize();
         },
-    }
+    },
+    Date: GraphQLDate,
 };
 
 const server = new ApolloServer({ typeDefs, resolvers, playground: false });
