@@ -13,28 +13,51 @@ admin.initializeApp({
 import User, { ISerializedUser, IUser } from "./models/User";
 
 const schema = buildSchema(`
+    scalar Date
+
     type User
     {
         id: ID!
         firstName: String!
         lastName: String!
+        email: String!
+        grades: [Grade!]!
     }
 
     input UserInput
     {
         firstName: String!
         lastName: String!
+        email: String!
+        password: String!
+    }
+
+    type Grade
+    {
+        id: ID!
+        value: Float!
+        date: Date!
+        description: String
+    }
+
+    input GradeInput
+    {
+        value: Float!
+        date: Date!
+        description: String
     }
 
     type Query
     {
-        retrieveUser(id: ID!): User
+        user(id: ID!): User
     }
 
     type Mutation
     {
         createUser(data: UserInput!): User
         updateUser(id: ID!, data: UserInput!): User
+
+        createGrade(data: GradeInput!): Grade
     }
 `);
 
