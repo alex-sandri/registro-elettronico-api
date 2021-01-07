@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import { ApolloServer, gql } from "apollo-server";
+import { ApolloServer, gql, IResolvers } from "apollo-server";
 import { GraphQLDate } from "graphql-iso-date";
 
 const serviceAccount = require("./service-account.json");
@@ -9,7 +9,7 @@ admin.initializeApp({
     databaseURL: "https://registro--elettronico.firebaseio.com",
 });
 
-import User, { ISerializedUser, IUser } from "./models/User";
+import User from "./models/User";
 
 const typeDefs = gql`
     scalar Date
@@ -60,9 +60,9 @@ const typeDefs = gql`
     }
 `;
 
-const resolvers = {
+const resolvers: IResolvers = {
     Query: {
-        user: async (args: { id: string }): Promise<ISerializedUser> =>
+        user: async (parent, args, context, info) =>
         {
             const user = await User.retrieve(args.id);
 
@@ -70,13 +70,13 @@ const resolvers = {
         },
     },
     Mutation: {
-        createUser: async (args: { data: IUser }): Promise<ISerializedUser> =>
+        createUser: async (parent, args, context, info) =>
         {
             const user = await User.create(args.data);
 
             return user.serialize();
         },
-        updateUser: async (args: { id: string, data: IUser }): Promise<ISerializedUser> =>
+        updateUser: async (parent, args, context, info) =>
         {
             const user = await User.retrieve(args.id);
 

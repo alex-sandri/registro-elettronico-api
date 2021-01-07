@@ -3,13 +3,13 @@ import ISerializable from "../interfaces/ISerializable";
 
 const db = firestore();
 
-export interface IUser
+interface IUser
 {
     firstName: string;
     lastName: string;
 }
 
-export interface ISerializedUser
+interface ISerializedUser
 {
     id: string;
     firstName: string;
