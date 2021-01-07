@@ -1,8 +1,7 @@
 import * as admin from "firebase-admin";
 import * as express from "express";
 import { graphqlHTTP } from "express-graphql";
-import { loadSchemaSync, GraphQLFileLoader } from "graphql-tools";
-import * as path from "path";
+import { buildSchema } from "graphql";
 
 const serviceAccount = require("./service-account.json");
 
@@ -12,6 +11,35 @@ admin.initializeApp({
 });
 
 import User, { IUser } from "./models/User";
+
+const schema = buildSchema(`
+    type UserName
+    {
+        first: String!
+        last: String!
+    }
+
+    type User
+    {
+        name: UserName!
+    }
+
+    input UserInput
+    {
+        name: UserName!
+    }
+
+    type Query
+    {
+        retrieveUser(id: ID!): User
+    }
+
+    type Mutation
+    {
+        createUser(data: UserInput!): User
+        updateUser(id: ID!, data: UserInput!): User
+    }
+`);
 
 const root = {
     createUser: async (args: { data: IUser }) =>
@@ -38,9 +66,6 @@ const root = {
 
 const app = express();
 
-app.use('/graphql', graphqlHTTP({
-    schema: loadSchemaSync(path.join(__dirname, "../config/schema.graphql"), { loaders: [ new GraphQLFileLoader() ] }),
-    rootValue: root,
-}));
+app.use('/graphql', graphqlHTTP({ schema, rootValue: root }));
 
 app.listen(4000);
