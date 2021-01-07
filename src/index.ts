@@ -10,23 +10,20 @@ admin.initializeApp({
     databaseURL: "https://registro--elettronico.firebaseio.com",
 });
 
-import User, { IUser } from "./models/User";
+import User, { ISerializedUser, IUser } from "./models/User";
 
 const schema = buildSchema(`
-    type UserName
-    {
-        first: String!
-        last: String!
-    }
-
     type User
     {
-        name: UserName!
+        id: ID!
+        firstName: String!
+        lastName: String!
     }
 
     input UserInput
     {
-        name: UserName!
+        firstName: String!
+        lastName: String!
     }
 
     type Query
@@ -42,25 +39,25 @@ const schema = buildSchema(`
 `);
 
 const root = {
-    createUser: async (args: { data: IUser }) =>
+    createUser: async (args: { data: IUser }): Promise<ISerializedUser> =>
     {
         const user = await User.create(args.data);
 
-        return user;
+        return user.serialize();
     },
-    retrieveUser: async (args: { id: string }) =>
+    retrieveUser: async (args: { id: string }): Promise<ISerializedUser> =>
     {
         const user = await User.retrieve(args.id);
 
-        return user;
+        return user.serialize();
     },
-    updateUser: async (args: { id: string, data: IUser }) =>
+    updateUser: async (args: { id: string, data: IUser }): Promise<ISerializedUser> =>
     {
         const user = await User.retrieve(args.id);
 
         await user.update(args.data);
 
-        return user;
+        return user.serialize();
     },
 };
 

@@ -4,16 +4,26 @@ const db = firestore();
 
 export interface IUser
 {
-    name: {
-        first: string;
-        last: string;
-    };
+    firstName: string;
+    lastName: string;
+}
+
+export interface ISerializedUser
+{
+    id: string;
+    firstName: string;
+    lastName: string;
 }
 
 export default class User
 {
     private constructor(public id: string, public data: IUser)
     {}
+
+    public serialize(): ISerializedUser
+    {
+        return { id: this.id, ...this.data };
+    }
 
     public static async create(data: IUser): Promise<User>
     {
