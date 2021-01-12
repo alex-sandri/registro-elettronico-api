@@ -1,5 +1,5 @@
 import { firestore } from "firebase-admin";
-import ISerializable from "../interfaces/ISerializable";
+import ISerializable from "../common/ISerializable";
 
 const db = firestore();
 

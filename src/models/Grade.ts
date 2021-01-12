@@ -1,6 +1,6 @@
 import { firestore } from "firebase-admin";
-import ISerializable from "../interfaces/ISerializable";
-import User from "./User";
+import ISerializable from "../common/ISerializable";
+import ISerializedDate from "../common/ISerializedDate";
 
 const db = firestore();
 
@@ -16,7 +16,7 @@ interface ISerializedGrade
 {
     id: string;
     value: number;
-    date: Date;
+    date: ISerializedDate;
     description: string;
 }
 
@@ -27,7 +27,12 @@ export default class Grade implements ISerializable
 
     public serialize(): ISerializedGrade
     {
-        return { id: this.id, ...this.data };
+        return {
+            id: this.id,
+            value: this.data.value,
+            date: { day: this.data.date.getDate(), month: this.data.date.getMonth() + 1, year: this.data.date.getFullYear() },
+            description: this.data.description,
+        };
     }
 
     public static async create(data: IGrade): Promise<Grade>
