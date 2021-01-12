@@ -31,13 +31,6 @@ const typeDefs = gql`
         description: String
     }
 
-    input GradeInput
-    {
-        value: Float!
-        date: Date!
-        description: String
-    }
-
     type Query
     {
         user(id: ID!): User
@@ -60,7 +53,11 @@ const typeDefs = gql`
             password: String,
         ): User
 
-        createGrade(data: GradeInput!): Grade
+        createGrade(
+            value: Float!
+            date: Date!
+            description: String
+        ): Grade
     }
 `;
 
