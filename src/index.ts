@@ -10,6 +10,7 @@ admin.initializeApp({
 });
 
 import User from "./models/User";
+import Grade from "./models/Grade";
 
 const typeDefs = gql`
     scalar Date
@@ -89,6 +90,12 @@ const resolvers: IResolvers = {
             });
 
             return user.serialize();
+        },
+        createGrade: async (parent, args, context, info) =>
+        {
+            const grade = await Grade.assign(user, args);
+
+            return grade.serialize();
         },
     },
     Date: GraphQLDate,
