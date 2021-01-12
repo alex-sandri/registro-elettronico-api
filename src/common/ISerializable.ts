@@ -1,4 +1,4 @@
 export default interface ISerializable
 {
-    serialize(): { [ key: string ]: any };
+    serialize(): Promise<{ [ key: string ]: any }>;
 }

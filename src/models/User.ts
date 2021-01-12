@@ -1,5 +1,6 @@
 import { firestore } from "firebase-admin";
 import ISerializable from "../common/ISerializable";
+import Grade, { ISerializedGrade } from "./Grade";
 
 const db = firestore();
 
@@ -25,6 +26,7 @@ interface ISerializedUser
     firstName: string;
     lastName: string;
     email: string;
+    grades: ISerializedGrade[];
 }
 
 export default class User implements ISerializable
@@ -32,9 +34,24 @@ export default class User implements ISerializable
     private constructor(public id: string, public data: IUser)
     {}
 
-    public serialize(): ISerializedUser
+    public async serialize(): Promise<ISerializedUser>
     {
-        return { id: this.id, ...this.data };
+        const grades = await Grade.for(this);
+
+        const serializedGrades: ISerializedGrade[] = [];
+
+        for (const grade of grades)
+        {
+            serializedGrades.push(await grade.serialize());
+        }
+
+        return {
+            id: this.id,
+            firstName: this.data.firstName,
+            lastName: this.data.lastName,
+            email: this.data.email,
+            grades: serializedGrades,
+        };
     }
 
     public static async create(data: IUser): Promise<User>
