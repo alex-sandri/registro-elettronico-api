@@ -30,19 +30,12 @@ export default class Teacher implements ISerializable
     {
         const classes = await Class.for(this);
 
-        const serializedClasses: ISerializedClass[] = [];
-
-        for (const { serialize } of classes)
-        {
-            serializedClasses.push(await serialize());
-        }
-
         return {
             id: this.id,
             firstName: this.data.firstName,
             lastName: this.data.lastName,
             email: this.data.email,
-            classes: serializedClasses,
+            classes: await Promise.all(classes.map(_ => _.serialize())),
         };
     }
 

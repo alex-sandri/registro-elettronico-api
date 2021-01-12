@@ -70,36 +70,36 @@ const resolvers: IResolvers = {
     Query: {
         student: async (parent, args, context, info) =>
         {
-            const { serialize } = await Student.retrieve(args.id);
+            const student = await Student.retrieve(args.id);
 
-            return serialize();
+            return student.serialize();
         },
     },
     Mutation: {
         createStudent: async (parent, args, context, info) =>
         {
-            const { serialize } = await Student.create(args);
+            const student = await Student.create(args);
 
-            return serialize();
+            return student.serialize();
         },
         updateStudent: async (parent, args, context, info) =>
         {
-            const { update, serialize } = await Student.retrieve(args.id);
+            const student = await Student.retrieve(args.id);
 
-            await update({
+            await student.update({
                 firstName: args.firstName,
                 lastName: args.lastName,
                 email: args.email,
                 password: args.password,
             });
 
-            return serialize();
+            return student.serialize();
         },
         createGrade: async (parent, args, context, info) =>
         {
-            const { serialize } = await Grade.create(args);
+            const grade = await Grade.create(args);
 
-            return serialize();
+            return grade.serialize();
         },
     },
     Date: GraphQLDate,

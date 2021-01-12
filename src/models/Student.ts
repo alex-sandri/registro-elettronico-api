@@ -39,19 +39,12 @@ export default class Student implements ISerializable
     {
         const grades = await Grade.for(this);
 
-        const serializedGrades: ISerializedGrade[] = [];
-
-        for (const { serialize } of grades)
-        {
-            serializedGrades.push(await serialize());
-        }
-
         return {
             id: this.id,
             firstName: this.data.firstName,
             lastName: this.data.lastName,
             email: this.data.email,
-            grades: serializedGrades,
+            grades: await Promise.all(grades.map(_ => _.serialize())),
         };
     }
 
