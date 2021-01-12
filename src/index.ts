@@ -102,6 +102,6 @@ const resolvers: IResolvers = {
     Date: GraphQLDate,
 };
 
-const server = new ApolloServer({ typeDefs, resolvers, playground: false });
+const server = new ApolloServer({ typeDefs, resolvers });
 
 server.listen({ port: 4000 });
