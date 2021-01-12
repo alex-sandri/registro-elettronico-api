@@ -6,6 +6,7 @@ const db = firestore();
 
 interface IGrade
 {
+    user: string;
     value: number;
     date: Date;
     description: string;
@@ -29,7 +30,7 @@ export default class Grade implements ISerializable
         return { id: this.id, ...this.data };
     }
 
-    public static async assign(user: User, data: IGrade): Promise<Grade>
+    public static async create(data: IGrade): Promise<Grade>
     {
         const { id } = await db.collection("grades").add(data);
 

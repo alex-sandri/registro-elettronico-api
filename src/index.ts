@@ -55,6 +55,7 @@ const typeDefs = gql`
         ): User
 
         createGrade(
+            user: String!
             value: Float!
             date: Date!
             description: String
@@ -93,7 +94,7 @@ const resolvers: IResolvers = {
         },
         createGrade: async (parent, args, context, info) =>
         {
-            const grade = await Grade.assign(user, args);
+            const grade = await Grade.create(args);
 
             return grade.serialize();
         },
