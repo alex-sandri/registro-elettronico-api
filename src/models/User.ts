@@ -12,6 +12,17 @@ interface IUser
     password: string;
 }
 
+interface ITeacherUser extends IUser
+{
+    type: "teacher";
+}
+
+interface IStudentUser extends IUser
+{
+    type: "student";
+    class: string;
+}
+
 interface IUpdateUser
 {
     firstName?: string;
@@ -29,9 +40,11 @@ interface ISerializedUser
     grades: ISerializedGrade[];
 }
 
+type TUser = ITeacherUser | IStudentUser;
+
 export default class User implements ISerializable
 {
-    private constructor(public id: string, public data: IUser)
+    private constructor(public id: string, public data: TUser)
     {}
 
     public async serialize(): Promise<ISerializedUser>
@@ -54,7 +67,7 @@ export default class User implements ISerializable
         };
     }
 
-    public static async create(data: IUser): Promise<User>
+    public static async create(data: TUser): Promise<User>
     {
         const { id } = await db.collection("users").add(data);
 
@@ -65,7 +78,7 @@ export default class User implements ISerializable
     {
         const snapshot = await db.collection("users").doc(id).get();
 
-        return new User(id, snapshot.data() as IUser);
+        return new User(id, snapshot.data() as TUser);
     }
 
     public async update(data: IUpdateUser): Promise<User>
