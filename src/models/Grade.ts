@@ -1,6 +1,5 @@
 import { firestore } from "firebase-admin";
 import ISerializable from "../common/ISerializable";
-import ISerializedDate from "../common/ISerializedDate";
 import User from "./User";
 
 const db = firestore();
@@ -17,7 +16,7 @@ export interface ISerializedGrade
 {
     id: string;
     value: number;
-    date: ISerializedDate;
+    date: Date;
     description: string;
 }
 
@@ -31,11 +30,7 @@ export default class Grade implements ISerializable
         return {
             id: this.id,
             value: this.data.value,
-            date: {
-                day: this.data.date.getDate(),
-                month: this.data.date.getMonth() + 1,
-                year: this.data.date.getFullYear()
-            },
+            date: this.data.date,
             description: this.data.description,
         };
     }
@@ -55,7 +50,12 @@ export default class Grade implements ISerializable
 
         for (const grade of docs)
         {
-            grades.push(new Grade(grade.id, grade.data() as IGrade));
+            const data = grade.data() as IGrade;
+
+            // Firestore converts it to a Timestamp
+            data.date = (data.date as unknown as firestore.Timestamp).toDate();
+
+            grades.push(new Grade(grade.id, data));
         }
 
         return grades;
