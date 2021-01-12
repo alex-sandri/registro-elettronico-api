@@ -4,26 +4,16 @@ import Grade, { ISerializedGrade } from "./Grade";
 
 const db = firestore();
 
-interface IUser
+interface IStudent
 {
     firstName: string;
     lastName: string;
     email: string;
     password: string;
-}
-
-interface ITeacherUser extends IUser
-{
-    type: "teacher";
-}
-
-interface IStudentUser extends IUser
-{
-    type: "student";
     class: string;
 }
 
-interface IUpdateUser
+interface IUpdateStudent
 {
     firstName?: string;
     lastName?: string;
@@ -31,7 +21,7 @@ interface IUpdateUser
     password?: string;
 }
 
-interface ISerializedUser
+interface ISerializedStudent
 {
     id: string;
     firstName: string;
@@ -40,14 +30,12 @@ interface ISerializedUser
     grades: ISerializedGrade[];
 }
 
-type TUser = ITeacherUser | IStudentUser;
-
-export default class User implements ISerializable
+export default class Student implements ISerializable
 {
-    private constructor(public id: string, public data: TUser)
+    private constructor(public id: string, public data: IStudent)
     {}
 
-    public async serialize(): Promise<ISerializedUser>
+    public async serialize(): Promise<ISerializedStudent>
     {
         const grades = await Grade.for(this);
 
@@ -67,28 +55,28 @@ export default class User implements ISerializable
         };
     }
 
-    public static async create(data: TUser): Promise<User>
+    public static async create(data: IStudent): Promise<Student>
     {
-        const { id } = await db.collection("users").add(data);
+        const { id } = await db.collection("students").add(data);
 
-        return new User(id, data);
+        return new Student(id, data);
     }
 
-    public static async retrieve(id: string): Promise<User>
+    public static async retrieve(id: string): Promise<Student>
     {
-        const snapshot = await db.collection("users").doc(id).get();
+        const snapshot = await db.collection("students").doc(id).get();
 
-        return new User(id, snapshot.data() as TUser);
+        return new Student(id, snapshot.data() as IStudent);
     }
 
-    public async update(data: IUpdateUser): Promise<User>
+    public async update(data: IUpdateStudent): Promise<Student>
     {
         this.data.firstName = data.firstName ?? this.data.firstName;
         this.data.lastName = data.lastName ?? this.data.lastName;
         this.data.email = data.email ?? this.data.email;
         this.data.password = data.password ?? this.data.password; // TODO: Encrypt it
 
-        await db.collection("users").doc(this.id).update(this.data);
+        await db.collection("students").doc(this.id).update(this.data);
 
         return this;
     }

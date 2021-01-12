@@ -1,12 +1,12 @@
 import { firestore } from "firebase-admin";
 import ISerializable from "../common/ISerializable";
-import User from "./User";
+import Student from "./Student";
 
 const db = firestore();
 
 interface IGrade
 {
-    user: string;
+    student: string;
     value: number;
     date: Date;
     description: string;
@@ -42,11 +42,11 @@ export default class Grade implements ISerializable
         return new Grade(id, data);
     }
 
-    public static async for(user: User): Promise<Grade[]>
+    public static async for(student: Student): Promise<Grade[]>
     {
         const grades: Grade[] = [];
 
-        const { docs } = await db.collection("grades").where("user" ,"==", user.id).get();
+        const { docs } = await db.collection("grades").where("student" ,"==", student.id).get();
 
         for (const grade of docs)
         {

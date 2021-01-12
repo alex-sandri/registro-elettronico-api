@@ -10,7 +10,7 @@ admin.initializeApp({
     databaseURL: "https://registro--elettronico.firebaseio.com",
 });
 
-import User from "./models/User";
+import Student from "./models/Student";
 import Grade from "./models/Grade";
 
 const typeDefs = gql`
@@ -18,7 +18,7 @@ const typeDefs = gql`
     scalar Email
     scalar Password
 
-    type User
+    type Student
     {
         id: ID!
         firstName: String!
@@ -37,28 +37,28 @@ const typeDefs = gql`
 
     type Query
     {
-        user(id: ID!): User
+        student(id: ID!): Student
     }
 
     type Mutation
     {
-        createUser(
+        createStudent(
             firstName: String!,
             lastName: String!,
             email: Email!,
             password: Password!,
-        ): User
+        ): Student
 
-        updateUser(
+        updateStudent(
             id: ID!,
             firstName: String,
             lastName: String,
             email: Email,
             password: Password,
-        ): User
+        ): Student
 
         createGrade(
-            user: String!
+            student: String!
             value: Float!
             date: Date!
             description: String
@@ -68,38 +68,38 @@ const typeDefs = gql`
 
 const resolvers: IResolvers = {
     Query: {
-        user: async (parent, args, context, info) =>
+        student: async (parent, args, context, info) =>
         {
-            const user = await User.retrieve(args.id);
+            const { serialize } = await Student.retrieve(args.id);
 
-            return user.serialize();
+            return serialize();
         },
     },
     Mutation: {
-        createUser: async (parent, args, context, info) =>
+        createStudent: async (parent, args, context, info) =>
         {
-            const user = await User.create(args);
+            const { serialize } = await Student.create(args);
 
-            return user.serialize();
+            return serialize();
         },
-        updateUser: async (parent, args, context, info) =>
+        updateStudent: async (parent, args, context, info) =>
         {
-            const user = await User.retrieve(args.id);
+            const { update, serialize } = await Student.retrieve(args.id);
 
-            await user.update({
+            await update({
                 firstName: args.firstName,
                 lastName: args.lastName,
                 email: args.email,
                 password: args.password,
             });
 
-            return user.serialize();
+            return serialize();
         },
         createGrade: async (parent, args, context, info) =>
         {
-            const grade = await Grade.create(args);
+            const { serialize } = await Grade.create(args);
 
-            return grade.serialize();
+            return serialize();
         },
     },
     Date: GraphQLDate,
