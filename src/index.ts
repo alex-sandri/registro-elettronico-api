@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
 import { ApolloServer, gql, IResolvers } from "apollo-server";
 import { GraphQLDate } from "graphql-iso-date";
+import { GraphQLEmail, GraphQLPassword } from "graphql-custom-types";
 
 const serviceAccount = require("./service-account.json");
 
@@ -14,13 +15,15 @@ import Grade from "./models/Grade";
 
 const typeDefs = gql`
     scalar Date
+    scalar Email
+    scalar Password
 
     type User
     {
         id: ID!
         firstName: String!
         lastName: String!
-        email: String!
+        email: Email!
         grades: [Grade!]!
     }
 
@@ -42,16 +45,16 @@ const typeDefs = gql`
         createUser(
             firstName: String!,
             lastName: String!,
-            email: String!,
-            password: String!,
+            email: Email!,
+            password: Password!,
         ): User
 
         updateUser(
             id: ID!,
             firstName: String,
             lastName: String,
-            email: String,
-            password: String,
+            email: Email,
+            password: Password,
         ): User
 
         createGrade(
@@ -100,6 +103,8 @@ const resolvers: IResolvers = {
         },
     },
     Date: GraphQLDate,
+    Email: GraphQLEmail,
+    Password: new GraphQLPassword(8),
 };
 
 const server = new ApolloServer({ typeDefs, resolvers });
