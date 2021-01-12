@@ -41,9 +41,9 @@ export default class Student implements ISerializable
 
         const serializedGrades: ISerializedGrade[] = [];
 
-        for (const grade of grades)
+        for (const { serialize } of grades)
         {
-            serializedGrades.push(await grade.serialize());
+            serializedGrades.push(await serialize());
         }
 
         return {
