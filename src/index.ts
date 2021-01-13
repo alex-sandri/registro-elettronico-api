@@ -155,6 +155,7 @@ const resolvers: IResolvers = {
                 lastName: args.lastName,
                 email: args.email,
                 password: args.password,
+                class: args.class,
             });
 
             return student.serialize();
@@ -173,7 +174,12 @@ const resolvers: IResolvers = {
         },
         updateTeacher: async (parent, args, context, info) =>
         {
-            const teacher = await Teacher.create(args);
+            const teacher = await Teacher.create({
+                firstName: args.firstName,
+                lastName: args.lastName,
+                email: args.email,
+                password: args.password,
+            });
 
             return teacher.serialize();
         },
