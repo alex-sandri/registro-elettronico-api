@@ -18,13 +18,10 @@ const typeDefs = gql`
     scalar Email
     scalar Password
 
-    type Student
+    type Class
     {
         id: ID!
-        firstName: String!
-        lastName: String!
-        email: Email!
-        grades: [Grade!]!
+        description: String!
     }
 
     type Grade
@@ -33,6 +30,32 @@ const typeDefs = gql`
         value: Float!
         date: Date!
         description: String
+    }
+
+    type Student
+    {
+        id: ID!
+        firstName: String!
+        lastName: String!
+        email: Email!
+        grades: [Grade!]!
+        class: Class!
+    }
+
+    type Subject
+    {
+        id: ID!
+        name: String!
+        description: String
+    }
+
+    type Teacher
+    {
+        id: ID!
+        firstName: String!
+        lastName: String!
+        email: Email!
+        classes: [Class!]!
     }
 
     type Query
