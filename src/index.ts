@@ -15,6 +15,7 @@ import Grade from "./models/Grade";
 import Class from "./models/Class";
 import Subject from "./models/Subject";
 import Teacher from "./models/Teacher";
+import Resolver from "./utilities/Resolver";
 
 const typeDefs = gql`
     scalar Date
@@ -120,33 +121,33 @@ const typeDefs = gql`
 
 const resolvers: IResolvers = {
     Query: {
-        student: async (parent, args, context, info) =>
+        student: Resolver.init(async args =>
         {
             const student = await Student.retrieve(args.id);
 
             return student.serialize();
-        },
+        }),
     },
     Mutation: {
-        createClass: async (parent, args, context, info) =>
+        createClass: Resolver.init(async args =>
         {
             const createdClass = await Class.create(args);
 
             return createdClass.serialize();
-        },
-        createGrade: async (parent, args, context, info) =>
+        }),
+        createGrade: Resolver.init(async args =>
         {
             const grade = await Grade.create(args);
 
             return grade.serialize();
-        },
-        createStudent: async (parent, args, context, info) =>
+        }),
+        createStudent: Resolver.init(async args =>
         {
             const student = await Student.create(args);
 
             return student.serialize();
-        },
-        updateStudent: async (parent, args, context, info) =>
+        }),
+        updateStudent: Resolver.init(async args =>
         {
             const student = await Student.retrieve(args.id);
 
@@ -159,20 +160,20 @@ const resolvers: IResolvers = {
             });
 
             return student.serialize();
-        },
-        createSubject: async (parent, args, context, info) =>
+        }),
+        createSubject: Resolver.init(async args =>
         {
             const subject = await Subject.create(args);
 
             return subject.serialize();
-        },
-        createTeacher: async (parent, args, context, info) =>
+        }),
+        createTeacher: Resolver.init(async args =>
         {
             const teacher = await Teacher.create(args);
 
             return teacher.serialize();
-        },
-        updateTeacher: async (parent, args, context, info) =>
+        }),
+        updateTeacher: Resolver.init(async args =>
         {
             const teacher = await Teacher.create({
                 firstName: args.firstName,
@@ -182,7 +183,7 @@ const resolvers: IResolvers = {
             });
 
             return teacher.serialize();
-        },
+        }),
     },
     Date: GraphQLDate,
     Email: GraphQLEmail,
