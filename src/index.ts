@@ -12,6 +12,9 @@ admin.initializeApp({
 
 import Student from "./models/Student";
 import Grade from "./models/Grade";
+import Class from "./models/Class";
+import Subject from "./models/Subject";
+import Teacher from "./models/Teacher";
 
 const typeDefs = gql`
     scalar Date
@@ -125,6 +128,18 @@ const resolvers: IResolvers = {
         },
     },
     Mutation: {
+        createClass: async (parent, args, context, info) =>
+        {
+            const createdClass = await Class.create(args);
+
+            return createdClass.serialize();
+        },
+        createGrade: async (parent, args, context, info) =>
+        {
+            const grade = await Grade.create(args);
+
+            return grade.serialize();
+        },
         createStudent: async (parent, args, context, info) =>
         {
             const student = await Student.create(args);
@@ -144,11 +159,23 @@ const resolvers: IResolvers = {
 
             return student.serialize();
         },
-        createGrade: async (parent, args, context, info) =>
+        createSubject: async (parent, args, context, info) =>
         {
-            const grade = await Grade.create(args);
+            const subject = await Subject.create(args);
 
-            return grade.serialize();
+            return subject.serialize();
+        },
+        createTeacher: async (parent, args, context, info) =>
+        {
+            const teacher = await Teacher.create(args);
+
+            return teacher.serialize();
+        },
+        updateTeacher: async (parent, args, context, info) =>
+        {
+            const teacher = await Teacher.create(args);
+
+            return teacher.serialize();
         },
     },
     Date: GraphQLDate,
