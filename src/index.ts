@@ -65,20 +65,9 @@ const typeDefs = gql`
 
     type Mutation
     {
-        createStudent(
-            firstName: String!,
-            lastName: String!,
-            email: Email!,
-            password: Password!,
-        ): Student
-
-        updateStudent(
-            id: ID!,
-            firstName: String,
-            lastName: String,
-            email: Email,
-            password: Password,
-        ): Student
+        createClass(
+            description: String!
+        ): Class
 
         createGrade(
             student: String!
@@ -86,6 +75,43 @@ const typeDefs = gql`
             date: Date!
             description: String
         ): Grade
+
+        createStudent(
+            firstName: String!
+            lastName: String!
+            email: Email!
+            password: Password!
+            class: String!
+        ): Student
+
+        updateStudent(
+            id: ID!,
+            firstName: String
+            lastName: String
+            email: Email
+            password: Password
+            class: String
+        ): Student
+
+        createSubject(
+            name: String!
+            description: String
+        ): Subject
+
+        createTeacher(
+            firstName: String!
+            lastName: String!
+            email: Email!
+            password: Password!
+        ): Teacher
+
+        updateTeacher(
+            id: ID!,
+            firstName: String
+            lastName: String
+            email: Email
+            password: Password
+        ): Teacher
     }
 `;
 
