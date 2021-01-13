@@ -1,6 +1,6 @@
 import { firestore } from "firebase-admin";
 import ISerializable from "../common/ISerializable";
-import { ISerializedClass } from "./Class";
+import Class, { ISerializedClass } from "./Class";
 import Grade, { ISerializedGrade } from "./Grade";
 
 const db = firestore();
@@ -30,7 +30,7 @@ interface ISerializedStudent
     lastName: string;
     email: string;
     grades: ISerializedGrade[];
-    class: string;
+    class: ISerializedClass;
 }
 
 export default class Student implements ISerializable
@@ -42,13 +42,15 @@ export default class Student implements ISerializable
     {
         const grades = await Grade.for(this);
 
+        const studentClass = await Class.retrieve(this.data.class);
+
         return {
             id: this.id,
             firstName: this.data.firstName,
             lastName: this.data.lastName,
             email: this.data.email,
             grades: await Promise.all(grades.map(_ => _.serialize())),
-            class: this.data.class,
+            class: await studentClass.serialize(),
         };
     }
 

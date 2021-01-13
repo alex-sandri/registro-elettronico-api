@@ -35,6 +35,13 @@ export default class Class implements ISerializable
         return new Class(id, data);
     }
 
+    public static async retrieve(id: string): Promise<Class>
+    {
+        const snapshot = await db.collection("classes").doc(id).get();
+
+        return new Class(id, snapshot.data() as IClass);
+    }
+
     public static async for(teacher: Teacher): Promise<Class[]>
     {
         const classes: Class[] = [];
