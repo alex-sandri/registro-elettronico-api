@@ -13,6 +13,14 @@ interface ITeacher
     password: string;
 }
 
+interface IUpdateTeacher
+{
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    password?: string;
+}
+
 interface ISerializedTeacher
 {
     id: string;
@@ -58,6 +66,22 @@ export default class Teacher implements ISerializable
         const snapshot = await db.collection("teachers").doc(id).get();
 
         result.data = new Teacher(id, snapshot.data() as ITeacher);
+
+        return result;
+    }
+
+    public async update(data: IUpdateTeacher): Promise<ApiOperationResult<Teacher>>
+    {
+        const result = new ApiOperationResult<Teacher>();
+
+        this.data.firstName = data.firstName ?? this.data.firstName;
+        this.data.lastName = data.lastName ?? this.data.lastName;
+        this.data.email = data.email ?? this.data.email;
+        this.data.password = data.password ?? this.data.password; // TODO: Encrypt it
+
+        await db.collection("teachers").doc(this.id).update(this.data);
+
+        result.data = this;
 
         return result;
     }
