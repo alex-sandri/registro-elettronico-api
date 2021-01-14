@@ -13,7 +13,6 @@ interface IGrade
 
 export interface ISerializedGrade
 {
-    id: string;
     value: number;
     date: Date;
     description: string;
@@ -21,13 +20,12 @@ export interface ISerializedGrade
 
 export default class Grade implements ISerializable
 {
-    private constructor(public id: string, public data: IGrade)
+    private constructor(public data: IGrade)
     {}
 
     public async serialize(): Promise<ISerializedGrade>
     {
         return {
-            id: this.id,
             value: this.data.value,
             date: this.data.date,
             description: this.data.description,
@@ -49,9 +47,12 @@ export default class Grade implements ISerializable
             return result;
         }
 
-        const { id } = await db.collection("grades").add(data);
+        await db.query(
+            "INSERT INTO grades (value, date, description, student) VALUES (?, ?, ?, ?)",
+            [ data.value, data.date, data.description, data.student ]
+        );
 
-        result.data = new Grade(id, data);
+        result.data = new Grade(data);
 
         return result;
     }
@@ -62,16 +63,14 @@ export default class Grade implements ISerializable
 
         const grades: Grade[] = [];
 
-        const { docs } = await db.collection("grades").where("student" ,"==", student.id).get();
+        const query = await db.query(
+            "SELECT * FROM grades WHERE student=?",
+            [ student.id ]
+        );
 
-        for (const grade of docs)
+        for (const row of query.rows)
         {
-            const data = grade.data() as IGrade;
-
-            // Firestore converts it to a Timestamp
-            data.date = (data.date as unknown as firestore.Timestamp).toDate();
-
-            grades.push(new Grade(grade.id, data));
+            grades.push(new Grade(row));
         }
 
         return grades;

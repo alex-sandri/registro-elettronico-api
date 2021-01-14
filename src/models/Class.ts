@@ -5,25 +5,23 @@ import Teacher from "./Teacher";
 
 interface IClass
 {
-    description: string;
+    name: string;
 }
 
 export interface ISerializedClass
 {
-    id: string;
-    description: string;
+    name: string;
 }
 
 export default class Class implements ISerializable
 {
-    private constructor(public id: string, public data: IClass)
+    private constructor(public data: IClass)
     {}
 
     public async serialize(): Promise<ISerializedClass>
     {
         return {
-            id: this.id,
-            description: this.data.description,
+            name: this.data.name,
         };
     }
 
@@ -33,9 +31,12 @@ export default class Class implements ISerializable
 
         const result = new ApiOperationResult<Class>();
 
-        const { id } = await db.collection("classes").add(data);
+        await db.query(
+            "INSERT INTO classes (name) VALUES (?)",
+            [ data.name ]
+        );
 
-        result.data = new Class(id, data);
+        result.data = new Class(data);
 
         return result;
     }
@@ -46,9 +47,12 @@ export default class Class implements ISerializable
 
         const result = new ApiOperationResult<Class>();
 
-        const snapshot = await db.collection("classes").doc(id).get();
+        const query = await db.query(
+            "SELECT * FROM classes WHERE name=?",
+            [ id ]
+        );
 
-        result.data = new Class(id, snapshot.data() as IClass);
+        result.data = new Class(query.rows[0]);
 
         return result;
     }
@@ -59,13 +63,14 @@ export default class Class implements ISerializable
 
         const classes: Class[] = [];
 
-        const { docs } = await db.collection("classes_teachers").where("teacher" ,"==", teacher.id).get();
+        const query = await db.query(
+            "SELECT * FROM classes_teachers WHERE teacher=?",
+            [ teacher.id ]
+        );
 
-        for (const grade of docs)
+        for (const row of query.rows)
         {
-            const data = grade.data() as IClass;
-
-            classes.push(new Class(grade.id, data));
+            classes.push(new Class(row));
         }
 
         return classes;
