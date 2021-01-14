@@ -48,7 +48,7 @@ export default class Grade implements ISerializable
         }
 
         await db.query(
-            "INSERT INTO grades (value, date, description, student) VALUES (?, ?, ?, ?)",
+            "INSERT INTO grades (value, date, description, student) VALUES ($1, $2, $3, $4)",
             [ data.value, data.date, data.description, data.student ]
         );
 
@@ -64,7 +64,7 @@ export default class Grade implements ISerializable
         const grades: Grade[] = [];
 
         const query = await db.query(
-            "SELECT * FROM grades WHERE student=?",
+            "SELECT * FROM grades WHERE student=$1",
             [ student.data.email ]
         );
 

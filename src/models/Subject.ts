@@ -34,7 +34,7 @@ export default class Subject implements ISerializable
         const result = new ApiOperationResult<Subject>();
 
         await db.query(
-            "INSERT INTO subjects (name, description) VALUES (?, ?)",
+            "INSERT INTO subjects (name, description) VALUES ($1, $2)",
             [ data.name, data.description ]
         );
 
@@ -50,7 +50,7 @@ export default class Subject implements ISerializable
         const result = new ApiOperationResult<Subject>();
 
         const query = await db.query(
-            "SELECT * FROM subjects WHERE name=?",
+            "SELECT * FROM subjects WHERE name=$1",
             [ id ]
         );
 

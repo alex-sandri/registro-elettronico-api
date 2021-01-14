@@ -32,7 +32,7 @@ export default class Class implements ISerializable
         const result = new ApiOperationResult<Class>();
 
         await db.query(
-            "INSERT INTO classes (name) VALUES (?)",
+            "INSERT INTO classes (name) VALUES ($1)",
             [ data.name ]
         );
 
@@ -48,7 +48,7 @@ export default class Class implements ISerializable
         const result = new ApiOperationResult<Class>();
 
         const query = await db.query(
-            "SELECT * FROM classes WHERE name=?",
+            "SELECT * FROM classes WHERE name=$1",
             [ id ]
         );
 
@@ -64,7 +64,7 @@ export default class Class implements ISerializable
         const classes: Class[] = [];
 
         const query = await db.query(
-            "SELECT * FROM classes_teachers WHERE teacher=?",
+            "SELECT * FROM classes_teachers WHERE teacher=$1",
             [ teacher.data.email ]
         );
 

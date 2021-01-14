@@ -67,7 +67,7 @@ export default class Student implements ISerializable
         }
 
         await db.query(
-            "INSERT INTO students (firstName, lastName, email, password, class) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO students (firstName, lastName, email, password, class) VALUES ($1, $2, $3, $4, $5)",
             [ data.firstName, data.lastName, data.email, /* TODO: Encrypt password */ data.password, data.class ]
         );
 
@@ -83,7 +83,7 @@ export default class Student implements ISerializable
         const result = new ApiOperationResult<Student>();
 
         const query = await db.query(
-            "SELECT * FROM students WHERE email=?",
+            "SELECT * FROM students WHERE email=$1",
             [ id ]
         );
 
@@ -104,7 +104,7 @@ export default class Student implements ISerializable
         this.data.password = data.password ?? this.data.password; // TODO: Encrypt it
 
         await db.query(
-            "UPDATE students SET firstName=?, lastName=?, email=?, password=?, class=? WHERE email=?",
+            "UPDATE students SET firstName=$1, lastName=$2, email=$3, password=$4, class=$5 WHERE email=$6",
             [ data.firstName, data.lastName, data.email, data.password, data.class, this.data.email ]
         );
 
