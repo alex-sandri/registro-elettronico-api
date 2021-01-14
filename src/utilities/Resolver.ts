@@ -10,6 +10,6 @@ export default class Resolver<T extends ISerializable>
     {
         const result = await this.callback(args);
 
-        return result;
+        return result.serialize();
     }
 }
