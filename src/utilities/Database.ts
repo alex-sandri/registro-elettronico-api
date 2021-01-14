@@ -8,7 +8,7 @@ export default class Database
 {
     public client: Client;
 
-    public constructor()
+    private constructor()
     {
         const user = process.env.DB_USER;
         const host = process.env.DB_HOST;
@@ -44,5 +44,14 @@ export default class Database
             password,
             port: parseInt(port),
         });
+    }
+
+    public static async connect(): Promise<Client>
+    {
+        const client = new Database().client;
+
+        await client.connect();
+
+        return client;
     }
 }

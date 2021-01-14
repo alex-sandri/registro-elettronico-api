@@ -1,8 +1,6 @@
-import { firestore } from "firebase-admin";
 import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
-
-const db = firestore();
+import Database from "../utilities/Database";
 
 interface ISubject
 {
@@ -33,6 +31,8 @@ export default class Subject implements ISerializable
 
     public static async create(data: ISubject): Promise<ApiOperationResult<Subject>>
     {
+        const db = await Database.connect();
+
         const result = new ApiOperationResult<Subject>();
 
         const { id } = await db.collection("subjects").add(data);
@@ -44,6 +44,8 @@ export default class Subject implements ISerializable
 
     public static async retrieve(id: string): Promise<ApiOperationResult<Subject>>
     {
+        const db = await Database.connect();
+
         const result = new ApiOperationResult<Subject>();
 
         const snapshot = await db.collection("subjects").doc(id).get();

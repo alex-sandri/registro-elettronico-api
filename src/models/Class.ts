@@ -1,9 +1,7 @@
-import { firestore } from "firebase-admin";
 import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
+import Database from "../utilities/Database";
 import Teacher from "./Teacher";
-
-const db = firestore();
 
 interface IClass
 {
@@ -31,6 +29,8 @@ export default class Class implements ISerializable
 
     public static async create(data: IClass): Promise<ApiOperationResult<Class>>
     {
+        const db = await Database.connect();
+
         const result = new ApiOperationResult<Class>();
 
         const { id } = await db.collection("classes").add(data);
@@ -42,6 +42,8 @@ export default class Class implements ISerializable
 
     public static async retrieve(id: string): Promise<ApiOperationResult<Class>>
     {
+        const db = await Database.connect();
+
         const result = new ApiOperationResult<Class>();
 
         const snapshot = await db.collection("classes").doc(id).get();
@@ -53,6 +55,8 @@ export default class Class implements ISerializable
 
     public static async for(teacher: Teacher): Promise<Class[]>
     {
+        const db = await Database.connect();
+
         const classes: Class[] = [];
 
         const { docs } = await db.collection("classes_teachers").where("teacher" ,"==", teacher.id).get();
