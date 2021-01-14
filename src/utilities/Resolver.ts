@@ -1,19 +1,15 @@
-type TCallbackType = (args: any) => Promise<any>;
+import ApiOperationResult from "../common/ApiOperationResult";
+import ISerializable from "../common/ISerializable";
 
-export default class Resolver
+export default class Resolver<T extends ISerializable>
 {
-    public constructor(private callback: TCallbackType)
+    public constructor(private callback: (args: any) => Promise<ApiOperationResult<T>>)
     {}
-
-    public static init(callback: TCallbackType): (parent: any, args: any, context: any, info: any) => Promise<void>
-    {
-        const middleware = new Resolver(callback);
-
-        return (parent, args, context, info) => middleware.use(parent, args, context, info);
-    }
 
     public async use(parent: any, args: any, context: any, info: any): Promise<any>
     {
-        return this.callback(args);
+        const result = await this.callback(args);
+
+        return result;
     }
 }

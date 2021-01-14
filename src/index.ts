@@ -121,33 +121,33 @@ const typeDefs = gql`
 
 const resolvers: IResolvers = {
     Query: {
-        student: Resolver.init(async args =>
+        student: new Resolver(async args =>
         {
             const student = await Student.retrieve(args.id);
 
             return student.serialize();
-        }),
+        }).use,
     },
     Mutation: {
-        createClass: Resolver.init(async args =>
+        createClass: new Resolver(async args =>
         {
             const createdClass = await Class.create(args);
 
             return createdClass.serialize();
-        }),
-        createGrade: Resolver.init(async args =>
+        }).use,
+        createGrade: new Resolver(async args =>
         {
             const grade = await Grade.create(args);
 
             return grade.serialize();
-        }),
-        createStudent: Resolver.init(async args =>
+        }).use,
+        createStudent: new Resolver(async args =>
         {
             const student = await Student.create(args);
 
             return student.serialize();
-        }),
-        updateStudent: Resolver.init(async args =>
+        }).use,
+        updateStudent: new Resolver(async args =>
         {
             const student = await Student.retrieve(args.id);
 
@@ -160,20 +160,20 @@ const resolvers: IResolvers = {
             });
 
             return student.serialize();
-        }),
-        createSubject: Resolver.init(async args =>
+        }).use,
+        createSubject: new Resolver(async args =>
         {
             const subject = await Subject.create(args);
 
             return subject.serialize();
-        }),
-        createTeacher: Resolver.init(async args =>
+        }).use,
+        createTeacher: new Resolver(async args =>
         {
             const teacher = await Teacher.create(args);
 
             return teacher.serialize();
-        }),
-        updateTeacher: Resolver.init(async args =>
+        }).use,
+        updateTeacher: new Resolver(async args =>
         {
             const teacher = await Teacher.create({
                 firstName: args.firstName,
@@ -183,7 +183,7 @@ const resolvers: IResolvers = {
             });
 
             return teacher.serialize();
-        }),
+        }).use,
     },
     Date: GraphQLDate,
     Email: GraphQLEmail,
