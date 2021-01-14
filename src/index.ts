@@ -57,7 +57,7 @@ const typeDefs = gql`
     type Mutation
     {
         createClass(
-            description: String!
+            name: String!
         ): Class
 
         createGrade(
