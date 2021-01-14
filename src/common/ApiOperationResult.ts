@@ -1,8 +1,8 @@
 import ISerializable from "./ISerializable";
 
-interface ISerializedApiOperationResult
+interface ISerializedApiOperationResult<T>
 {
-    data: any;
+    data?: T;
     errors?: IApiOperationResultError[];
 }
 
@@ -12,15 +12,15 @@ interface IApiOperationResultError
     message: string;
 }
 
-export default class ApiOperationResult implements ISerializable
+export default class ApiOperationResult<T> implements ISerializable
 {
-    public data: any;
+    public data?: T;
     public errors?: IApiOperationResultError[];
 
     constructor()
     {}
 
-    public async serialize(): Promise<ISerializedApiOperationResult>
+    public async serialize(): Promise<ISerializedApiOperationResult<T>>
     {
         return {
             data: this.data,
