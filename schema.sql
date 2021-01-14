@@ -12,7 +12,7 @@ CREATE TABLE grades (
 
 	PRIMARY KEY (value, timestamp, description),
 	FOREIGN KEY (student) REFERENCES students
-	
+
 	CHECK(value > 0 And value <= 10),
 	CHECK(timestamp <= CURRENT_DATE)
 );
