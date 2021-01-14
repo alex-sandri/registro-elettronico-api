@@ -121,7 +121,7 @@ const typeDefs = gql`
 
 const resolvers: IResolvers = {
     Query: {
-        student: Resolver.init(Student.retrieve),
+        student: Resolver.init(async args => Student.retrieve(args.id)),
     },
     Mutation: {
         createClass: Resolver.init(Class.create),
