@@ -8,8 +8,10 @@ CREATE TABLE grades (
     value INT NOT NULL,
     timestamp TIMESTAMP NOT NULL,
     description VARCHAR(255) NOT NULL,
+	student VARCHAR(30) NOT NULL,
 
 	PRIMARY KEY (value, timestamp, description),
+	FOREIGN KEY (student) REFERENCES students
 	
 	CHECK(value > 0 And value <= 10),
 	CHECK(timestamp <= CURRENT_DATE)
