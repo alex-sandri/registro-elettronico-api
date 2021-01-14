@@ -24,7 +24,6 @@ interface IUpdateStudent
 
 interface ISerializedStudent
 {
-    id: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -34,7 +33,7 @@ interface ISerializedStudent
 
 export default class Student implements ISerializable
 {
-    private constructor(public id: string, public data: IStudent)
+    private constructor(public data: IStudent)
     {}
 
     public async serialize(): Promise<ISerializedStudent>
@@ -44,7 +43,6 @@ export default class Student implements ISerializable
         const { data: studentClass } = await Class.retrieve(this.data.class);
 
         return {
-            id: this.id,
             firstName: this.data.firstName,
             lastName: this.data.lastName,
             email: this.data.email,
@@ -59,9 +57,21 @@ export default class Student implements ISerializable
 
         const result = new ApiOperationResult<Student>();
 
-        const { id } = await db.collection("students").add(data);
+        const studentClass = await Class.retrieve(data.class);
 
-        result.data = new Student(id, data);
+        if (!studentClass.data)
+        {
+            result.errors = [ { id: "student/inexistent", message: "This student does not exist" } ];
+
+            return result;
+        }
+
+        await db.query(
+            "INSERT INTO students (firstName, lastName, email, password, class) VALUES (?, ?, ?, ?, ?)",
+            [ data.firstName, data.lastName, data.email, /* TODO: Encrypt password */ data.password, data.class ]
+        );
+
+        result.data = new Student(data);
 
         return result;
     }
@@ -72,9 +82,12 @@ export default class Student implements ISerializable
 
         const result = new ApiOperationResult<Student>();
 
-        const snapshot = await db.collection("students").doc(id).get();
+        const query = await db.query(
+            "SELECT * FROM students WHERE email=?",
+            [ id ]
+        );
 
-        result.data = new Student(id, snapshot.data() as IStudent);
+        result.data = new Student(query.rows[0]);
 
         return result;
     }
@@ -90,7 +103,10 @@ export default class Student implements ISerializable
         this.data.email = data.email ?? this.data.email;
         this.data.password = data.password ?? this.data.password; // TODO: Encrypt it
 
-        await db.collection("students").doc(this.id).update(this.data);
+        await db.query(
+            "UPDATE students SET firstName=?, lastName=?, email=?, password=?, class=? WHERE email=?",
+            [ data.firstName, data.lastName, data.email, data.password, data.class, this.data.email ]
+        );
 
         result.data = this;
 

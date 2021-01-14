@@ -10,20 +10,18 @@ interface ISubject
 
 interface ISerializedSubject
 {
-    id: string;
     name: string;
     description: string;
 }
 
 export default class Subject implements ISerializable
 {
-    private constructor(public id: string, public data: ISubject)
+    private constructor(public data: ISubject)
     {}
 
     public async serialize(): Promise<ISerializedSubject>
     {
         return {
-            id: this.id,
             name: this.data.name,
             description: this.data.description,
         };
@@ -35,9 +33,12 @@ export default class Subject implements ISerializable
 
         const result = new ApiOperationResult<Subject>();
 
-        const { id } = await db.collection("subjects").add(data);
+        await db.query(
+            "INSERT INTO subjects (name, description) VALUES (?, ?)",
+            [ data.name, data.description ]
+        );
 
-        result.data = new Subject(id, data);
+        result.data = new Subject(data);
 
         return result;
     }
@@ -48,9 +49,12 @@ export default class Subject implements ISerializable
 
         const result = new ApiOperationResult<Subject>();
 
-        const snapshot = await db.collection("subjects").doc(id).get();
+        const query = await db.query(
+            "SELECT * FROM subjects WHERE name=?",
+            [ id ]
+        );
 
-        result.data = new Subject(id, snapshot.data() as ISubject);
+        result.data = new Subject(query.rows[0]);
 
         return result;
     }

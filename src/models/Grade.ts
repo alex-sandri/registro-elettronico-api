@@ -38,9 +38,9 @@ export default class Grade implements ISerializable
 
         const result = new ApiOperationResult<Grade>();
 
-        const student = Student.retrieve(data.student);
+        const student = await Student.retrieve(data.student);
 
-        if (!student)
+        if (!student.data)
         {
             result.errors = [ { id: "student/inexistent", message: "This student does not exist" } ];
 

@@ -21,7 +21,6 @@ interface IUpdateTeacher
 
 interface ISerializedTeacher
 {
-    id: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -30,7 +29,7 @@ interface ISerializedTeacher
 
 export default class Teacher implements ISerializable
 {
-    private constructor(public id: string, public data: ITeacher)
+    private constructor(public data: ITeacher)
     {}
 
     public async serialize(): Promise<ISerializedTeacher>
@@ -38,7 +37,6 @@ export default class Teacher implements ISerializable
         const classes = await Class.for(this);
 
         return {
-            id: this.id,
             firstName: this.data.firstName,
             lastName: this.data.lastName,
             email: this.data.email,
@@ -52,9 +50,12 @@ export default class Teacher implements ISerializable
 
         const result = new ApiOperationResult<Teacher>();
 
-        const { id } = await db.collection("teachers").add(data);
+        await db.query(
+            "INSERT INTO teachers (firstName, lastName, email, password) VALUES (?, ?, ?, ?)",
+            [ data.firstName, data.lastName, data.email, /* TODO: Encrypt password */ data.password ]
+        );
 
-        result.data = new Teacher(id, data);
+        result.data = new Teacher(data);
 
         return result;
     }
@@ -65,9 +66,12 @@ export default class Teacher implements ISerializable
 
         const result = new ApiOperationResult<Teacher>();
 
-        const snapshot = await db.collection("teachers").doc(id).get();
+        const query = await db.query(
+            "SELECT * FROM teachers WHERE email=?",
+            [ id ]
+        );
 
-        result.data = new Teacher(id, snapshot.data() as ITeacher);
+        result.data = new Teacher(query.rows[0]);
 
         return result;
     }
@@ -83,7 +87,10 @@ export default class Teacher implements ISerializable
         this.data.email = data.email ?? this.data.email;
         this.data.password = data.password ?? this.data.password; // TODO: Encrypt it
 
-        await db.collection("teachers").doc(this.id).update(this.data);
+        await db.query(
+            "UPDATE teachers SET firstName=?, lastName=?, email=?, password=? WHERE email=?",
+            [ data.firstName, data.lastName, data.email, data.password, this.data.email ]
+        );
 
         result.data = this;
 
