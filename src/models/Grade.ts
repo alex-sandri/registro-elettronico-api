@@ -44,7 +44,9 @@ export default class Grade implements ISerializable
 
         if (!student)
         {
-            return null;
+            result.errors = [ { id: "student/inexistent", message: "This student does not exist" } ];
+
+            return result;
         }
 
         const { id } = await db.collection("grades").add(data);
