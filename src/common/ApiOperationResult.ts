@@ -17,9 +17,6 @@ export default class ApiOperationResult<T extends ISerializable> implements ISer
     public data?: T;
     public errors?: IApiOperationResultError[];
 
-    constructor()
-    {}
-
     public async serialize(): Promise<ISerializedApiOperationResult>
     {
         return {

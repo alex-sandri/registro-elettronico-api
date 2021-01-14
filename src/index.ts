@@ -135,12 +135,7 @@ const resolvers: IResolvers = {
 
             return createdClass.serialize();
         }).use,
-        createGrade: new Resolver(async args =>
-        {
-            const grade = await Grade.create(args);
-
-            return grade.serialize();
-        }).use,
+        createGrade: new Resolver(Grade.create).use,
         createStudent: new Resolver(async args =>
         {
             const student = await Student.create(args);
