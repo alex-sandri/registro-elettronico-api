@@ -65,7 +65,7 @@ export default class Class implements ISerializable
 
         const query = await db.query(
             "SELECT * FROM classes_teachers WHERE teacher=?",
-            [ teacher.id ]
+            [ teacher.data.email ]
         );
 
         for (const row of query.rows)

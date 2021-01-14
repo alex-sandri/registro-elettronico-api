@@ -65,7 +65,7 @@ export default class Grade implements ISerializable
 
         const query = await db.query(
             "SELECT * FROM grades WHERE student=?",
-            [ student.id ]
+            [ student.data.email ]
         );
 
         for (const row of query.rows)
