@@ -2,7 +2,7 @@ import ISerializable from "./ISerializable";
 
 interface ISerializedApiOperationResult<T>
 {
-    data?: T;
+    data?: T & ISerializable;
     errors?: IApiOperationResultError[];
 }
 
@@ -12,7 +12,7 @@ interface IApiOperationResultError
     message: string;
 }
 
-export default class ApiOperationResult<T> implements ISerializable
+export default class ApiOperationResult<T extends ISerializable> implements ISerializable
 {
     public data?: T;
     public errors?: IApiOperationResultError[];

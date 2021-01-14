@@ -1,4 +1,5 @@
 import { firestore } from "firebase-admin";
+import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 import Student from "./Student";
 
@@ -35,8 +36,10 @@ export default class Grade implements ISerializable
         };
     }
 
-    public static async create(data: IGrade): Promise<Grade>
+    public static async create(data: IGrade): Promise<ApiOperationResult<Grade>>
     {
+        const result = new ApiOperationResult<Grade>();
+
         const student = Student.retrieve(data.student);
 
         if (!student)
@@ -46,7 +49,9 @@ export default class Grade implements ISerializable
 
         const { id } = await db.collection("grades").add(data);
 
-        return new Grade(id, data);
+        result.data = new Grade(id, data);
+
+        return result;
     }
 
     public static async for(student: Student): Promise<Grade[]>
