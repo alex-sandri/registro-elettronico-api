@@ -17,6 +17,13 @@ export default class Resolver<T extends ISerializable>
     {
         const result = await this.callback(args);
 
-        return result.serialize();
+        console.log(result);
+
+        if (!result.data)
+        {
+            throw result.errors;
+        }
+
+        return result.data.serialize();
     }
 }
