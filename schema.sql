@@ -8,7 +8,7 @@ CREATE TABLE grades (
     value INT NOT NULL,
     timestamp TIMESTAMP NOT NULL,
     description VARCHAR(255) NOT NULL,
-	student VARCHAR(30) NOT NULL,
+	student VARCHAR(255) NOT NULL,
 
 	PRIMARY KEY (value, timestamp, description),
 	FOREIGN KEY (student) REFERENCES students
