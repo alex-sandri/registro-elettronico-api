@@ -37,6 +37,13 @@ export default class Grade implements ISerializable
 
     public static async create(data: IGrade): Promise<Grade>
     {
+        const student = Student.retrieve(data.student);
+
+        if (!student)
+        {
+            return null;
+        }
+
         const { id } = await db.collection("grades").add(data);
 
         return new Grade(id, data);
