@@ -16,21 +16,18 @@ const typeDefs = gql`
 
     type Class
     {
-        id: ID!
-        description: String!
+        name: String!
     }
 
     type Grade
     {
-        id: ID!
         value: Float!
         date: Date!
-        description: String
+        description: String!
     }
 
     type Student
     {
-        id: ID!
         firstName: String!
         lastName: String!
         email: Email!
@@ -40,14 +37,12 @@ const typeDefs = gql`
 
     type Subject
     {
-        id: ID!
         name: String!
-        description: String
+        description: String!
     }
 
     type Teacher
     {
-        id: ID!
         firstName: String!
         lastName: String!
         email: Email!
@@ -66,10 +61,11 @@ const typeDefs = gql`
         ): Class
 
         createGrade(
-            student: String!
             value: Float!
             date: Date!
             description: String
+
+            student: String!
         ): Grade
 
         createStudent(
@@ -77,15 +73,16 @@ const typeDefs = gql`
             lastName: String!
             email: Email!
             password: Password!
+
             class: String!
         ): Student
 
         updateStudent(
-            id: ID!,
             firstName: String
             lastName: String
-            email: Email
+            email: Email!
             password: Password
+
             class: String
         ): Student
 
@@ -102,10 +99,9 @@ const typeDefs = gql`
         ): Teacher
 
         updateTeacher(
-            id: ID!,
             firstName: String
             lastName: String
-            email: Email
+            email: Email!
             password: Password
         ): Teacher
     }
