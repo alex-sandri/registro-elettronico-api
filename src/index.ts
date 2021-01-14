@@ -129,19 +129,9 @@ const resolvers: IResolvers = {
         }).use,
     },
     Mutation: {
-        createClass: new Resolver(async args =>
-        {
-            const createdClass = await Class.create(args);
-
-            return createdClass.serialize();
-        }).use,
+        createClass: new Resolver(Class.create).use,
         createGrade: new Resolver(Grade.create).use,
-        createStudent: new Resolver(async args =>
-        {
-            const student = await Student.create(args);
-
-            return student.serialize();
-        }).use,
+        createStudent: new Resolver(Student.create).use,
         updateStudent: new Resolver(async args =>
         {
             const student = await Student.retrieve(args.id);
@@ -156,21 +146,11 @@ const resolvers: IResolvers = {
 
             return student.serialize();
         }).use,
-        createSubject: new Resolver(async args =>
-        {
-            const subject = await Subject.create(args);
-
-            return subject.serialize();
-        }).use,
-        createTeacher: new Resolver(async args =>
-        {
-            const teacher = await Teacher.create(args);
-
-            return teacher.serialize();
-        }).use,
+        createSubject: new Resolver(Subject.create).use,
+        createTeacher: new Resolver(Teacher.create).use,
         updateTeacher: new Resolver(async args =>
         {
-            const teacher = await Teacher.create({
+            const teacher = await Teacher.update({
                 firstName: args.firstName,
                 lastName: args.lastName,
                 email: args.email,

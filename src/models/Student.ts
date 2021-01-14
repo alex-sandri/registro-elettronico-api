@@ -1,4 +1,5 @@
 import { firestore } from "firebase-admin";
+import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 import Class, { ISerializedClass } from "./Class";
 import Grade, { ISerializedGrade } from "./Grade";
@@ -42,7 +43,7 @@ export default class Student implements ISerializable
     {
         const grades = await Grade.for(this);
 
-        const studentClass = await Class.retrieve(this.data.class);
+        const { data: studentClass } = await Class.retrieve(this.data.class);
 
         return {
             id: this.id,
@@ -50,26 +51,36 @@ export default class Student implements ISerializable
             lastName: this.data.lastName,
             email: this.data.email,
             grades: await Promise.all(grades.map(_ => _.serialize())),
-            class: await studentClass.serialize(),
+            class: await studentClass!.serialize(),
         };
     }
 
-    public static async create(data: IStudent): Promise<Student>
+    public static async create(data: IStudent): Promise<ApiOperationResult<Student>>
     {
+        const result = new ApiOperationResult<Student>();
+
         const { id } = await db.collection("students").add(data);
 
-        return new Student(id, data);
+        result.data = new Student(id, data);
+
+        return result;
     }
 
-    public static async retrieve(id: string): Promise<Student>
+    public static async retrieve(id: string): Promise<ApiOperationResult<Student>>
     {
+        const result = new ApiOperationResult<Student>();
+
         const snapshot = await db.collection("students").doc(id).get();
 
-        return new Student(id, snapshot.data() as IStudent);
+        result.data = new Student(id, snapshot.data() as IStudent);
+
+        return result;
     }
 
-    public async update(data: IUpdateStudent): Promise<Student>
+    public async update(data: IUpdateStudent): Promise<ApiOperationResult<Student>>
     {
+        const result = new ApiOperationResult<Student>();
+
         this.data.firstName = data.firstName ?? this.data.firstName;
         this.data.lastName = data.lastName ?? this.data.lastName;
         this.data.email = data.email ?? this.data.email;
@@ -77,6 +88,8 @@ export default class Student implements ISerializable
 
         await db.collection("students").doc(this.id).update(this.data);
 
-        return this;
+        result.data = this;
+
+        return result;
     }
 }

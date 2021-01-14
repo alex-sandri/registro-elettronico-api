@@ -1,4 +1,5 @@
 import { firestore } from "firebase-admin";
+import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 import Teacher from "./Teacher";
 
@@ -28,18 +29,26 @@ export default class Class implements ISerializable
         };
     }
 
-    public static async create(data: IClass): Promise<Class>
+    public static async create(data: IClass): Promise<ApiOperationResult<Class>>
     {
+        const result = new ApiOperationResult<Class>();
+
         const { id } = await db.collection("classes").add(data);
 
-        return new Class(id, data);
+        result.data = new Class(id, data);
+
+        return result;
     }
 
-    public static async retrieve(id: string): Promise<Class>
+    public static async retrieve(id: string): Promise<ApiOperationResult<Class>>
     {
+        const result = new ApiOperationResult<Class>();
+
         const snapshot = await db.collection("classes").doc(id).get();
 
-        return new Class(id, snapshot.data() as IClass);
+        result.data = new Class(id, snapshot.data() as IClass);
+
+        return result;
     }
 
     public static async for(teacher: Teacher): Promise<Class[]>

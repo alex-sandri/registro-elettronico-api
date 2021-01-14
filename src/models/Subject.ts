@@ -1,4 +1,5 @@
 import { firestore } from "firebase-admin";
+import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 
 const db = firestore();
@@ -30,17 +31,25 @@ export default class Subject implements ISerializable
         };
     }
 
-    public static async create(data: ISubject): Promise<Subject>
+    public static async create(data: ISubject): Promise<ApiOperationResult<Subject>>
     {
+        const result = new ApiOperationResult<Subject>();
+
         const { id } = await db.collection("subjects").add(data);
 
-        return new Subject(id, data);
+        result.data = new Subject(id, data);
+
+        return result;
     }
 
-    public static async retrieve(id: string): Promise<Subject>
+    public static async retrieve(id: string): Promise<ApiOperationResult<Subject>>
     {
+        const result = new ApiOperationResult<Subject>();
+
         const snapshot = await db.collection("subjects").doc(id).get();
 
-        return new Subject(id, snapshot.data() as ISubject);
+        result.data = new Subject(id, snapshot.data() as ISubject);
+
+        return result;
     }
 }
