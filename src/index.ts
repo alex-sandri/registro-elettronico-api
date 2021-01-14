@@ -121,13 +121,13 @@ const typeDefs = gql`
 
 const resolvers: IResolvers = {
     Query: {
-        student: new Resolver(Student.retrieve).use,
+        student: Resolver.init(Student.retrieve),
     },
     Mutation: {
-        createClass: new Resolver(Class.create).use,
-        createGrade: new Resolver(Grade.create).use,
-        createStudent: new Resolver(Student.create).use,
-        updateStudent: new Resolver(async args =>
+        createClass: Resolver.init(Class.create),
+        createGrade: Resolver.init(Grade.create),
+        createStudent: Resolver.init(Student.create),
+        updateStudent: Resolver.init(async args =>
         {
             const result = await Student.retrieve(args.id);
 
@@ -143,10 +143,10 @@ const resolvers: IResolvers = {
                 password: args.password,
                 class: args.class,
             });
-        }).use,
-        createSubject: new Resolver(Subject.create).use,
-        createTeacher: new Resolver(Teacher.create).use,
-        updateTeacher: new Resolver(async args =>
+        }),
+        createSubject: Resolver.init(Subject.create),
+        createTeacher: Resolver.init(Teacher.create),
+        updateTeacher: Resolver.init(async args =>
         {
             const result = await Teacher.retrieve(args.id);
 
@@ -161,7 +161,7 @@ const resolvers: IResolvers = {
                 email: args.email,
                 password: args.password,
             });
-        }).use,
+        }),
     },
     Date: GraphQLDate,
     Email: GraphQLEmail,
