@@ -1,14 +1,6 @@
-import * as admin from "firebase-admin";
 import { ApolloServer, gql, IResolvers } from "apollo-server";
 import { GraphQLDate } from "graphql-iso-date";
 import { GraphQLEmail, GraphQLPassword } from "graphql-custom-types";
-
-const serviceAccount = require("./service-account.json");
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://registro--elettronico.firebaseio.com",
-});
 
 import Student from "./models/Student";
 import Grade from "./models/Grade";
