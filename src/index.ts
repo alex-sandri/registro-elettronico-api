@@ -121,12 +121,7 @@ const typeDefs = gql`
 
 const resolvers: IResolvers = {
     Query: {
-        student: new Resolver(async args =>
-        {
-            const student = await Student.retrieve(args.id);
-
-            return student.serialize();
-        }).use,
+        student: new Resolver(Student.retrieve).use,
     },
     Mutation: {
         createClass: new Resolver(Class.create).use,
@@ -134,30 +129,42 @@ const resolvers: IResolvers = {
         createStudent: new Resolver(Student.create).use,
         updateStudent: new Resolver(async args =>
         {
-            const student = await Student.retrieve(args.id);
+            const { data: student } = await Student.retrieve(args.id);
 
-            await student.update({
+            if (!student)
+            {
+                // TODO
+
+                return;
+            }
+
+            return student.update({
                 firstName: args.firstName,
                 lastName: args.lastName,
                 email: args.email,
                 password: args.password,
                 class: args.class,
             });
-
-            return student.serialize();
         }).use,
         createSubject: new Resolver(Subject.create).use,
         createTeacher: new Resolver(Teacher.create).use,
         updateTeacher: new Resolver(async args =>
         {
-            const teacher = await Teacher.update({
+            const { data: teacher } = await Teacher.retrieve(args.id);
+
+            if (!teacher)
+            {
+                // TODO
+
+                return;
+            }
+
+            return teacher.update({
                 firstName: args.firstName,
                 lastName: args.lastName,
                 email: args.email,
                 password: args.password,
             });
-
-            return teacher.serialize();
         }).use,
     },
     Date: GraphQLDate,
