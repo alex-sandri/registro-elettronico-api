@@ -1,7 +1,7 @@
 import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 import Database from "../utilities/Database";
-import Class, { ISerializedClass } from "./Class";
+import Teaching, { ISerializedTeaching } from "./Teaching";
 
 interface ITeacher
 {
@@ -24,7 +24,7 @@ export interface ISerializedTeacher
     firstName: string;
     lastName: string;
     email: string;
-    classes: ISerializedClass[];
+    teachings: ISerializedTeaching[];
 }
 
 export default class Teacher implements ISerializable
@@ -34,13 +34,13 @@ export default class Teacher implements ISerializable
 
     public async serialize(): Promise<ISerializedTeacher>
     {
-        const classes = await Class.for(this);
+        const teachings = await Teaching.for(this);
 
         return {
             firstName: this.data.firstName,
             lastName: this.data.lastName,
             email: this.data.email,
-            classes: await Promise.all(classes.map(_ => _.serialize())),
+            teachings: await Promise.all(teachings.map(_ => _.serialize())),
         };
     }
 
