@@ -63,7 +63,7 @@ const typeDefs = gql`
         createGrade(
             value: Float!
             date: Date!
-            description: String
+            description: String!
 
             student: String!
         ): Grade
@@ -88,7 +88,7 @@ const typeDefs = gql`
 
         createSubject(
             name: String!
-            description: String
+            description: String!
         ): Subject
 
         createTeacher(
