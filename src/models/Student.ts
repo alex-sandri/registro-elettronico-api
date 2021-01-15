@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import ISerializable from "../common/ISerializable";
+import Utilities from "../utilities/Utilities";
 import Class, { ISerializedClass } from "./Class";
 import Grade, { ISerializedGrade } from "./Grade";
 
@@ -59,7 +60,7 @@ export default class Student implements ISerializable
                 firstName: data.firstName,
                 lastName: data.lastName,
                 email: data.email,
-                password: data.password, // TODO: Encrypt
+                password: Utilities.hash(data.password),
                 Class: {
                     connect: {
                         name: data.class,
@@ -93,10 +94,17 @@ export default class Student implements ISerializable
     {
         const db = new PrismaClient();
 
+        let password: string | undefined;
+
+        if (data.password)
+        {
+            password = Utilities.hash(data.password);
+        }
+
         this.data.firstName = data.firstName ?? this.data.firstName;
         this.data.lastName = data.lastName ?? this.data.lastName;
         this.data.email = data.email ?? this.data.email;
-        this.data.password = data.password ?? this.data.password; // TODO: Encrypt it
+        this.data.password = password ?? this.data.password;
 
         await db.student.update({
             where: {
