@@ -60,6 +60,8 @@ const typeDefs = gql`
     type Query
     {
         student(id: ID!): Student
+
+        teacher(id: ID!): Teacher
     }
 
     type Mutation
@@ -124,6 +126,7 @@ const typeDefs = gql`
 const resolvers: IResolvers = {
     Query: {
         student: Resolver.init(async args => Student.retrieve(args.id)),
+        teacher: Resolver.init(async args => Teacher.retrieve(args.id)),
     },
     Mutation: {
         createClass: Resolver.init(Class.create),
