@@ -60,7 +60,7 @@ export default class Teaching implements ISerializable
         const classes: Teaching[] = [];
 
         const query = await db.query(
-            "SELECT * FROM teachings WHERE teacher=$1", // TODO: JOIN
+            "SELECT * FROM teachings WHERE teacher=$1",
             [ teacher.data.email ]
         );
 
