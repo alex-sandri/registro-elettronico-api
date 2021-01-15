@@ -56,23 +56,4 @@ export default class Class implements ISerializable
 
         return result;
     }
-
-    public static async for(teacher: Teacher): Promise<Class[]>
-    {
-        const db = await Database.connect();
-
-        const classes: Class[] = [];
-
-        const query = await db.query(
-            "SELECT * FROM classes_teachers WHERE teacher=$1",
-            [ teacher.data.email ]
-        );
-
-        for (const row of query.rows)
-        {
-            classes.push(new Class(row));
-        }
-
-        return classes;
-    }
 }
