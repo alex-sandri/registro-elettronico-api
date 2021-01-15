@@ -1,7 +1,6 @@
 import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 import Database from "../utilities/Database";
-import Teacher from "./Teacher";
 
 interface IClass
 {
