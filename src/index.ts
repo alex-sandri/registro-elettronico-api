@@ -72,7 +72,7 @@ const typeDefs = gql`
 
         createGrade(
             value: Float!
-            date: Date!
+            timestamp: Date!
             description: String!
 
             student: String!
