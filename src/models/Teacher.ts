@@ -19,7 +19,7 @@ interface IUpdateTeacher
     password?: string;
 }
 
-interface ISerializedTeacher
+export interface ISerializedTeacher
 {
     firstName: string;
     lastName: string;

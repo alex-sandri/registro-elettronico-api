@@ -49,6 +49,13 @@ const typeDefs = gql`
         classes: [Class!]!
     }
 
+    type Teaching
+    {
+        teacher: Teacher!
+        class: Class!
+        subject: Subject!
+    }
+
     type Query
     {
         student(id: ID!): Student

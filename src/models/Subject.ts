@@ -8,7 +8,7 @@ interface ISubject
     description: string;
 }
 
-interface ISerializedSubject
+export interface ISerializedSubject
 {
     name: string;
     description: string;
