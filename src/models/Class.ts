@@ -1,6 +1,6 @@
+import { PrismaClient } from "@prisma/client";
 import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
-import Database from "../utilities/Database";
 
 interface IClass
 {
@@ -26,14 +26,15 @@ export default class Class implements ISerializable
 
     public static async create(data: IClass): Promise<ApiOperationResult<Class>>
     {
-        const db = await Database.connect();
+        const db = new PrismaClient();
 
         const result = new ApiOperationResult<Class>();
 
-        await db.query(
-            "INSERT INTO classes (name) VALUES ($1)",
-            [ data.name ]
-        );
+        await db.class.create({
+            data: {
+                name: data.name,
+            },
+        });
 
         result.data = new Class(data);
 
@@ -42,23 +43,24 @@ export default class Class implements ISerializable
 
     public static async retrieve(id: string): Promise<ApiOperationResult<Class>>
     {
-        const db = await Database.connect();
+        const db = new PrismaClient();
 
         const result = new ApiOperationResult<Class>();
 
-        const query = await db.query(
-            "SELECT * FROM classes WHERE name=$1",
-            [ id ]
-        );
+        const retrievedClass = await db.class.findUnique({
+            where: {
+                name: id,
+            },
+        });
 
-        if (query.rowCount === 0)
+        if (!retrievedClass)
         {
             result.errors = [ { id: "class/inexistent", message: "This class does not exist" } ];
 
             return result;
         }
 
-        result.data = new Class(query.rows[0]);
+        result.data = new Class(retrievedClass);
 
         return result;
     }

@@ -1,6 +1,6 @@
+import { PrismaClient } from "@prisma/client";
 import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
-import Database from "../utilities/Database";
 import Class, { ISerializedClass } from "./Class";
 import Subject, { ISerializedSubject } from "./Subject";
 import Teacher from "./Teacher";
@@ -36,14 +36,29 @@ export default class Teaching implements ISerializable
 
     public static async create(data: ITeaching): Promise<ApiOperationResult<Teaching>>
     {
-        const db = await Database.connect();
+        const db = new PrismaClient();
 
         const result = new ApiOperationResult<Teaching>();
 
-        await db.query(
-            "INSERT INTO teachings (teacher, class, subject) VALUES ($1, $2, $3)",
-            [ data.teacher, data.class, data.subject ]
-        );
+        await db.teaching.create({
+            data: {
+                Class: {
+                    connect: {
+                        name: data.class,
+                    },
+                },
+                Subject: {
+                    connect: {
+                        name: data.subject,
+                    },
+                },
+                Teacher: {
+                    connect: {
+                        email: data.teacher,
+                    },
+                },
+            },
+        });
 
         result.data = new Teaching(data);
 
@@ -52,20 +67,14 @@ export default class Teaching implements ISerializable
 
     public static async for(teacher: Teacher): Promise<Teaching[]>
     {
-        const db = await Database.connect();
+        const db = new PrismaClient();
 
-        const classes: Teaching[] = [];
+        const classes = await db.teaching.findMany({
+            where: {
+                teacher: teacher.data.email,
+            },
+        });
 
-        const query = await db.query(
-            "SELECT * FROM teachings WHERE teacher=$1",
-            [ teacher.data.email ]
-        );
-
-        for (const row of query.rows)
-        {
-            classes.push(new Teaching(row));
-        }
-
-        return classes;
+        return classes.map(_ => new Teaching(_));
     }
 }

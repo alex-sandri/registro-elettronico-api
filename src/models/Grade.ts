@@ -1,20 +1,20 @@
+import { PrismaClient } from "@prisma/client";
 import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
-import Database from "../utilities/Database";
 import Student from "./Student";
 
 interface IGrade
 {
     student: string;
     value: number;
-    date: Date;
+    timestamp: Date;
     description: string;
 }
 
 export interface ISerializedGrade
 {
     value: number;
-    date: Date;
+    timestamp: Date;
     description: string;
 }
 
@@ -27,14 +27,14 @@ export default class Grade implements ISerializable
     {
         return {
             value: this.data.value,
-            date: this.data.date,
+            timestamp: this.data.timestamp,
             description: this.data.description,
         };
     }
 
     public static async create(data: IGrade): Promise<ApiOperationResult<Grade>>
     {
-        const db = await Database.connect();
+        const db = new PrismaClient();
 
         const result = new ApiOperationResult<Grade>();
 
@@ -47,10 +47,18 @@ export default class Grade implements ISerializable
             return result;
         }
 
-        await db.query(
-            "INSERT INTO grades (value, date, description, student) VALUES ($1, $2, $3, $4)",
-            [ data.value, data.date, data.description, data.student ]
-        );
+        await db.grade.create({
+            data: {
+                value: data.value,
+                timestamp: data.timestamp,
+                description: data.description,
+                Student: {
+                    connect: {
+                        email: data.student,
+                    },
+                },
+            },
+        });
 
         result.data = new Grade(data);
 
@@ -59,20 +67,14 @@ export default class Grade implements ISerializable
 
     public static async for(student: Student): Promise<Grade[]>
     {
-        const db = await Database.connect();
+        const db = new PrismaClient();
 
-        const grades: Grade[] = [];
+        const grades = await db.grade.findMany({
+            where: {
+                student: student.data.email,
+            },
+        });
 
-        const query = await db.query(
-            "SELECT * FROM grades WHERE student=$1",
-            [ student.data.email ]
-        );
-
-        for (const row of query.rows)
-        {
-            grades.push(new Grade(row));
-        }
-
-        return grades;
+        return grades.map(_ => new Grade(_));
     }
 }

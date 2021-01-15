@@ -1,6 +1,6 @@
+import { PrismaClient } from "@prisma/client";
 import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
-import Database from "../utilities/Database";
 import Class, { ISerializedClass } from "./Class";
 import Grade, { ISerializedGrade } from "./Grade";
 
@@ -53,7 +53,7 @@ export default class Student implements ISerializable
 
     public static async create(data: IStudent): Promise<ApiOperationResult<Student>>
     {
-        const db = await Database.connect();
+        const db = new PrismaClient();
 
         const result = new ApiOperationResult<Student>();
 
@@ -66,10 +66,19 @@ export default class Student implements ISerializable
             return result;
         }
 
-        await db.query(
-            "INSERT INTO students (firstName, lastName, email, password, class) VALUES ($1, $2, $3, $4, $5)",
-            [ data.firstName, data.lastName, data.email, /* TODO: Encrypt password */ data.password, data.class ]
-        );
+        await db.student.create({
+            data: {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                password: data.password, // TODO: Encrypt
+                Class: {
+                    connect: {
+                        name: data.class,
+                    },
+                },
+            },
+        });
 
         result.data = new Student(data);
 
@@ -78,30 +87,31 @@ export default class Student implements ISerializable
 
     public static async retrieve(id: string): Promise<ApiOperationResult<Student>>
     {
-        const db = await Database.connect();
+        const db = new PrismaClient();
 
         const result = new ApiOperationResult<Student>();
 
-        const query = await db.query(
-            "SELECT * FROM students WHERE email=$1",
-            [ id ]
-        );
+        const retrievedStudent = await db.student.findUnique({
+            where: {
+                email: id,
+            },
+        });
 
-        if (query.rowCount === 0)
+        if (!retrievedStudent)
         {
             result.errors = [ { id: "student/inexistent", message: "This student does not exist" } ];
 
             return result;
         }
 
-        result.data = new Student(query.rows[0]);
+        result.data = new Student(retrievedStudent);
 
         return result;
     }
 
     public async update(data: IUpdateStudent): Promise<ApiOperationResult<Student>>
     {
-        const db = await Database.connect();
+        const db = new PrismaClient();
 
         const result = new ApiOperationResult<Student>();
 
@@ -110,10 +120,22 @@ export default class Student implements ISerializable
         this.data.email = data.email ?? this.data.email;
         this.data.password = data.password ?? this.data.password; // TODO: Encrypt it
 
-        await db.query(
-            "UPDATE students SET firstName=$1, lastName=$2, email=$3, password=$4, class=$5 WHERE email=$6",
-            [ data.firstName, data.lastName, data.email, data.password, data.class, this.data.email ]
-        );
+        await db.student.update({
+            where: {
+                email: this.data.email,
+            },
+            data: {
+                firstName: this.data.firstName,
+                lastName: this.data.lastName,
+                email: this.data.email,
+                password: this.data.password,
+                Class: {
+                    connect: {
+                        name: this.data.class,
+                    },
+                },
+            },
+        });
 
         result.data = this;
 

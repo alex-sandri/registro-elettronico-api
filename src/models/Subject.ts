@@ -1,6 +1,6 @@
+import { PrismaClient } from "@prisma/client";
 import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
-import Database from "../utilities/Database";
 
 interface ISubject
 {
@@ -29,14 +29,16 @@ export default class Subject implements ISerializable
 
     public static async create(data: ISubject): Promise<ApiOperationResult<Subject>>
     {
-        const db = await Database.connect();
+        const db = new PrismaClient();
 
         const result = new ApiOperationResult<Subject>();
 
-        await db.query(
-            "INSERT INTO subjects (name, description) VALUES ($1, $2)",
-            [ data.name, data.description ]
-        );
+        await db.subject.create({
+            data: {
+                name: data.name,
+                description: data.description,
+            },
+        });
 
         result.data = new Subject(data);
 
@@ -45,16 +47,22 @@ export default class Subject implements ISerializable
 
     public static async retrieve(id: string): Promise<ApiOperationResult<Subject>>
     {
-        const db = await Database.connect();
+        const db = new PrismaClient();
 
         const result = new ApiOperationResult<Subject>();
 
-        const query = await db.query(
-            "SELECT * FROM subjects WHERE name=$1",
-            [ id ]
-        );
+        const subject = await db.subject.findUnique({
+            where: {
+                name: id,
+            },
+        });
 
-        result.data = new Subject(query.rows[0]);
+        if (!subject)
+        {
+            throw new Error("This subject does not exist");
+        }
+
+        result.data = new Subject(subject);
 
         return result;
     }

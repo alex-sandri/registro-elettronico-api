@@ -23,7 +23,7 @@ const typeDefs = gql`
     type Grade
     {
         value: Float!
-        date: Date!
+        timestamp: Date!
         description: String!
     }
 

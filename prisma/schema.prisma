@@ -7,53 +7,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model classes {
-  name      String      @id
-  students  students[]
-  teachings teachings[]
+model Class {
+  name     String     @id
+  Student  Student[]
+  Teaching Teaching[]
 }
 
-model grades {
+model Grade {
   value       Int
   timestamp   DateTime
   description String
   student     String
-  students    students @relation(fields: [student], references: [email])
+  Student     Student  @relation(fields: [student], references: [email])
 
-  @@id([value, timestamp, description])
+  @@id([value, timestamp, description, student])
 }
 
-model students {
-  firstname String
-  lastname  String
-  email     String   @id
+model Student {
+  firstName String
+  lastName  String
+  email     String  @id
   password  String
   class     String
-  classes   classes  @relation(fields: [class], references: [name])
-  grades    grades[]
+  Class     Class   @relation(fields: [class], references: [name])
+  Grade     Grade[]
 }
 
-model subjects {
-  name        String      @id
+model Subject {
+  name        String     @id
   description String
-  teachings   teachings[]
+  Teaching    Teaching[]
 }
 
-model teachers {
-  firstname String
-  lastname  String
-  email     String      @id
+model Teacher {
+  firstName String
+  lastName  String
+  email     String     @id
   password  String
-  teachings teachings[]
+  Teaching  Teaching[]
 }
 
-model teachings {
-  teacher  String
-  class    String
-  subject  String
-  classes  classes  @relation(fields: [class], references: [name])
-  subjects subjects @relation(fields: [subject], references: [name])
-  teachers teachers @relation(fields: [teacher], references: [email])
+model Teaching {
+  teacher String
+  class   String
+  subject String
+  Class   Class   @relation(fields: [class], references: [name])
+  Subject Subject @relation(fields: [subject], references: [name])
+  Teacher Teacher @relation(fields: [teacher], references: [email])
 
   @@id([class, teacher, subject])
 }
