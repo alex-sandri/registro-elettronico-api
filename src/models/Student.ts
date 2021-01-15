@@ -99,9 +99,7 @@ export default class Student implements ISerializable
 
         if (!retrievedStudent)
         {
-            result.errors = [ { id: "student/inexistent", message: "This student does not exist" } ];
-
-            return result;
+            throw new Error("This student does not exist");
         }
 
         result.data = new Student(retrievedStudent);

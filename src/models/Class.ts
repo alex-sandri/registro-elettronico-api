@@ -55,9 +55,7 @@ export default class Class implements ISerializable
 
         if (!retrievedClass)
         {
-            result.errors = [ { id: "class/inexistent", message: "This class does not exist" } ];
-
-            return result;
+            throw new Error("This class does not exist");
         }
 
         result.data = new Class(retrievedClass);
