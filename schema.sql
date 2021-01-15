@@ -4,6 +4,15 @@ CREATE TABLE classes (
 	PRIMARY KEY (name)
 );
 
+CREATE TABLE classes_teachers (
+	class VARCHAR(30) NOT NULL,
+	teacher VARCHAR(255) NOT NULL,
+
+	PRIMARY KEY (class, teacher),
+	FOREIGN KEY (class) REFERENCES classes,
+	FOREIGN KEY (teacher) REFERENCES teachers
+);
+
 CREATE TABLE grades (
     value INT NOT NULL,
     timestamp TIMESTAMP NOT NULL,
