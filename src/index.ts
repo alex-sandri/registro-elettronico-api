@@ -8,6 +8,7 @@ import Class from "./models/Class";
 import Subject from "./models/Subject";
 import Teacher from "./models/Teacher";
 import Resolver from "./utilities/Resolver";
+import Teaching from "./models/Teaching";
 
 const typeDefs = gql`
     scalar Date
@@ -111,6 +112,12 @@ const typeDefs = gql`
             email: Email!
             password: Password
         ): Teacher
+
+        createTeaching(
+            teacher: String!
+            class: String!
+            subject: String!
+        ): Teaching
     }
 `;
 
@@ -157,6 +164,7 @@ const resolvers: IResolvers = {
                 password: args.password,
             });
         }),
+        createTeaching: Resolver.init(Teaching.create),
     },
     Date: GraphQLDate,
     Email: GraphQLEmail,
