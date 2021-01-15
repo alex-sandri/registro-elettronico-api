@@ -6,9 +6,9 @@ import { Client } from "pg";
 
 export default class Database
 {
-    public client: Client;
+    public static client: Client;
 
-    private constructor()
+    private static init(): void
     {
         const user = process.env.DB_USER;
         const host = process.env.DB_HOST;
@@ -37,7 +37,7 @@ export default class Database
             throw new Error("DB_PORT is required in .env");
         }
 
-        this.client = new Client({
+        Database.client ??= new Client({
             user,
             host,
             database,
@@ -48,10 +48,13 @@ export default class Database
 
     public static async connect(): Promise<Client>
     {
-        const client = new Database().client;
+        if (!Database.client)
+        {
+            Database.init();
 
-        await client.connect();
+            await Database.client!.connect();
+        }
 
-        return client;
+        return Database.client;
     }
 }
