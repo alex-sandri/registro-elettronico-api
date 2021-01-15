@@ -134,7 +134,7 @@ const resolvers: IResolvers = {
         createStudent: Resolver.init(Student.create),
         updateStudent: Resolver.init(async args =>
         {
-            const student = await Student.retrieve(args.id);
+            const student = await Student.retrieve(args.email);
 
             return student.update({
                 firstName: args.firstName,
@@ -148,7 +148,7 @@ const resolvers: IResolvers = {
         createTeacher: Resolver.init(Teacher.create),
         updateTeacher: Resolver.init(async args =>
         {
-            const teacher = await Teacher.retrieve(args.id);
+            const teacher = await Teacher.retrieve(args.email);
 
             return teacher.update({
                 firstName: args.firstName,
