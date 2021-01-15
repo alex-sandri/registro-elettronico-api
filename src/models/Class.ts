@@ -51,6 +51,13 @@ export default class Class implements ISerializable
             [ id ]
         );
 
+        if (query.rowCount === 0)
+        {
+            result.errors = [ { id: "class/inexistent", message: "This class does not exist" } ];
+
+            return result;
+        }
+
         result.data = new Class(query.rows[0]);
 
         return result;

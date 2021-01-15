@@ -61,7 +61,7 @@ export default class Student implements ISerializable
 
         if (!studentClass.data)
         {
-            result.errors = [ { id: "class/inexistent", message: "This class does not exist" } ];
+            result.errors = studentClass.errors;
 
             return result;
         }
@@ -86,6 +86,13 @@ export default class Student implements ISerializable
             "SELECT * FROM students WHERE email=$1",
             [ id ]
         );
+
+        if (query.rowCount === 0)
+        {
+            result.errors = [ { id: "student/inexistent", message: "This student does not exist" } ];
+
+            return result;
+        }
 
         result.data = new Student(query.rows[0]);
 

@@ -42,7 +42,7 @@ export default class Grade implements ISerializable
 
         if (!student.data)
         {
-            result.errors = [ { id: "student/inexistent", message: "This student does not exist" } ];
+            result.errors = student.errors;
 
             return result;
         }

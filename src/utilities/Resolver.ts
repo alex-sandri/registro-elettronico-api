@@ -19,7 +19,14 @@ export default class Resolver<T extends ISerializable>
 
         if (!result.data)
         {
-            throw result.errors;
+            if (!result.errors)
+            {
+                return;
+            }
+
+            const error = result.errors[0];
+
+            throw new Error(error.message);
         }
 
         return result.data.serialize();
