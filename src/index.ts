@@ -46,7 +46,7 @@ const typeDefs = gql`
         firstName: String!
         lastName: String!
         email: Email!
-        classes: [Class!]!
+        teachings: [Teaching!]!
     }
 
     type Teaching
