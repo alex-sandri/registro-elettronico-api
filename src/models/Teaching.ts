@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 import Class, { ISerializedClass } from "./Class";
 import Subject, { ISerializedSubject } from "./Subject";
@@ -25,20 +24,18 @@ export default class Teaching implements ISerializable
 
     public async serialize(): Promise<ISerializedTeaching>
     {
-        const { data: teachingClass } = await Class.retrieve(this.data.class);
-        const { data: subject } = await Subject.retrieve(this.data.subject);
+        const teachingClass = await Class.retrieve(this.data.class);
+        const subject = await Subject.retrieve(this.data.subject);
 
         return {
-            class: await teachingClass!.serialize(),
-            subject: await subject!.serialize(),
+            class: await teachingClass.serialize(),
+            subject: await subject.serialize(),
         };
     }
 
-    public static async create(data: ITeaching): Promise<ApiOperationResult<Teaching>>
+    public static async create(data: ITeaching): Promise<Teaching>
     {
         const db = new PrismaClient();
-
-        const result = new ApiOperationResult<Teaching>();
 
         await db.teaching.create({
             data: {
@@ -60,9 +57,7 @@ export default class Teaching implements ISerializable
             },
         });
 
-        result.data = new Teaching(data);
-
-        return result;
+        return new Teaching(data);
     }
 
     public static async for(teacher: Teacher): Promise<Teaching[]>

@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 import Teaching, { ISerializedTeaching } from "./Teaching";
 
@@ -44,11 +43,9 @@ export default class Teacher implements ISerializable
         };
     }
 
-    public static async create(data: ITeacher): Promise<ApiOperationResult<Teacher>>
+    public static async create(data: ITeacher): Promise<Teacher>
     {
         const db = new PrismaClient();
-
-        const result = new ApiOperationResult<Teacher>();
 
         await db.teacher.create({
             data: {
@@ -59,16 +56,12 @@ export default class Teacher implements ISerializable
             },
         });
 
-        result.data = new Teacher(data);
-
-        return result;
+        return new Teacher(data);
     }
 
-    public static async retrieve(id: string): Promise<ApiOperationResult<Teacher>>
+    public static async retrieve(id: string): Promise<Teacher>
     {
         const db = new PrismaClient();
-
-        const result = new ApiOperationResult<Teacher>();
 
         const teacher = await db.teacher.findUnique({
             where: {
@@ -81,16 +74,12 @@ export default class Teacher implements ISerializable
             throw new Error("This teacher does not exist");
         }
 
-        result.data = new Teacher(teacher);
-
-        return result;
+        return new Teacher(teacher);
     }
 
-    public async update(data: IUpdateTeacher): Promise<ApiOperationResult<Teacher>>
+    public async update(data: IUpdateTeacher): Promise<Teacher>
     {
         const db = new PrismaClient();
-
-        const result = new ApiOperationResult<Teacher>();
 
         this.data.firstName = data.firstName ?? this.data.firstName;
         this.data.lastName = data.lastName ?? this.data.lastName;
@@ -109,8 +98,6 @@ export default class Teacher implements ISerializable
             },
         });
 
-        result.data = this;
-
-        return result;
+        return this;
     }
 }

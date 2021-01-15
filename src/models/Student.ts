@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 import Class, { ISerializedClass } from "./Class";
 import Grade, { ISerializedGrade } from "./Grade";
@@ -40,31 +39,20 @@ export default class Student implements ISerializable
     {
         const grades = await Grade.for(this);
 
-        const { data: studentClass } = await Class.retrieve(this.data.class);
+        const studentClass = await Class.retrieve(this.data.class);
 
         return {
             firstName: this.data.firstName,
             lastName: this.data.lastName,
             email: this.data.email,
             grades: await Promise.all(grades.map(_ => _.serialize())),
-            class: await studentClass!.serialize(),
+            class: await studentClass.serialize(),
         };
     }
 
-    public static async create(data: IStudent): Promise<ApiOperationResult<Student>>
+    public static async create(data: IStudent): Promise<Student>
     {
         const db = new PrismaClient();
-
-        const result = new ApiOperationResult<Student>();
-
-        const studentClass = await Class.retrieve(data.class);
-
-        if (!studentClass.data)
-        {
-            result.errors = studentClass.errors;
-
-            return result;
-        }
 
         await db.student.create({
             data: {
@@ -80,38 +68,30 @@ export default class Student implements ISerializable
             },
         });
 
-        result.data = new Student(data);
-
-        return result;
+        return new Student(data);
     }
 
-    public static async retrieve(id: string): Promise<ApiOperationResult<Student>>
+    public static async retrieve(id: string): Promise<Student>
     {
         const db = new PrismaClient();
 
-        const result = new ApiOperationResult<Student>();
-
-        const retrievedStudent = await db.student.findUnique({
+        const student = await db.student.findUnique({
             where: {
                 email: id,
             },
         });
 
-        if (!retrievedStudent)
+        if (!student)
         {
             throw new Error("This student does not exist");
         }
 
-        result.data = new Student(retrievedStudent);
-
-        return result;
+        return new Student(student);
     }
 
-    public async update(data: IUpdateStudent): Promise<ApiOperationResult<Student>>
+    public async update(data: IUpdateStudent): Promise<Student>
     {
         const db = new PrismaClient();
-
-        const result = new ApiOperationResult<Student>();
 
         this.data.firstName = data.firstName ?? this.data.firstName;
         this.data.lastName = data.lastName ?? this.data.lastName;
@@ -135,8 +115,6 @@ export default class Student implements ISerializable
             },
         });
 
-        result.data = this;
-
-        return result;
+        return this;
     }
 }

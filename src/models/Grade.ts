@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 import Student from "./Student";
 
@@ -32,20 +31,9 @@ export default class Grade implements ISerializable
         };
     }
 
-    public static async create(data: IGrade): Promise<ApiOperationResult<Grade>>
+    public static async create(data: IGrade): Promise<Grade>
     {
         const db = new PrismaClient();
-
-        const result = new ApiOperationResult<Grade>();
-
-        const student = await Student.retrieve(data.student);
-
-        if (!student.data)
-        {
-            result.errors = student.errors;
-
-            return result;
-        }
 
         await db.grade.create({
             data: {
@@ -60,9 +48,7 @@ export default class Grade implements ISerializable
             },
         });
 
-        result.data = new Grade(data);
-
-        return result;
+        return new Grade(data);
     }
 
     public static async for(student: Student): Promise<Grade[]>

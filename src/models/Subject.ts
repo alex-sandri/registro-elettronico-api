@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 
 interface ISubject
@@ -27,11 +26,9 @@ export default class Subject implements ISerializable
         };
     }
 
-    public static async create(data: ISubject): Promise<ApiOperationResult<Subject>>
+    public static async create(data: ISubject): Promise<Subject>
     {
         const db = new PrismaClient();
-
-        const result = new ApiOperationResult<Subject>();
 
         await db.subject.create({
             data: {
@@ -40,16 +37,12 @@ export default class Subject implements ISerializable
             },
         });
 
-        result.data = new Subject(data);
-
-        return result;
+        return new Subject(data);
     }
 
-    public static async retrieve(id: string): Promise<ApiOperationResult<Subject>>
+    public static async retrieve(id: string): Promise<Subject>
     {
         const db = new PrismaClient();
-
-        const result = new ApiOperationResult<Subject>();
 
         const subject = await db.subject.findUnique({
             where: {
@@ -62,8 +55,6 @@ export default class Subject implements ISerializable
             throw new Error("This subject does not exist");
         }
 
-        result.data = new Subject(subject);
-
-        return result;
+        return new Subject(subject);
     }
 }

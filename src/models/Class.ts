@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 
 interface IClass
@@ -24,11 +23,9 @@ export default class Class implements ISerializable
         };
     }
 
-    public static async create(data: IClass): Promise<ApiOperationResult<Class>>
+    public static async create(data: IClass): Promise<Class>
     {
         const db = new PrismaClient();
-
-        const result = new ApiOperationResult<Class>();
 
         await db.class.create({
             data: {
@@ -36,16 +33,12 @@ export default class Class implements ISerializable
             },
         });
 
-        result.data = new Class(data);
-
-        return result;
+        return new Class(data);
     }
 
-    public static async retrieve(id: string): Promise<ApiOperationResult<Class>>
+    public static async retrieve(id: string): Promise<Class>
     {
         const db = new PrismaClient();
-
-        const result = new ApiOperationResult<Class>();
 
         const retrievedClass = await db.class.findUnique({
             where: {
@@ -58,8 +51,6 @@ export default class Class implements ISerializable
             throw new Error("This class does not exist");
         }
 
-        result.data = new Class(retrievedClass);
-
-        return result;
+        return new Class(retrievedClass);
     }
 }

@@ -1,12 +1,11 @@
-import ApiOperationResult from "../common/ApiOperationResult";
 import ISerializable from "../common/ISerializable";
 
 export default class Resolver<T extends ISerializable>
 {
-    private constructor(private callback: (args: any) => Promise<ApiOperationResult<T>>)
+    private constructor(private callback: (args: any) => Promise<T>)
     {}
 
-    public static init<T extends ISerializable>(callback: (args: any) => Promise<ApiOperationResult<T>>): (parent: any, args: any, context: any, info: any) => Promise<void>
+    public static init<T extends ISerializable>(callback: (args: any) => Promise<T>): (parent: any, args: any, context: any, info: any) => Promise<void>
     {
         const instance = new Resolver(callback);
 
@@ -17,18 +16,6 @@ export default class Resolver<T extends ISerializable>
     {
         const result = await this.callback(args);
 
-        if (!result.data)
-        {
-            if (!result.errors)
-            {
-                return;
-            }
-
-            const error = result.errors[0];
-
-            throw new Error(error.message);
-        }
-
-        return result.data.serialize();
+        return result.serialize();
     }
 }
