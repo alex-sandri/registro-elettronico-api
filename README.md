@@ -20,6 +20,8 @@ Create a file named `.env` and set the following variables:
     require('crypto').randomBytes(64).toString('hex')
     ```
 
-### Generate Prisma client
+### Install the dependencies
+Run `npm i`.
 
+### Generate Prisma client
 Run `npx prisma generate`.
