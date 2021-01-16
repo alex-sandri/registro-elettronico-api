@@ -22,7 +22,7 @@ interface IUpdateStudent
     class?: string;
 }
 
-interface ISerializedStudent
+export interface ISerializedStudent
 {
     firstName: string;
     lastName: string;

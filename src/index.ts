@@ -125,14 +125,14 @@ const typeDefs = gql`
 
 const resolvers: IResolvers = {
     Query: {
-        student: Resolver.init(async args => Student.retrieve(args.id)),
-        teacher: Resolver.init(async args => Teacher.retrieve(args.id)),
+        student: Resolver.init([ "teacher", "student" ], async args => Student.retrieve(args.id)),
+        teacher: Resolver.init([ "teacher" ], async args => Teacher.retrieve(args.id)),
     },
     Mutation: {
-        createClass: Resolver.init(Class.create),
-        createGrade: Resolver.init(Grade.create),
-        createStudent: Resolver.init(Student.create),
-        updateStudent: Resolver.init(async args =>
+        createClass: Resolver.init([ "teacher" ], Class.create),
+        createGrade: Resolver.init([ "teacher" ], Grade.create),
+        createStudent: Resolver.init([ "teacher" ], Student.create),
+        updateStudent: Resolver.init([ "student" ], async args =>
         {
             const student = await Student.retrieve(args.email);
 
@@ -144,9 +144,9 @@ const resolvers: IResolvers = {
                 class: args.class,
             });
         }),
-        createSubject: Resolver.init(Subject.create),
-        createTeacher: Resolver.init(Teacher.create),
-        updateTeacher: Resolver.init(async args =>
+        createSubject: Resolver.init([ "teacher" ], Subject.create),
+        createTeacher: Resolver.init([ "teacher" ], Teacher.create),
+        updateTeacher: Resolver.init([ "teacher" ], async args =>
         {
             const teacher = await Teacher.retrieve(args.email);
 
@@ -157,13 +157,23 @@ const resolvers: IResolvers = {
                 password: args.password,
             });
         }),
-        createTeaching: Resolver.init(Teaching.create),
+        createTeaching: Resolver.init([ "teacher" ], Teaching.create),
     },
     Date: GraphQLDate,
     Email: GraphQLEmail,
     Password: new GraphQLPassword(8),
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) =>
+    {
+        // Save the Bearer Token in the context
+        const token = req.headers.authorization?.split(" ")[1] ?? "";
+
+        return { token };
+    },
+});
 
 server.listen({ port: 4000 });
