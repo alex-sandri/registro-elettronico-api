@@ -1,5 +1,9 @@
 # API Registro Elettronico
 
+## Requirements
+- [`Node.js`](https://nodejs.org/)
+- [`PostgreSQL`](https://www.postgresql.org/)
+
 ## First steps
 
 ### Create the DB
