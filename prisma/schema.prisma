@@ -57,3 +57,10 @@ model Teaching {
 
   @@id([class, teacher, subject])
 }
+
+model Admin {
+  firstName String
+  lastName  String
+  email     String @id
+  password  String
+}

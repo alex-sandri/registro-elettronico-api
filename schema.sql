@@ -1,3 +1,13 @@
+CREATE TABLE "Admin"
+(
+    "firstName" VARCHAR(30) NOT NULL,
+    "lastName" VARCHAR(30) NOT NULL,
+    "email" VARCHAR(255) NOT NULL,
+    "password" VARCHAR(255) NOT NULL,
+
+    PRIMARY KEY ("email")
+);
+
 CREATE TABLE "Class"
 (
     "name" VARCHAR(30) NOT NULL,

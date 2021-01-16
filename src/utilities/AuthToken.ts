@@ -1,5 +1,6 @@
 import * as jwt from "jsonwebtoken";
 import ISerializable from "../common/ISerializable";
+import Admin, { ISerializedAdmin } from "../models/Admin";
 import Student, { ISerializedStudent } from "../models/Student";
 import Teacher, { ISerializedTeacher } from "../models/Teacher";
 import Utilities from "./Utilities";
@@ -23,7 +24,7 @@ interface ISerializedAuthToken
 {
     id: string;
     type: TAuthTokenType;
-    user: ISerializedTeacher | ISerializedStudent;
+    user: ISerializedAdmin | ISerializedTeacher | ISerializedStudent;
 }
 
 export default class AuthToken implements ISerializable
@@ -31,7 +32,7 @@ export default class AuthToken implements ISerializable
     private constructor(
         public readonly id: string,
         public readonly type: TAuthTokenType,
-        public readonly user: Teacher | Student,
+        public readonly user: Admin | Teacher | Student,
     ) {}
 
     public async serialize(): Promise<ISerializedAuthToken>
@@ -45,14 +46,13 @@ export default class AuthToken implements ISerializable
 
     public static async create(data: ICreateAuthToken): Promise<AuthToken>
     {
-        let user: Teacher | Student | null;
+        let user: Admin | Teacher | Student | null;
 
         switch (data.type)
         {
             case "admin":
             {
-                // TODO
-                user = await Teacher.retrieve(data.email);
+                user = await Admin.retrieve(data.email);
 
                 break;
             }
@@ -105,14 +105,13 @@ export default class AuthToken implements ISerializable
 
         const data = token as IAuthToken;
 
-        let user: Teacher | Student | null;
+        let user: Admin | Teacher | Student | null;
 
         switch (data.type)
         {
             case "admin":
             {
-                // TODO
-                user = await Teacher.retrieve(data.user);
+                user = await Admin.retrieve(data.user);
 
                 break;
             }

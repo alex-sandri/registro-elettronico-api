@@ -10,6 +10,7 @@ import Teacher from "./models/Teacher";
 import Resolver from "./utilities/Resolver";
 import Teaching from "./models/Teaching";
 import AuthToken from "./utilities/AuthToken";
+import Admin from "./models/Admin";
 
 const typeDefs = gql`
     scalar Date
@@ -23,7 +24,14 @@ const typeDefs = gql`
         TEACHER
     }
 
-    union AuthTokenUser = Teacher | Student
+    union AuthTokenUser = Admin | Teacher | Student
+
+    type Admin
+    {
+        firstName: String!
+        lastName: String!
+        email: Email!
+    }
 
     type AuthToken
     {
@@ -143,6 +151,20 @@ const typeDefs = gql`
             email: Email!
             password: Password!
         ): AuthToken
+
+        createAdmin(
+            firstName: String!
+            lastName: String!
+            email: Email!
+            password: Password!
+        ): Admin
+
+        updateAdmin(
+            firstName: String
+            lastName: String
+            email: Email!
+            password: Password
+        ): Admin
     }
 `;
 
@@ -235,6 +257,31 @@ const resolvers: IResolvers = {
 
             return token.serialize();
         },
+        createAdmin: Resolver.init([ "admin" ], Admin.create),
+        updateAdmin: Resolver.init([ "admin" ], async (args, token) =>
+        {
+            if (token.type === "admin")
+            {
+                if (args.email !== token.user.data.email)
+                {
+                    throw new ForbiddenError("Forbidden");
+                }
+            }
+
+            const admin = await Admin.retrieve(args.email);
+
+            if (!admin)
+            {
+                throw new Error("This admin does not exist");
+            }
+
+            return admin.update({
+                firstName: args.firstName,
+                lastName: args.lastName,
+                email: args.email,
+                password: args.password,
+            });
+        }),
     },
     Date: GraphQLDate,
     Email: GraphQLEmail,
@@ -246,9 +293,13 @@ const resolvers: IResolvers = {
             {
                 return "Student";
             }
-            else
+            else if (obj.teachings)
             {
                 return "Teacher";
+            }
+            else
+            {
+                return "Admin";
             }
         },
     },
