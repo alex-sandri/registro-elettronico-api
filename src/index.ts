@@ -1,4 +1,4 @@
-import { ApolloServer, gql, IResolvers } from "apollo-server";
+import { ApolloServer, ForbiddenError, gql, IResolvers } from "apollo-server";
 import { GraphQLDate } from "graphql-iso-date";
 import { GraphQLEmail, GraphQLPassword } from "graphql-custom-types";
 
@@ -132,8 +132,16 @@ const resolvers: IResolvers = {
         createClass: Resolver.init([ "admin" ], Class.create),
         createGrade: Resolver.init([ "teacher" ], Grade.create),
         createStudent: Resolver.init([ "admin" ], Student.create),
-        updateStudent: Resolver.init([ "admin", "student" ], async args =>
+        updateStudent: Resolver.init([ "admin", "student" ], async (args, token) =>
         {
+            if (token.type === "student")
+            {
+                if (args.email !== token.user.data.email)
+                {
+                    throw new ForbiddenError("Forbidden");
+                }
+            }
+
             const student = await Student.retrieve(args.email);
 
             return student.update({
@@ -146,8 +154,16 @@ const resolvers: IResolvers = {
         }),
         createSubject: Resolver.init([ "admin" ], Subject.create),
         createTeacher: Resolver.init([ "admin" ], Teacher.create),
-        updateTeacher: Resolver.init([ "admin", "teacher" ], async args =>
+        updateTeacher: Resolver.init([ "admin", "teacher" ], async (args, token) =>
         {
+            if (token.type === "teacher")
+            {
+                if (args.email !== token.user.data.email)
+                {
+                    throw new ForbiddenError("Forbidden");
+                }
+            }
+
             const teacher = await Teacher.retrieve(args.email);
 
             return teacher.update({
