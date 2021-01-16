@@ -9,6 +9,16 @@
 ### Create the DB
 Use [`schema.sql`](schema.sql) to create the required tables.
 
+### Create the first ADMIN user
+In the `Admin` table add a new entry with the required fields.
+
+For the password field use the Node.js CLI to hash the password with this command:
+```javascript
+require("bcrypt").hashSync("PASSWORD", 15)
+```
+Replace `PASSWORD` with a strong password to prevent unauthorized access.\
+__COPY ONLY THE STRING INSIDE THE QUOTATION MARKS__
+
 ### Set environment variables
 Create a file named `.env` and set the following variables:
 
@@ -21,8 +31,9 @@ Create a file named `.env` and set the following variables:
     The **secret** token used to generate JWTs for authorization.\
     You can generate one using the Node.js CLI with this command:
     ```javascript
-    require('crypto').randomBytes(64).toString('hex')
+    require("crypto").randomBytes(64).toString("hex")
     ```
+    __COPY ONLY THE STRING INSIDE THE QUOTATION MARKS__
 
 ### Install the dependencies
 Run `npm i`.
