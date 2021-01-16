@@ -47,7 +47,7 @@ export default class Student implements ISerializable
             lastName: this.data.lastName,
             email: this.data.email,
             grades: await Promise.all(grades.map(_ => _.serialize())),
-            class: await studentClass.serialize(),
+            class: await studentClass!.serialize(),
         };
     }
 
@@ -72,7 +72,7 @@ export default class Student implements ISerializable
         return new Student(data);
     }
 
-    public static async retrieve(id: string): Promise<Student>
+    public static async retrieve(id: string): Promise<Student | null>
     {
         const db = new PrismaClient();
 
@@ -84,7 +84,7 @@ export default class Student implements ISerializable
 
         if (!student)
         {
-            throw new Error("This student does not exist");
+            return null;
         }
 
         return new Student(student);

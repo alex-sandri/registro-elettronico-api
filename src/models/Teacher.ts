@@ -60,7 +60,7 @@ export default class Teacher implements ISerializable
         return new Teacher(data);
     }
 
-    public static async retrieve(id: string): Promise<Teacher>
+    public static async retrieve(id: string): Promise<Teacher | null>
     {
         const db = new PrismaClient();
 
@@ -72,7 +72,7 @@ export default class Teacher implements ISerializable
 
         if (!teacher)
         {
-            throw new Error("This teacher does not exist");
+            return null;
         }
 
         return new Teacher(teacher);

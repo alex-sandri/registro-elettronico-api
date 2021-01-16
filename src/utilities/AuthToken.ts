@@ -45,7 +45,7 @@ export default class AuthToken implements ISerializable
 
     public static async create(data: ICreateAuthToken): Promise<AuthToken>
     {
-        let user: Teacher | Student;
+        let user: Teacher | Student | null;
 
         switch (data.type)
         {
@@ -68,6 +68,11 @@ export default class AuthToken implements ISerializable
 
                 break;
             }
+        }
+
+        if (!user)
+        {
+            throw new Error(`This ${data.type} does not exist`);
         }
 
         if (!Utilities.verifyHash(data.password, user.data.password))
@@ -100,7 +105,7 @@ export default class AuthToken implements ISerializable
 
         const data = token as IAuthToken;
 
-        let user: Teacher | Student;
+        let user: Teacher | Student | null;
 
         switch (data.type)
         {
@@ -125,7 +130,10 @@ export default class AuthToken implements ISerializable
             }
         }
 
-        if (!user) return null;
+        if (!user)
+        {
+            return null;
+        }
 
         return new AuthToken(id, data.type, user);
     }

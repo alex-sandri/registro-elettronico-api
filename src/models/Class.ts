@@ -36,7 +36,7 @@ export default class Class implements ISerializable
         return new Class(data);
     }
 
-    public static async retrieve(id: string): Promise<Class>
+    public static async retrieve(id: string): Promise<Class | null>
     {
         const db = new PrismaClient();
 
@@ -48,7 +48,7 @@ export default class Class implements ISerializable
 
         if (!retrievedClass)
         {
-            throw new Error("This class does not exist");
+            return null;
         }
 
         return new Class(retrievedClass);

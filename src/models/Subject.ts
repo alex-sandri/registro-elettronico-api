@@ -40,7 +40,7 @@ export default class Subject implements ISerializable
         return new Subject(data);
     }
 
-    public static async retrieve(id: string): Promise<Subject>
+    public static async retrieve(id: string): Promise<Subject | null>
     {
         const db = new PrismaClient();
 
@@ -52,7 +52,7 @@ export default class Subject implements ISerializable
 
         if (!subject)
         {
-            throw new Error("This subject does not exist");
+            return null;
         }
 
         return new Subject(subject);

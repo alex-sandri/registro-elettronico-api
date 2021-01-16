@@ -148,8 +148,28 @@ const typeDefs = gql`
 
 const resolvers: IResolvers = {
     Query: {
-        student: Resolver.init([ "admin", "teacher", "student" ], async args => Student.retrieve(args.id)),
-        teacher: Resolver.init([ "admin", "teacher" ], async args => Teacher.retrieve(args.id)),
+        student: Resolver.init([ "admin", "teacher", "student" ], async args =>
+        {
+            const student = await Student.retrieve(args.id);
+
+            if (!student)
+            {
+                throw new Error("This student does not exist");
+            }
+
+            return student;
+        }),
+        teacher: Resolver.init([ "admin", "teacher" ], async args =>
+        {
+            const teacher = await Teacher.retrieve(args.id);
+
+            if (!teacher)
+            {
+                throw new Error("This teacher does not exist");
+            }
+
+            return teacher;
+        }),
     },
     Mutation: {
         createClass: Resolver.init([ "admin" ], Class.create),
@@ -166,6 +186,11 @@ const resolvers: IResolvers = {
             }
 
             const student = await Student.retrieve(args.email);
+
+            if (!student)
+            {
+                throw new Error("This student does not exist");
+            }
 
             return student.update({
                 firstName: args.firstName,
@@ -188,6 +213,11 @@ const resolvers: IResolvers = {
             }
 
             const teacher = await Teacher.retrieve(args.email);
+
+            if (!teacher)
+            {
+                throw new Error("This teacher does not exist");
+            }
 
             return teacher.update({
                 firstName: args.firstName,
