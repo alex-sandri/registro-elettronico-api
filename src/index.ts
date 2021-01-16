@@ -125,14 +125,14 @@ const typeDefs = gql`
 
 const resolvers: IResolvers = {
     Query: {
-        student: Resolver.init([ "teacher", "student" ], async args => Student.retrieve(args.id)),
-        teacher: Resolver.init([ "teacher" ], async args => Teacher.retrieve(args.id)),
+        student: Resolver.init([ "admin", "teacher", "student" ], async args => Student.retrieve(args.id)),
+        teacher: Resolver.init([ "admin", "teacher" ], async args => Teacher.retrieve(args.id)),
     },
     Mutation: {
-        createClass: Resolver.init([ "teacher" ], Class.create),
+        createClass: Resolver.init([ "admin" ], Class.create),
         createGrade: Resolver.init([ "teacher" ], Grade.create),
-        createStudent: Resolver.init([ "teacher" ], Student.create),
-        updateStudent: Resolver.init([ "student" ], async args =>
+        createStudent: Resolver.init([ "admin" ], Student.create),
+        updateStudent: Resolver.init([ "admin", "student" ], async args =>
         {
             const student = await Student.retrieve(args.email);
 
@@ -144,9 +144,9 @@ const resolvers: IResolvers = {
                 class: args.class,
             });
         }),
-        createSubject: Resolver.init([ "teacher" ], Subject.create),
-        createTeacher: Resolver.init([ "teacher" ], Teacher.create),
-        updateTeacher: Resolver.init([ "teacher" ], async args =>
+        createSubject: Resolver.init([ "admin" ], Subject.create),
+        createTeacher: Resolver.init([ "admin" ], Teacher.create),
+        updateTeacher: Resolver.init([ "admin", "teacher" ], async args =>
         {
             const teacher = await Teacher.retrieve(args.email);
 
@@ -157,7 +157,7 @@ const resolvers: IResolvers = {
                 password: args.password,
             });
         }),
-        createTeaching: Resolver.init([ "teacher" ], Teaching.create),
+        createTeaching: Resolver.init([ "admin" ], Teaching.create),
     },
     Date: GraphQLDate,
     Email: GraphQLEmail,

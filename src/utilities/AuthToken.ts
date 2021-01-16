@@ -3,7 +3,7 @@ import ISerializable from "../common/ISerializable";
 import Student, { ISerializedStudent } from "../models/Student";
 import Teacher, { ISerializedTeacher } from "../models/Teacher";
 
-export type TAuthTokenType = "teacher" | "student";
+export type TAuthTokenType = "admin" | "student"| "teacher";
 
 interface IAuthToken
 {
@@ -41,8 +41,9 @@ export default class AuthToken implements ISerializable
 
         switch (data.type)
         {
-            case "teacher":
+            case "admin":
             {
+                // TODO
                 user = await Teacher.retrieve(data.user);
 
                 break;
@@ -50,6 +51,12 @@ export default class AuthToken implements ISerializable
             case "student":
             {
                 user = await Student.retrieve(data.user);
+
+                break;
+            }
+            case "teacher":
+            {
+                user = await Teacher.retrieve(data.user);
 
                 break;
             }
@@ -79,8 +86,9 @@ export default class AuthToken implements ISerializable
 
         switch (data.type)
         {
-            case "teacher":
+            case "admin":
             {
+                // TODO
                 user = await Teacher.retrieve(data.user);
 
                 break;
@@ -88,6 +96,12 @@ export default class AuthToken implements ISerializable
             case "student":
             {
                 user = await Student.retrieve(data.user);
+
+                break;
+            }
+            case "teacher":
+            {
+                user = await Teacher.retrieve(data.user);
 
                 break;
             }
