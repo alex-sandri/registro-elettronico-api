@@ -75,7 +75,12 @@ export default class AuthToken implements ISerializable
             throw new Error("Wrong password");
         }
 
-        const id = jwt.sign({ user: user.data.email }, process.env.TOKEN_SECRET!);
+        const payload: IAuthToken = {
+            type: data.type,
+            user: user.data.email,
+        };
+
+        const id = jwt.sign(payload, process.env.TOKEN_SECRET!);
 
         return new AuthToken(id, data.type, user);
     }
