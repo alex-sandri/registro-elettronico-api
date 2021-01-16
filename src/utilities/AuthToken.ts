@@ -2,8 +2,16 @@ import * as jwt from "jsonwebtoken";
 import ISerializable from "../common/ISerializable";
 import Student, { ISerializedStudent } from "../models/Student";
 import Teacher, { ISerializedTeacher } from "../models/Teacher";
+import Utilities from "./Utilities";
 
 export type TAuthTokenType = "admin" | "student"| "teacher";
+
+interface ICreateAuthToken
+{
+    type: TAuthTokenType;
+    email: string;
+    password: string;
+}
 
 interface IAuthToken
 {
@@ -35,7 +43,7 @@ export default class AuthToken implements ISerializable
         };
     }
 
-    public static async create(data: IAuthToken): Promise<AuthToken>
+    public static async create(data: ICreateAuthToken): Promise<AuthToken>
     {
         let user: Teacher | Student;
 
@@ -44,22 +52,27 @@ export default class AuthToken implements ISerializable
             case "admin":
             {
                 // TODO
-                user = await Teacher.retrieve(data.user);
+                user = await Teacher.retrieve(data.email);
 
                 break;
             }
             case "student":
             {
-                user = await Student.retrieve(data.user);
+                user = await Student.retrieve(data.email);
 
                 break;
             }
             case "teacher":
             {
-                user = await Teacher.retrieve(data.user);
+                user = await Teacher.retrieve(data.email);
 
                 break;
             }
+        }
+
+        if (!Utilities.verifyHash(data.password, user.data.password))
+        {
+            throw new Error("Wrong password");
         }
 
         const id = jwt.sign({ user: user.data.email }, process.env.TOKEN_SECRET!);

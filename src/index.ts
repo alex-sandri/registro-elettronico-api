@@ -9,11 +9,28 @@ import Subject from "./models/Subject";
 import Teacher from "./models/Teacher";
 import Resolver from "./utilities/Resolver";
 import Teaching from "./models/Teaching";
+import AuthToken from "./utilities/AuthToken";
 
 const typeDefs = gql`
     scalar Date
     scalar Email
     scalar Password
+
+    enum AuthTokenType
+    {
+        ADMIN
+        STUDENT
+        TEACHER
+    }
+
+    union AuthTokenUser = Teacher | Student
+
+    type AuthToken
+    {
+        id: String!
+        type: AuthTokenType!
+        user: AuthTokenUser!
+    }
 
     type Class
     {
@@ -120,6 +137,12 @@ const typeDefs = gql`
             class: String!
             subject: String!
         ): Teaching
+
+        createAuthToken(
+            type: AuthTokenType!
+            email: Email!
+            password: Password!
+        ): AuthToken
     }
 `;
 
@@ -174,10 +197,31 @@ const resolvers: IResolvers = {
             });
         }),
         createTeaching: Resolver.init([ "admin" ], Teaching.create),
+        createAuthToken: async (parent: any, args: any, context: any, info: any) =>
+        {
+            args.type = (args.type as string).toLowerCase();
+
+            const token = await AuthToken.create(args);
+
+            return token.serialize();
+        },
     },
     Date: GraphQLDate,
     Email: GraphQLEmail,
     Password: new GraphQLPassword(8),
+    AuthTokenUser: {
+        __resolveType(obj: any, context: any, info: any)
+        {
+            if(obj.class)
+            {
+                return "Student";
+            }
+            else
+            {
+                return "Teacher";
+            }
+        },
+    },
 };
 
 const server = new ApolloServer({
