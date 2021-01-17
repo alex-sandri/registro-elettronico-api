@@ -1,4 +1,5 @@
 import ISerializable from "../common/ISerializable";
+import Database from "../utilities/Database";
 import Teaching, { ISerializedTeaching } from "./Teaching";
 import User, { ISerializedUser, IUpdateUser, IUser } from "./User";
 
@@ -40,12 +41,24 @@ export default class Teacher extends User implements ISerializable
 
     public static async create(data: ITeacher): Promise<Teacher>
     {
+        const db = Database.client;
+
         await super.create({
             type: data.type,
             firstName: data.firstName,
             lastName: data.lastName,
             email: data.email,
             password: data.password,
+        });
+
+        await db.teacher.create({
+            data: {
+                User: {
+                    connect: {
+                        email: data.email,
+                    },
+                },
+            },
         });
 
         return new Teacher(data);
