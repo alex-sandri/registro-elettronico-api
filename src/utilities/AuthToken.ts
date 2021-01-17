@@ -1,15 +1,12 @@
 import * as jwt from "jsonwebtoken";
 import ISerializable from "../common/ISerializable";
-import Admin, { ISerializedAdmin } from "../models/Admin";
-import Student, { ISerializedStudent } from "../models/Student";
-import Teacher, { ISerializedTeacher } from "../models/Teacher";
+import User, { ISerializedUser } from "../models/User";
 import Utilities from "./Utilities";
 
 export type TAuthTokenType = "admin" | "student"| "teacher";
 
 interface ICreateAuthToken
 {
-    type: TAuthTokenType;
     email: string;
     password: string;
 }
@@ -24,55 +21,34 @@ interface ISerializedAuthToken
 {
     id: string;
     type: TAuthTokenType;
-    user: ISerializedAdmin | ISerializedTeacher | ISerializedStudent;
+    user: ISerializedUser;
 }
 
 export default class AuthToken implements ISerializable
 {
+    public readonly type = this.user.data.type;
+
     private constructor(
         public readonly id: string,
-        public readonly type: TAuthTokenType,
-        public readonly user: Admin | Teacher | Student,
+        public readonly user: User,
     ) {}
 
     public async serialize(): Promise<ISerializedAuthToken>
     {
         return {
             id: this.id,
-            type: this.type,
+            type: this.user.data.type,
             user: await this.user.serialize(),
         };
     }
 
     public static async create(data: ICreateAuthToken): Promise<AuthToken>
     {
-        let user: Admin | Teacher | Student | null;
-
-        switch (data.type)
-        {
-            case "admin":
-            {
-                user = await Admin.retrieve(data.email);
-
-                break;
-            }
-            case "student":
-            {
-                user = await Student.retrieve(data.email);
-
-                break;
-            }
-            case "teacher":
-            {
-                user = await Teacher.retrieve(data.email);
-
-                break;
-            }
-        }
+        const user = await User.retrieve(data.email);
 
         if (!user)
         {
-            throw new Error(`This ${data.type} does not exist`);
+            throw new Error(`This user does not exist`);
         }
 
         if (!Utilities.verifyHash(data.password, user.data.password))
@@ -81,13 +57,13 @@ export default class AuthToken implements ISerializable
         }
 
         const payload: IAuthToken = {
-            type: data.type,
+            type: user.data.type,
             user: user.data.email,
         };
 
         const id = jwt.sign(payload, process.env.TOKEN_SECRET!);
 
-        return new AuthToken(id, data.type, user);
+        return new AuthToken(id, user);
     }
 
     public static async retrieve(id: string): Promise<AuthToken | null>
@@ -105,35 +81,13 @@ export default class AuthToken implements ISerializable
 
         const data = token as IAuthToken;
 
-        let user: Admin | Teacher | Student | null;
-
-        switch (data.type)
-        {
-            case "admin":
-            {
-                user = await Admin.retrieve(data.user);
-
-                break;
-            }
-            case "student":
-            {
-                user = await Student.retrieve(data.user);
-
-                break;
-            }
-            case "teacher":
-            {
-                user = await Teacher.retrieve(data.user);
-
-                break;
-            }
-        }
+        const user = await User.retrieve(data.user);
 
         if (!user)
         {
             return null;
         }
 
-        return new AuthToken(id, data.type, user);
+        return new AuthToken(id, user);
     }
 }

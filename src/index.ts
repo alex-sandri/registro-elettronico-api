@@ -167,7 +167,6 @@ const typeDefs = gql`
         ): Teaching
 
         createAuthToken(
-            type: AuthTokenType!
             email: Email!
             password: Password!
         ): AuthToken
