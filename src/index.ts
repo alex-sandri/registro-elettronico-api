@@ -46,6 +46,11 @@ const typeDefs = gql`
     type Class
     {
         name: String!
+    }
+
+    type ClassWithStudents
+    {
+        name: String!
         students: [Student!]!
     }
 
@@ -82,7 +87,7 @@ const typeDefs = gql`
     type Teaching
     {
         teacher: Teacher!
-        class: Class!
+        class: ClassWithStudents!
         subject: Subject!
     }
 

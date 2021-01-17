@@ -18,9 +18,14 @@ export default class Class implements ISerializable
     private constructor(public data: IClass)
     {}
 
-    public async serialize(): Promise<ISerializedClass>
+    public async serialize(includeStudents?: boolean): Promise<ISerializedClass>
     {
-        const students = await Student.for(this);
+        let students: Student[] = [];
+
+        if (includeStudents)
+        {
+            students = await Student.for(this);
+        }
 
         return {
             name: this.data.name,
