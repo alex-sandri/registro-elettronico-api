@@ -26,7 +26,7 @@ export default class Student extends User implements ISerializable
     protected constructor(public data: IStudent)
     {
         super({
-            type: data.type,
+            type: "student",
             firstName: data.firstName,
             lastName: data.lastName,
             email: data.email,
@@ -52,7 +52,7 @@ export default class Student extends User implements ISerializable
         const db = Database.client;
 
         await super.create({
-            type: data.type,
+            type: "student",
             firstName: data.firstName,
             lastName: data.lastName,
             email: data.email,

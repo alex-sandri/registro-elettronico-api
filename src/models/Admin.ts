@@ -25,7 +25,7 @@ export default class Admin extends User implements ISerializable
     protected constructor(public data: IAdmin)
     {
         super({
-            type: data.type,
+            type: "admin",
             firstName: data.firstName,
             lastName: data.lastName,
             email: data.email,
@@ -43,7 +43,7 @@ export default class Admin extends User implements ISerializable
     public static async create(data: IAdmin): Promise<Admin>
     {
         await super.create({
-            type: data.type,
+            type: "admin",
             firstName: data.firstName,
             lastName: data.lastName,
             email: data.email,
