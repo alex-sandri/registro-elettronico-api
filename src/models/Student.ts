@@ -125,4 +125,17 @@ export default class Student implements ISerializable
 
         return this;
     }
+
+    public static async for(studentClass: Class): Promise<Student[]>
+    {
+        const db = new PrismaClient();
+
+        const grades = await db.student.findMany({
+            where: {
+                class: studentClass.data.name,
+            },
+        });
+
+        return grades.map(_ => new Student(_));
+    }
 }

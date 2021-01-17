@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import ISerializable from "../common/ISerializable";
+import Student, { ISerializedStudent } from "./Student";
 
 interface IClass
 {
@@ -9,6 +10,7 @@ interface IClass
 export interface ISerializedClass
 {
     name: string;
+    students: ISerializedStudent[];
 }
 
 export default class Class implements ISerializable
@@ -18,8 +20,11 @@ export default class Class implements ISerializable
 
     public async serialize(): Promise<ISerializedClass>
     {
+        const students = await Student.for(this);
+
         return {
             name: this.data.name,
+            students: await Promise.all(students.map(_ => _.serialize())),
         };
     }
 

@@ -43,6 +43,7 @@ const typeDefs = gql`
     type Class
     {
         name: String!
+        students: [Student!]!
     }
 
     type Grade
