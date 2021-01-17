@@ -281,8 +281,6 @@ const resolvers: IResolvers = {
         createTeaching: Resolver.init([ "admin" ], Teaching.create),
         createAuthToken: async (parent: any, args: any, context: any, info: any) =>
         {
-            args.type = (args.type as string).toLowerCase();
-
             const token = await AuthToken.create(args);
 
             return token.serialize();
