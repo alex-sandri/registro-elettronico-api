@@ -2,7 +2,7 @@ import ISerializable from "../common/ISerializable";
 import Database from "../utilities/Database";
 import Class, { ISerializedClass } from "./Class";
 import Subject, { ISerializedSubject } from "./Subject";
-import Teacher from "./Teacher";
+import Teacher, { ISerializedTeacher } from "./Teacher";
 
 interface ITeaching
 {
@@ -13,6 +13,7 @@ interface ITeaching
 
 export interface ISerializedTeaching
 {
+    teacher: ISerializedTeacher;
     class: ISerializedClass;
     subject: ISerializedSubject;
 }
@@ -24,10 +25,12 @@ export default class Teaching implements ISerializable
 
     public async serialize(): Promise<ISerializedTeaching>
     {
+        const teacher = await Teacher.retrieve(this.data.teacher);
         const teachingClass = await Class.retrieve(this.data.class);
         const subject = await Subject.retrieve(this.data.subject);
 
         return {
+            teacher: await teacher!.serialize(false),
             class: await teachingClass!.serialize(),
             subject: await subject!.serialize(),
         };

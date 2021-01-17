@@ -84,9 +84,16 @@ const typeDefs = gql`
         teachings: [Teaching!]!
     }
 
+    type TeacherWithoutTeachings
+    {
+        firstName: String!
+        lastName: String!
+        email: Email!
+    }
+
     type Teaching
     {
-        teacher: Teacher!
+        teacher: TeacherWithoutTeachings!
         class: Class!
         subject: Subject!
     }

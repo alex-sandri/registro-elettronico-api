@@ -29,9 +29,14 @@ export default class Teacher extends User implements ISerializable
         });
     }
 
-    public async serialize(): Promise<ISerializedTeacher>
+    public async serialize(includeTeachings = true): Promise<ISerializedTeacher>
     {
-        const teachings = await Teaching.for(this);
+        let teachings: Teaching[] = [];
+
+        if (includeTeachings)
+        {
+            teachings = await Teaching.for(this);
+        }
 
         return {
             ...await super.serialize(),
