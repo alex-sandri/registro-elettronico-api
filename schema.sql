@@ -34,9 +34,11 @@ CREATE TABLE "Grade"
     "timestamp" TIMESTAMP NOT NULL,
     "description" VARCHAR(255) NOT NULL,
     "student" VARCHAR(255) NOT NULL,
+    "subject" VARCHAR(30) NOT NULL,
 
-    PRIMARY KEY ("value", "timestamp", "description", "student"),
+    PRIMARY KEY ("timestamp", "student", "subject"),
     FOREIGN KEY ("student") REFERENCES "Student",
+    FOREIGN KEY ("subject") REFERENCES "Subject",
 
     CHECK("value" > 0 AND "value" <= 10),
     CHECK("timestamp" <= CURRENT_DATE)

@@ -18,9 +18,11 @@ model Grade {
   timestamp   DateTime
   description String
   student     String
+  subject     String
   Student     Student  @relation(fields: [student], references: [email])
+  Subject     Subject  @relation(fields: [subject], references: [name])
 
-  @@id([value, timestamp, description, student])
+  @@id([timestamp, student, subject])
 }
 
 model Student {
@@ -34,6 +36,7 @@ model Student {
 model Subject {
   name        String     @id
   description String
+  Grade       Grade[]
   Teaching    Teaching[]
 }
 

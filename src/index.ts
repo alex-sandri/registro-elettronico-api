@@ -59,6 +59,7 @@ const typeDefs = gql`
         value: Float!
         timestamp: Date!
         description: String!
+        subject: Subject!
     }
 
     type Student
@@ -119,6 +120,7 @@ const typeDefs = gql`
             description: String!
 
             student: String!
+            subject: String!
         ): Grade
 
         createStudent(
