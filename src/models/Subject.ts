@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import ISerializable from "../common/ISerializable";
+import Database from "../utilities/Database";
 
 interface ISubject
 {
@@ -28,7 +28,7 @@ export default class Subject implements ISerializable
 
     public static async create(data: ISubject): Promise<Subject>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         await db.subject.create({
             data: {
@@ -42,7 +42,7 @@ export default class Subject implements ISerializable
 
     public static async retrieve(id: string): Promise<Subject | null>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         const subject = await db.subject.findUnique({
             where: {

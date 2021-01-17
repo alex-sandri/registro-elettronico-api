@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import ISerializable from "../common/ISerializable";
+import Database from "../utilities/Database";
 import Student from "./Student";
 
 interface IGrade
@@ -33,7 +33,7 @@ export default class Grade implements ISerializable
 
     public static async create(data: IGrade): Promise<Grade>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         await db.grade.create({
             data: {
@@ -53,7 +53,7 @@ export default class Grade implements ISerializable
 
     public static async for(student: Student): Promise<Grade[]>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         const grades = await db.grade.findMany({
             where: {

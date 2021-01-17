@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import ISerializable from "../common/ISerializable";
+import Database from "../utilities/Database";
 import Class, { ISerializedClass } from "./Class";
 import Subject, { ISerializedSubject } from "./Subject";
 import Teacher from "./Teacher";
@@ -35,7 +35,7 @@ export default class Teaching implements ISerializable
 
     public static async create(data: ITeaching): Promise<Teaching>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         await db.teaching.create({
             data: {
@@ -62,7 +62,7 @@ export default class Teaching implements ISerializable
 
     public static async for(teacher: Teacher): Promise<Teaching[]>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         const classes = await db.teaching.findMany({
             where: {

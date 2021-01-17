@@ -11,6 +11,9 @@ import Resolver from "./utilities/Resolver";
 import Teaching from "./models/Teaching";
 import AuthToken from "./utilities/AuthToken";
 import Admin from "./models/Admin";
+import Database from "./utilities/Database";
+
+Database.init();
 
 const typeDefs = gql`
     scalar Date

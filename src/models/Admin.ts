@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import ISerializable from "../common/ISerializable";
+import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 
 interface IAdmin
@@ -41,7 +41,7 @@ export default class Admin implements ISerializable
 
     public static async create(data: IAdmin): Promise<Admin>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         await db.admin.create({
             data: {
@@ -57,7 +57,7 @@ export default class Admin implements ISerializable
 
     public static async retrieve(id: string): Promise<Admin | null>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         const admin = await db.admin.findUnique({
             where: {
@@ -75,7 +75,7 @@ export default class Admin implements ISerializable
 
     public async update(data: IUpdateAdmin): Promise<Admin>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         let password: string | undefined;
 

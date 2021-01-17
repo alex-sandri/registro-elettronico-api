@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import ISerializable from "../common/ISerializable";
+import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import Teaching, { ISerializedTeaching } from "./Teaching";
 
@@ -46,7 +46,7 @@ export default class Teacher implements ISerializable
 
     public static async create(data: ITeacher): Promise<Teacher>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         await db.teacher.create({
             data: {
@@ -62,7 +62,7 @@ export default class Teacher implements ISerializable
 
     public static async retrieve(id: string): Promise<Teacher | null>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         const teacher = await db.teacher.findUnique({
             where: {
@@ -80,7 +80,7 @@ export default class Teacher implements ISerializable
 
     public async update(data: IUpdateTeacher): Promise<Teacher>
     {
-        const db = new PrismaClient();
+        const db = Database.client;
 
         let password: string | undefined;
 
