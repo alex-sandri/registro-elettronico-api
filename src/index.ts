@@ -46,12 +46,12 @@ const typeDefs = gql`
     type Class
     {
         name: String!
+        students: [Student!]!
     }
 
-    type ClassWithStudents
+    type ClassWithoutStudents
     {
         name: String!
-        students: [Student!]!
     }
 
     type Grade
@@ -67,7 +67,7 @@ const typeDefs = gql`
         lastName: String!
         email: Email!
         grades: [Grade!]!
-        class: Class!
+        class: ClassWithoutStudents!
     }
 
     type Subject
@@ -87,12 +87,14 @@ const typeDefs = gql`
     type Teaching
     {
         teacher: Teacher!
-        class: ClassWithStudents!
+        class: Class!
         subject: Subject!
     }
 
     type Query
     {
+        class(id: ID!): Class
+
         student(id: ID!): Student
 
         teacher(id: ID!): Teacher
@@ -179,6 +181,17 @@ const typeDefs = gql`
 
 const resolvers: IResolvers = {
     Query: {
+        class: Resolver.init([ "admin", "teacher" ], async args =>
+        {
+            const retrievedClass = await Class.retrieve(args.id);
+
+            if (!retrievedClass)
+            {
+                throw new Error("This class does not exist");
+            }
+
+            return retrievedClass;
+        }),
         student: Resolver.init([ "admin", "teacher", "student" ], async args =>
         {
             const student = await Student.retrieve(args.id);

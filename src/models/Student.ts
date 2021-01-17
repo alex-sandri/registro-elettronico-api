@@ -47,7 +47,7 @@ export default class Student implements ISerializable
             lastName: this.data.lastName,
             email: this.data.email,
             grades: await Promise.all(grades.map(_ => _.serialize())),
-            class: await studentClass!.serialize(),
+            class: await studentClass!.serialize(false),
         };
     }
 
