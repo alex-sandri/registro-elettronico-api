@@ -1,5 +1,15 @@
-CREATE TABLE "Admin"
+CREATE TABLE "Class"
 (
+    "name" VARCHAR(30) NOT NULL,
+
+    PRIMARY KEY ("name")
+);
+
+CREATE TYPE USERTYPE AS ENUM ('admin', 'student', 'teacher');
+
+CREATE TABLE "User"
+(
+    "type" USERTYPE NOT NULL,
     "firstName" VARCHAR(30) NOT NULL,
     "lastName" VARCHAR(30) NOT NULL,
     "email" VARCHAR(255) NOT NULL,
@@ -8,22 +18,13 @@ CREATE TABLE "Admin"
     PRIMARY KEY ("email")
 );
 
-CREATE TABLE "Class"
-(
-    "name" VARCHAR(30) NOT NULL,
-
-    PRIMARY KEY ("name")
-);
-
 CREATE TABLE "Student"
 (
-    "firstName" VARCHAR(30) NOT NULL,
-    "lastName" VARCHAR(30) NOT NULL,
     "email" VARCHAR(255) NOT NULL,
-    "password" VARCHAR(255) NOT NULL,
     "class" VARCHAR(30) NOT NULL,
 
     PRIMARY KEY ("email"),
+    FOREIGN KEY ("email") REFERENCES "User",
     FOREIGN KEY ("class") REFERENCES "Class"
 );
 
@@ -51,12 +52,10 @@ CREATE TABLE "Subject"
 
 CREATE TABLE "Teacher"
 (
-    "firstName" VARCHAR(30) NOT NULL,
-    "lastName" VARCHAR(30) NOT NULL,
     "email" VARCHAR(255) NOT NULL,
-    "password" VARCHAR(255) NOT NULL,
 
-    PRIMARY KEY ("email")
+    PRIMARY KEY ("email"),
+    FOREIGN KEY ("email") REFERENCES "User"
 );
 
 CREATE TABLE "Teaching"

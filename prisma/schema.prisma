@@ -24,13 +24,11 @@ model Grade {
 }
 
 model Student {
-  firstName String
-  lastName  String
-  email     String  @id
-  password  String
-  class     String
-  Class     Class   @relation(fields: [class], references: [name])
-  Grade     Grade[]
+  email String  @id
+  class String
+  Class Class   @relation(fields: [class], references: [name])
+  User  User    @relation(fields: [email], references: [email])
+  Grade Grade[]
 }
 
 model Subject {
@@ -40,11 +38,9 @@ model Subject {
 }
 
 model Teacher {
-  firstName String
-  lastName  String
-  email     String     @id
-  password  String
-  Teaching  Teaching[]
+  email    String     @id
+  User     User       @relation(fields: [email], references: [email])
+  Teaching Teaching[]
 }
 
 model Teaching {
@@ -58,9 +54,18 @@ model Teaching {
   @@id([class, teacher, subject])
 }
 
-model Admin {
+model User {
+  type      usertype
   firstName String
   lastName  String
-  email     String @id
+  email     String   @id
   password  String
+  Student   Student?
+  Teacher   Teacher?
+}
+
+enum usertype {
+  admin
+  student
+  teacher
 }

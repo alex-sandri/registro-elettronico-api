@@ -1,40 +1,38 @@
 import ISerializable from "../common/ISerializable";
 import Database from "../utilities/Database";
-import Utilities from "../utilities/Utilities";
 import Class, { ISerializedClass } from "./Class";
 import Grade, { ISerializedGrade } from "./Grade";
+import User, { ISerializedUser, IUpdateUser, IUser } from "./User";
 
-interface IStudent
+interface IStudent extends IUser
 {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
+    type: "student";
     class: string;
 }
 
-interface IUpdateStudent
+interface IUpdateStudent extends IUpdateUser
 {
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    password?: string;
     class?: string;
 }
 
-export interface ISerializedStudent
+export interface ISerializedStudent extends ISerializedUser
 {
-    firstName: string;
-    lastName: string;
-    email: string;
     grades: ISerializedGrade[];
     class: ISerializedClass;
 }
 
-export default class Student implements ISerializable
+export default class Student extends User implements ISerializable
 {
-    private constructor(public data: IStudent)
-    {}
+    protected constructor(public data: IStudent)
+    {
+        super({
+            type: data.type,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            password: data.password,
+        });
+    }
 
     public async serialize(): Promise<ISerializedStudent>
     {
@@ -43,9 +41,7 @@ export default class Student implements ISerializable
         const studentClass = await Class.retrieve(this.data.class);
 
         return {
-            firstName: this.data.firstName,
-            lastName: this.data.lastName,
-            email: this.data.email,
+            ...await super.serialize(),
             grades: await Promise.all(grades.map(_ => _.serialize())),
             class: await studentClass!.serialize(false),
         };
@@ -55,12 +51,21 @@ export default class Student implements ISerializable
     {
         const db = Database.client;
 
+        await super.create({
+            type: data.type,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            password: data.password,
+        });
+
         await db.student.create({
             data: {
-                firstName: data.firstName,
-                lastName: data.lastName,
-                email: data.email,
-                password: Utilities.hash(data.password),
+                User: {
+                    connect: {
+                        email: data.email,
+                    },
+                },
                 Class: {
                     connect: {
                         name: data.class,
@@ -76,6 +81,13 @@ export default class Student implements ISerializable
     {
         const db = Database.client;
 
+        const user = await super.retrieve(id);
+
+        if (!user || user.data.type !== "student")
+        {
+            return null;
+        }
+
         const student = await db.student.findUnique({
             where: {
                 email: id,
@@ -87,34 +99,27 @@ export default class Student implements ISerializable
             return null;
         }
 
-        return new Student(student);
+        return new Student({ ...user.data, ...student, type: "student" });
     }
 
     public async update(data: IUpdateStudent): Promise<Student>
     {
         const db = Database.client;
 
-        let password: string | undefined;
+        await super.update({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            password: data.password,
+        });
 
-        if (data.password)
-        {
-            password = Utilities.hash(data.password);
-        }
-
-        this.data.firstName = data.firstName ?? this.data.firstName;
-        this.data.lastName = data.lastName ?? this.data.lastName;
-        this.data.email = data.email ?? this.data.email;
-        this.data.password = password ?? this.data.password;
+        this.data.class = data.class ?? this.data.password;
 
         await db.student.update({
             where: {
                 email: this.data.email,
             },
             data: {
-                firstName: this.data.firstName,
-                lastName: this.data.lastName,
-                email: this.data.email,
-                password: this.data.password,
                 Class: {
                     connect: {
                         name: this.data.class,
@@ -130,12 +135,15 @@ export default class Student implements ISerializable
     {
         const db = Database.client;
 
-        const grades = await db.student.findMany({
+        const students = await db.student.findMany({
             where: {
                 class: studentClass.data.name,
             },
+            include: {
+                User: true,
+            },
         });
 
-        return grades.map(_ => new Student(_));
+        return students.map(_ => new Student({ ..._.User, class: _.class, type: "student" }));
     }
 }

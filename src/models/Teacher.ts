@@ -1,60 +1,51 @@
 import ISerializable from "../common/ISerializable";
-import Database from "../utilities/Database";
-import Utilities from "../utilities/Utilities";
 import Teaching, { ISerializedTeaching } from "./Teaching";
+import User, { ISerializedUser, IUpdateUser, IUser } from "./User";
 
-interface ITeacher
+interface ITeacher extends IUser
 {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
+    type: "teacher";
 }
 
-interface IUpdateTeacher
-{
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    password?: string;
-}
+interface IUpdateTeacher extends IUpdateUser
+{}
 
-export interface ISerializedTeacher
+export interface ISerializedTeacher extends ISerializedUser
 {
-    firstName: string;
-    lastName: string;
-    email: string;
     teachings: ISerializedTeaching[];
 }
 
-export default class Teacher implements ISerializable
+export default class Teacher extends User implements ISerializable
 {
-    private constructor(public data: ITeacher)
-    {}
+    protected constructor(public data: ITeacher)
+    {
+        super({
+            type: data.type,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            password: data.password,
+        });
+    }
 
     public async serialize(): Promise<ISerializedTeacher>
     {
         const teachings = await Teaching.for(this);
 
         return {
-            firstName: this.data.firstName,
-            lastName: this.data.lastName,
-            email: this.data.email,
+            ...await super.serialize(),
             teachings: await Promise.all(teachings.map(_ => _.serialize())),
         };
     }
 
     public static async create(data: ITeacher): Promise<Teacher>
     {
-        const db = Database.client;
-
-        await db.teacher.create({
-            data: {
-                firstName: data.firstName,
-                lastName: data.lastName,
-                email: data.email,
-                password: Utilities.hash(data.password),
-            },
+        await super.create({
+            type: data.type,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            password: data.password,
         });
 
         return new Teacher(data);
@@ -62,48 +53,23 @@ export default class Teacher implements ISerializable
 
     public static async retrieve(id: string): Promise<Teacher | null>
     {
-        const db = Database.client;
+        const user = await super.retrieve(id);
 
-        const teacher = await db.teacher.findUnique({
-            where: {
-                email: id,
-            },
-        });
-
-        if (!teacher)
+        if (!user || user.data.type !== "teacher")
         {
             return null;
         }
 
-        return new Teacher(teacher);
+        return new Teacher({ ...user.data, type: "teacher" });
     }
 
     public async update(data: IUpdateTeacher): Promise<Teacher>
     {
-        const db = Database.client;
-
-        let password: string | undefined;
-
-        if (data.password)
-        {
-            password = Utilities.hash(data.password);
-        }
-
-        this.data.firstName = data.firstName ?? this.data.firstName;
-        this.data.lastName = data.lastName ?? this.data.lastName;
-        this.data.email = data.email ?? this.data.email;
-        this.data.password = password ?? this.data.password;
-
-        await db.teacher.update({
-            where: {
-                email: this.data.email,
-            },
-            data: {
-                firstName: this.data.firstName,
-                lastName: this.data.lastName,
-                email: this.data.email,
-                password: this.data.password,
-            },
+        await super.update({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            password: data.password,
         });
 
         return this;
