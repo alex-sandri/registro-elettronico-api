@@ -343,19 +343,6 @@ const server = new ApolloServer({
 
         return { token };
     },
-    formatError: error =>
-    {
-        if
-        (
-            error.message.startsWith("Variable \"$password\"")
-            && error.message.endsWith("Query error: String not long enough")
-        )
-        {
-            return new Error("The password is too short");
-        }
-
-        return error;
-    },
 });
 
 server.listen({ port: 4000 });
