@@ -24,6 +24,7 @@ export interface IUpdateUser
 
 export interface ISerializedUser
 {
+    type: TUserType;
     firstName: string;
     lastName: string;
     email: string;
@@ -37,6 +38,7 @@ export default class User implements ISerializable
     public async serialize(): Promise<ISerializedUser>
     {
         return {
+            type: this.data.type,
             firstName: this.data.firstName,
             lastName: this.data.lastName,
             email: this.data.email,

@@ -25,6 +25,7 @@ const typeDefs = gql`
 
     type Admin
     {
+        type: String!
         firstName: String!
         lastName: String!
         email: String!
@@ -58,6 +59,7 @@ const typeDefs = gql`
 
     type Student
     {
+        type: String!
         firstName: String!
         lastName: String!
         email: String!
@@ -73,6 +75,7 @@ const typeDefs = gql`
 
     type Teacher
     {
+        type: String!
         firstName: String!
         lastName: String!
         email: String!
