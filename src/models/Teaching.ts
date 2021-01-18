@@ -1,4 +1,5 @@
 import ISerializable from "../common/ISerializable";
+import { TEACHING_CREATE_SCHEMA } from "../common/Schemas";
 import Database from "../utilities/Database";
 import Class, { ISerializedClass } from "./Class";
 import Subject, { ISerializedSubject } from "./Subject";
@@ -38,6 +39,13 @@ export default class Teaching implements ISerializable
 
     public static async create(data: ITeaching): Promise<Teaching>
     {
+        const result = TEACHING_CREATE_SCHEMA.validate(data);
+
+        if (result.error)
+        {
+            throw new Error(result.error.message);
+        }
+
         const db = Database.client;
 
         await db.teaching.create({

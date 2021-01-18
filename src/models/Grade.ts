@@ -1,4 +1,5 @@
 import ISerializable from "../common/ISerializable";
+import { GRADE_CREATE_SCHEMA } from "../common/Schemas";
 import Database from "../utilities/Database";
 import Student from "./Student";
 import Subject, { ISerializedSubject } from "./Subject";
@@ -8,14 +9,14 @@ interface IGrade
     student: string;
     subject: string;
     value: number;
-    timestamp: Date;
+    timestamp: string;
     description: string;
 }
 
 export interface ISerializedGrade
 {
     value: number;
-    timestamp: Date;
+    timestamp: string;
     description: string;
     subject: ISerializedSubject;
 }
@@ -39,6 +40,13 @@ export default class Grade implements ISerializable
 
     public static async create(data: IGrade): Promise<Grade>
     {
+        const result = GRADE_CREATE_SCHEMA.validate(data);
+
+        if (result.error)
+        {
+            throw new Error(result.error.message);
+        }
+
         const db = Database.client;
 
         await db.grade.create({
