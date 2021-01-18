@@ -2,7 +2,7 @@ import Joi from "joi";
 
 export const USER_CREATE_SCHEMA = Joi.object({
     type: Joi.string()
-        .valid([ "admin", "student", "teacher" ])
+        .valid("admin", "student", "teacher")
         .required(),
     firstName: Joi.string()
         .required(),

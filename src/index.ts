@@ -1,6 +1,4 @@
 import { ApolloServer, ForbiddenError, gql, IResolvers } from "apollo-server";
-import { GraphQLDate } from "graphql-iso-date";
-import { GraphQLEmail, GraphQLPassword } from "graphql-custom-types";
 
 import Student from "./models/Student";
 import Grade from "./models/Grade";
@@ -16,10 +14,6 @@ import Database from "./utilities/Database";
 Database.init();
 
 const typeDefs = gql`
-    scalar Date
-    scalar Email
-    scalar Password
-
     enum AuthTokenType
     {
         ADMIN
@@ -33,7 +27,7 @@ const typeDefs = gql`
     {
         firstName: String!
         lastName: String!
-        email: Email!
+        email: String!
     }
 
     type AuthToken
@@ -57,7 +51,7 @@ const typeDefs = gql`
     type Grade
     {
         value: Float!
-        timestamp: Date!
+        timestamp: String!
         description: String!
         subject: Subject!
     }
@@ -66,7 +60,7 @@ const typeDefs = gql`
     {
         firstName: String!
         lastName: String!
-        email: Email!
+        email: String!
         grades: [Grade!]!
         class: ClassWithoutStudents!
     }
@@ -81,7 +75,7 @@ const typeDefs = gql`
     {
         firstName: String!
         lastName: String!
-        email: Email!
+        email: String!
         teachings: [Teaching!]!
     }
 
@@ -89,7 +83,7 @@ const typeDefs = gql`
     {
         firstName: String!
         lastName: String!
-        email: Email!
+        email: String!
     }
 
     type Teaching
@@ -116,7 +110,7 @@ const typeDefs = gql`
 
         createGrade(
             value: Float!
-            timestamp: Date!
+            timestamp: String!
             description: String!
 
             student: String!
@@ -126,8 +120,8 @@ const typeDefs = gql`
         createStudent(
             firstName: String!
             lastName: String!
-            email: Email!
-            password: Password!
+            email: String!
+            password: String!
 
             class: String!
         ): Student
@@ -135,8 +129,8 @@ const typeDefs = gql`
         updateStudent(
             firstName: String
             lastName: String
-            email: Email!
-            password: Password
+            email: String!
+            password: String
 
             class: String
         ): Student
@@ -149,15 +143,15 @@ const typeDefs = gql`
         createTeacher(
             firstName: String!
             lastName: String!
-            email: Email!
-            password: Password!
+            email: String!
+            password: String!
         ): Teacher
 
         updateTeacher(
             firstName: String
             lastName: String
-            email: Email!
-            password: Password
+            email: String!
+            password: String
         ): Teacher
 
         createTeaching(
@@ -167,22 +161,22 @@ const typeDefs = gql`
         ): Teaching
 
         createAuthToken(
-            email: Email!
-            password: Password!
+            email: String!
+            password: String!
         ): AuthToken
 
         createAdmin(
             firstName: String!
             lastName: String!
-            email: Email!
-            password: Password!
+            email: String!
+            password: String!
         ): Admin
 
         updateAdmin(
             firstName: String
             lastName: String
-            email: Email!
-            password: Password
+            email: String!
+            password: String
         ): Admin
     }
 `;
@@ -311,9 +305,6 @@ const resolvers: IResolvers = {
             });
         }),
     },
-    Date: GraphQLDate,
-    Email: GraphQLEmail,
-    Password: new GraphQLPassword(8),
     AuthTokenUser: {
         __resolveType(obj: any, context: any, info: any)
         {
