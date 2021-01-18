@@ -1,4 +1,5 @@
 import ISerializable from "../common/ISerializable";
+import { USER_CREATE_SCHEMA, USER_UPDATE_SCHEMA } from "../common/Schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 
@@ -44,17 +45,18 @@ export default class User implements ISerializable
 
     public static async create(data: IUser): Promise<User>
     {
+        const result = USER_CREATE_SCHEMA.validate(data);
+
+        if (result.error)
+        {
+            throw new Error(result.error.message);
+        }
+
         const db = Database.client;
 
-        await db.user.create({
-            data: {
-                type: data.type,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                email: data.email,
-                password: Utilities.hash(data.password),
-            },
-        });
+        data.password = Utilities.hash(data.password);
+
+        await db.user.create({ data });
 
         return new User(data);
     }
@@ -79,6 +81,13 @@ export default class User implements ISerializable
 
     public async update(data: IUpdateUser): Promise<User>
     {
+        const result = USER_UPDATE_SCHEMA.validate(data);
+
+        if (result.error)
+        {
+            throw new Error(result.error.message);
+        }
+
         const db = Database.client;
 
         let password: string | undefined;
@@ -93,17 +102,7 @@ export default class User implements ISerializable
         this.data.email = data.email ?? this.data.email;
         this.data.password = password ?? this.data.password;
 
-        await db.user.update({
-            where: {
-                email: this.data.email,
-            },
-            data: {
-                firstName: this.data.firstName,
-                lastName: this.data.lastName,
-                email: this.data.email,
-                password: this.data.password,
-            },
-        });
+        await db.user.update({ where: { email: this.data.email }, data });
 
         return this;
     }
