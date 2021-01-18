@@ -43,6 +43,12 @@ export const SUBJECT_CREATE_SCHEMA = Joi.object({
 export const TEACHING_CREATE_SCHEMA = Joi.object({
     name: Joi.string()
         .required(),
+    teacher: Joi.string()
+        .required(),
+    class: Joi.string()
+        .required(),
+    subject: Joi.string()
+        .required(),
 });
 
 export const USER_CREATE_SCHEMA = Joi.object({
