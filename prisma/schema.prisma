@@ -14,6 +14,7 @@ model Class {
 }
 
 model Grade {
+  id          String   @id
   value       Int
   timestamp   DateTime
   description String
@@ -21,8 +22,6 @@ model Grade {
   subject     String
   Student     Student  @relation(fields: [student], references: [email])
   Subject     Subject  @relation(fields: [subject], references: [name])
-
-  @@id([timestamp, student, subject])
 }
 
 model Student {

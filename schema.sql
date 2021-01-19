@@ -30,13 +30,14 @@ CREATE TABLE "Student"
 
 CREATE TABLE "Grade"
 (
+    "id" VARCHAR(255) NOT NULL,
     "value" INT NOT NULL,
     "timestamp" TIMESTAMP NOT NULL,
     "description" VARCHAR(255) NOT NULL,
     "student" VARCHAR(255) NOT NULL,
     "subject" VARCHAR(30) NOT NULL,
 
-    PRIMARY KEY ("timestamp", "student", "subject"),
+    PRIMARY KEY ("id"),
     FOREIGN KEY ("student") REFERENCES "Student",
     FOREIGN KEY ("subject") REFERENCES "Subject",
 

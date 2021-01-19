@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 import ISerializable from "../common/ISerializable";
 import { GRADE_CREATE_SCHEMA } from "../config/Schemas";
 import Database from "../utilities/Database";
@@ -51,6 +53,7 @@ export default class Grade implements ISerializable
 
         await db.grade.create({
             data: {
+                id: uuidv4(),
                 value: data.value,
                 timestamp: data.timestamp,
                 description: data.description,
