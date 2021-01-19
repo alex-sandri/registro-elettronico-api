@@ -222,7 +222,12 @@ const resolvers: IResolvers = {
     },
     Mutation: {
         createClass: Resolver.init([ "admin" ], Class.create),
-        createGrade: Resolver.init([ "teacher" ], Grade.create),
+        createGrade: Resolver.init([ "teacher" ], args =>
+        {
+            args.timestamp = new Date(args.timestamp);
+
+            return Grade.create(args);
+        }),
         createStudent: Resolver.init([ "admin" ], Student.create),
         updateStudent: Resolver.init([ "admin", "student" ], async (args, token) =>
         {

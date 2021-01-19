@@ -25,8 +25,9 @@ export const GRADE_CREATE_SCHEMA = Joi.object({
         .max(10)
         .multiple(0.25)
         .required(),
-    timestamp: Joi.string()
-        .isoDate()
+    timestamp: Joi.date()
+        .max("now")
+        .iso()
         .required(),
     description: Joi.string()
         .valid("")
