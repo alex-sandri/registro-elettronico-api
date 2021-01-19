@@ -10,18 +10,19 @@ import Teaching from "./models/Teaching";
 import AuthToken from "./models/AuthToken";
 import Admin from "./models/Admin";
 import Database from "./utilities/Database";
+import User from "./models/User";
 
 Database.init();
 
 const typeDefs = gql`
-    enum AuthTokenType
+    enum UserType
     {
         ADMIN
         STUDENT
         TEACHER
     }
 
-    union AuthTokenUser = Admin | Teacher | Student
+    union User = Admin | Teacher | Student
 
     type Admin
     {
@@ -34,8 +35,8 @@ const typeDefs = gql`
     type AuthToken
     {
         id: String!
-        type: AuthTokenType!
-        user: AuthTokenUser!
+        type: UserType!
+        user: User!
     }
 
     type Class
@@ -103,6 +104,8 @@ const typeDefs = gql`
         student(id: ID!): Student
 
         teacher(id: ID!): Teacher
+
+        user(id: ID!): User
     }
 
     type Mutation
@@ -219,6 +222,17 @@ const resolvers: IResolvers = {
 
             return teacher;
         }),
+        user: Resolver.init([ "admin", "teacher", "student" ], async args =>
+        {
+            const user = await User.retrieve(args.id);
+
+            if (!user)
+            {
+                throw new Error("This user does not exist");
+            }
+
+            return user;
+        }),
     },
     Mutation: {
         createClass: Resolver.init([ "admin" ], Class.create),
@@ -313,10 +327,10 @@ const resolvers: IResolvers = {
             });
         }),
     },
-    AuthTokenUser: {
+    User: {
         __resolveType(obj: any, context: any, info: any)
         {
-            if(obj.class)
+            if (obj.class)
             {
                 return "Student";
             }
