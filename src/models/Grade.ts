@@ -9,7 +9,7 @@ interface IGrade
     student: string;
     subject: string;
     value: number;
-    timestamp: string;
+    timestamp: Date;
     description: string;
 }
 
@@ -32,7 +32,7 @@ export default class Grade implements ISerializable
 
         return {
             value: this.data.value,
-            timestamp: this.data.timestamp,
+            timestamp: this.data.timestamp.toISOString(),
             description: this.data.description,
             subject: await subject!.serialize(),
         };
