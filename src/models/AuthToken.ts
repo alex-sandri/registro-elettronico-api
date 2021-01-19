@@ -1,7 +1,8 @@
 import * as jwt from "jsonwebtoken";
 import ISerializable from "../common/ISerializable";
-import User, { ISerializedUser } from "../models/User";
-import Utilities from "./Utilities";
+import User, { ISerializedUser } from "./User";
+import Utilities from "../utilities/Utilities";
+import { AUTH_TOKEN_CREATE_SCHEMA } from "../common/Schemas";
 
 export type TAuthTokenType = "admin" | "student"| "teacher";
 
@@ -44,6 +45,13 @@ export default class AuthToken implements ISerializable
 
     public static async create(data: ICreateAuthToken): Promise<AuthToken>
     {
+        const result = AUTH_TOKEN_CREATE_SCHEMA.validate(data);
+
+        if (result.error)
+        {
+            throw new Error(result.error.message);
+        }
+
         const user = await User.retrieve(data.email);
 
         if (!user)

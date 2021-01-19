@@ -1,6 +1,6 @@
 import { AuthenticationError, ForbiddenError } from "apollo-server";
 import ISerializable from "../common/ISerializable";
-import AuthToken, { TAuthTokenType } from "./AuthToken";
+import AuthToken, { TAuthTokenType } from "../models/AuthToken";
 
 export default class Resolver<T extends ISerializable>
 {

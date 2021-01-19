@@ -1,5 +1,14 @@
 import Joi from "joi";
 
+export const AUTH_TOKEN_CREATE_SCHEMA = Joi.object({
+    email: Joi.string()
+        .email()
+        .required(),
+    password: Joi.string()
+        .min(8)
+        .required(),
+});
+
 export const CLASS_CREATE_SCHEMA = Joi.object({
     name: Joi.string()
         .required(),

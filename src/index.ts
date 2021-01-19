@@ -7,7 +7,7 @@ import Subject from "./models/Subject";
 import Teacher from "./models/Teacher";
 import Resolver from "./utilities/Resolver";
 import Teaching from "./models/Teaching";
-import AuthToken from "./utilities/AuthToken";
+import AuthToken from "./models/AuthToken";
 import Admin from "./models/Admin";
 import Database from "./utilities/Database";
 
