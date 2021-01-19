@@ -224,11 +224,18 @@ const resolvers: IResolvers = {
         }),
         user: Resolver.init([ "admin", "teacher", "student" ], async args =>
         {
-            const user = await User.retrieve(args.id);
+            let user = await User.retrieve(args.id);
 
             if (!user)
             {
                 throw new Error("This user does not exist");
+            }
+
+            switch (user.data.type)
+            {
+                case "admin": user = await Admin.retrieve(args.id) as Admin;
+                case "student": user = await Student.retrieve(args.id) as Student;
+                case "teacher": user = await Teacher.retrieve(args.id) as Teacher;
             }
 
             return user;
