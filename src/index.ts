@@ -233,9 +233,9 @@ const resolvers: IResolvers = {
 
             switch (user.data.type)
             {
-                case "admin": user = await Admin.retrieve(args.id) as Admin;
-                case "student": user = await Student.retrieve(args.id) as Student;
-                case "teacher": user = await Teacher.retrieve(args.id) as Teacher;
+                case "admin": user = await Admin.retrieve(args.id) as Admin; break;
+                case "student": user = await Student.retrieve(args.id) as Student; break;
+                case "teacher": user = await Teacher.retrieve(args.id) as Teacher; break;
             }
 
             return user;
