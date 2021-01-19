@@ -1,5 +1,5 @@
 import ISerializable from "../common/ISerializable";
-import { SUBJECT_CREATE_SCHEMA } from "../common/Schemas";
+import { SUBJECT_CREATE_SCHEMA } from "../config/Schemas";
 import Database from "../utilities/Database";
 
 interface ISubject

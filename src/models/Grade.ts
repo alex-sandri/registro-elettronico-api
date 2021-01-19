@@ -1,5 +1,5 @@
 import ISerializable from "../common/ISerializable";
-import { GRADE_CREATE_SCHEMA } from "../common/Schemas";
+import { GRADE_CREATE_SCHEMA } from "../config/Schemas";
 import Database from "../utilities/Database";
 import Student from "./Student";
 import Subject, { ISerializedSubject } from "./Subject";

@@ -1,5 +1,5 @@
 import ISerializable from "../common/ISerializable";
-import { USER_CREATE_SCHEMA, USER_UPDATE_SCHEMA } from "../common/Schemas";
+import { USER_CREATE_SCHEMA, USER_UPDATE_SCHEMA } from "../config/Schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 

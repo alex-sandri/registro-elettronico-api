@@ -2,7 +2,7 @@ import * as jwt from "jsonwebtoken";
 import ISerializable from "../common/ISerializable";
 import User, { ISerializedUser } from "./User";
 import Utilities from "../utilities/Utilities";
-import { AUTH_TOKEN_CREATE_SCHEMA } from "../common/Schemas";
+import { AUTH_TOKEN_CREATE_SCHEMA } from "../config/Schemas";
 
 export type TAuthTokenType = "admin" | "student"| "teacher";
 

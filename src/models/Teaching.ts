@@ -1,5 +1,5 @@
 import ISerializable from "../common/ISerializable";
-import { TEACHING_CREATE_SCHEMA } from "../common/Schemas";
+import { TEACHING_CREATE_SCHEMA } from "../config/Schemas";
 import Database from "../utilities/Database";
 import Class, { ISerializedClass } from "./Class";
 import Subject, { ISerializedSubject } from "./Subject";

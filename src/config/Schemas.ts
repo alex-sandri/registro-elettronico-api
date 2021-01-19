@@ -1,11 +1,12 @@
 import Joi from "joi";
+import { Config } from "./Config";
 
 export const AUTH_TOKEN_CREATE_SCHEMA = Joi.object({
     email: Joi.string()
         .email()
         .required(),
     password: Joi.string()
-        .min(8)
+        .min(Config.PASSWORD_MIN_LENGTH)
         .required(),
 });
 
@@ -72,7 +73,7 @@ export const USER_CREATE_SCHEMA = Joi.object({
         .email()
         .required(),
     password: Joi.string()
-        .min(8)
+        .min(Config.PASSWORD_MIN_LENGTH)
         .required(),
 });
 
