@@ -30,7 +30,7 @@ export const GRADE_CREATE_SCHEMA = Joi.object({
         .iso()
         .required(),
     description: Joi.string()
-        .valid("")
+        .allow("")
         .required(),
 });
 
