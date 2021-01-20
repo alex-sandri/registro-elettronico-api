@@ -1,11 +1,13 @@
+CREATE TYPE USERTYPE AS ENUM ('admin', 'student', 'teacher');
+
+CREATE DOMAIN GRADE AS NUMERIC(4, 2) NOT NULL CHECK(value between 0 and 10) CHECK(value % 0.25 = 0);
+
 CREATE TABLE "Class"
 (
     "name" VARCHAR(30) NOT NULL,
 
     PRIMARY KEY ("name")
 );
-
-CREATE TYPE USERTYPE AS ENUM ('admin', 'student', 'teacher');
 
 CREATE TABLE "User"
 (
@@ -31,7 +33,7 @@ CREATE TABLE "Student"
 CREATE TABLE "Grade"
 (
     "id" VARCHAR(255) NOT NULL,
-    "value" INT NOT NULL,
+    "value" GRADE NOT NULL,
     "timestamp" TIMESTAMP NOT NULL,
     "description" VARCHAR(255) NOT NULL,
     "student" VARCHAR(255) NOT NULL,
@@ -41,7 +43,6 @@ CREATE TABLE "Grade"
     FOREIGN KEY ("student") REFERENCES "Student",
     FOREIGN KEY ("subject") REFERENCES "Subject",
 
-    CHECK("value" > 0 AND "value" <= 10),
     CHECK("timestamp" <= CURRENT_DATE)
 );
 
