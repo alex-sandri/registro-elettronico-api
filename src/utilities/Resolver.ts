@@ -6,13 +6,13 @@ export default class Resolver<T extends ISerializable>
 {
     private constructor(
         private types: TAuthTokenType[],
-        private callback: (args: any, token: AuthToken) => Promise<T>
+        private callback: (args: any, token: AuthToken) => Promise<T | T[]>
     )
     {}
 
     public static init<T extends ISerializable>(
         types: TAuthTokenType[],
-        callback: (args: any, token: AuthToken) => Promise<T>
+        callback: (args: any, token: AuthToken) => Promise<T | T[]>
     ): (parent: any, args: any, context: any, info: any) => Promise<void>
     {
         const instance = new Resolver(types, callback);
@@ -35,6 +35,11 @@ export default class Resolver<T extends ISerializable>
         }
 
         const result = await this.callback(args, token);
+
+        if (Array.isArray(result))
+        {
+            return result.map(_ => _.serialize());
+        }
 
         return result.serialize();
     }

@@ -65,4 +65,13 @@ export default class Subject implements ISerializable
 
         return new Subject(subject);
     }
+
+    public static async list(): Promise<Subject[]>
+    {
+        const db = Database.client;
+
+        const subjects = await db.subject.findMany();
+
+        return subjects.map(_ => new Subject(_));
+    }
 }

@@ -103,6 +103,8 @@ const typeDefs = gql`
 
         student(id: ID!): Student
 
+        subjects: [Subject!]!
+
         teacher(id: ID!): Teacher
 
         user(id: ID!): User
@@ -211,6 +213,7 @@ const resolvers: IResolvers = {
 
             return student;
         }),
+        subjects: Resolver.init([ "admin", "teacher", "student" ], Subject.list),
         teacher: Resolver.init([ "admin", "teacher" ], async args =>
         {
             const teacher = await Teacher.retrieve(args.id);
