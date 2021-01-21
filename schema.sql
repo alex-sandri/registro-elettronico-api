@@ -26,8 +26,8 @@ CREATE TABLE "Student"
     "class" VARCHAR(30) NOT NULL,
 
     PRIMARY KEY ("email"),
-    FOREIGN KEY ("email") REFERENCES "User",
-    FOREIGN KEY ("class") REFERENCES "Class"
+    FOREIGN KEY ("email") REFERENCES "User" ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY ("class") REFERENCES "Class" ON UPDATE CASCADE
 );
 
 CREATE TABLE "Grade"
@@ -40,8 +40,8 @@ CREATE TABLE "Grade"
     "subject" VARCHAR(30) NOT NULL,
 
     PRIMARY KEY ("id"),
-    FOREIGN KEY ("student") REFERENCES "Student",
-    FOREIGN KEY ("subject") REFERENCES "Subject",
+    FOREIGN KEY ("student") REFERENCES "Student" ON UPDATE CASCADE,
+    FOREIGN KEY ("subject") REFERENCES "Subject" ON UPDATE CASCADE,
 
     CHECK("timestamp" <= CURRENT_DATE)
 );
@@ -59,7 +59,7 @@ CREATE TABLE "Teacher"
     "email" VARCHAR(255) NOT NULL,
 
     PRIMARY KEY ("email"),
-    FOREIGN KEY ("email") REFERENCES "User"
+    FOREIGN KEY ("email") REFERENCES "User" ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE "Teaching"
@@ -69,7 +69,7 @@ CREATE TABLE "Teaching"
     "subject" VARCHAR(30) NOT NULL,
 
     PRIMARY KEY ("class", "teacher", "subject"),
-    FOREIGN KEY ("class") REFERENCES "Class",
-    FOREIGN KEY ("teacher") REFERENCES "Teacher",
-    FOREIGN KEY ("subject") REFERENCES "Subject"
+    FOREIGN KEY ("class") REFERENCES "Class" ON UPDATE CASCADE,
+    FOREIGN KEY ("teacher") REFERENCES "Teacher" ON UPDATE CASCADE,
+    FOREIGN KEY ("subject") REFERENCES "Subject" ON UPDATE CASCADE
 );
