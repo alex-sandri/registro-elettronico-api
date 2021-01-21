@@ -75,12 +75,12 @@ export default class Teaching implements ISerializable
     {
         const db = Database.client;
 
-        const classes = await db.teaching.findMany({
+        const teachings = await db.teaching.findMany({
             where: {
                 teacher: teacher.data.email,
             },
         });
 
-        return classes.map(_ => new Teaching(_));
+        return teachings.map(_ => new Teaching(_));
     }
 }

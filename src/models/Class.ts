@@ -2,6 +2,7 @@ import ISerializable from "../common/ISerializable";
 import { CLASS_CREATE_SCHEMA } from "../config/Schemas";
 import Database from "../utilities/Database";
 import Student, { ISerializedStudent } from "./Student";
+import Teacher from "./Teacher";
 
 interface IClass
 {
@@ -70,5 +71,21 @@ export default class Class implements ISerializable
         }
 
         return new Class(retrievedClass);
+    }
+
+    public static async for(teacher: Teacher): Promise<Class[]>
+    {
+        const db = Database.client;
+
+        const classes = await db.teaching.findMany({
+            where: {
+                teacher: teacher.data.email,
+            },
+            include: {
+                Class: true,
+            },
+        });
+
+        return classes.map(_ => new Class(_.Class));
     }
 }
