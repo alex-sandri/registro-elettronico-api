@@ -1,4 +1,10 @@
-import { ApolloServer, ForbiddenError, gql, IResolvers } from "apollo-server";
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import bearerToken from "express-bearer-token";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 import Student from "./models/Student";
 import Grade from "./models/Grade";
@@ -14,189 +20,15 @@ import User from "./models/User";
 
 Database.init();
 
-const typeDefs = gql`
-    enum UserType
-    {
-        ADMIN
-        STUDENT
-        TEACHER
-    }
+const app = express();
 
-    union User = Admin | Teacher | Student
+app.use(cors());
+app.use(helmet());
+app.use(bearerToken());
 
-    type Admin
-    {
-        type: String!
-        firstName: String!
-        lastName: String!
-        email: String!
-    }
+app.use(express.json());
 
-    type AuthToken
-    {
-        id: String!
-        type: UserType!
-        user: User!
-    }
-
-    type Class
-    {
-        name: String!
-        students: [Student!]!
-    }
-
-    type ClassWithoutStudents
-    {
-        name: String!
-    }
-
-    type Grade
-    {
-        value: Float!
-        timestamp: String!
-        description: String!
-        subject: Subject!
-    }
-
-    type Student
-    {
-        type: String!
-        firstName: String!
-        lastName: String!
-        email: String!
-        grades: [Grade!]!
-        class: ClassWithoutStudents!
-    }
-
-    type Subject
-    {
-        name: String!
-        description: String!
-    }
-
-    type Teacher
-    {
-        type: String!
-        firstName: String!
-        lastName: String!
-        email: String!
-        classes: [Class!]!
-        teachings: [Teaching!]!
-    }
-
-    type TeacherWithoutTeachings
-    {
-        firstName: String!
-        lastName: String!
-        email: String!
-    }
-
-    type Teaching
-    {
-        teacher: TeacherWithoutTeachings!
-        class: Class!
-        subject: Subject!
-    }
-
-    type Query
-    {
-        admins: [Admin!]!
-
-        class(id: ID!): Class
-        classes: [Class!]!
-
-        student(id: ID!): Student
-        students: [Student!]!
-
-        subjects: [Subject!]!
-
-        teacher(id: ID!): Teacher
-        teachers: [Teacher!]!
-
-        user(id: ID!): User
-        users: [User!]!
-    }
-
-    type Mutation
-    {
-        createClass(
-            name: String!
-        ): Class
-
-        createGrade(
-            value: Float!
-            timestamp: String!
-            description: String!
-
-            student: String!
-            subject: String!
-        ): Grade
-
-        createStudent(
-            firstName: String!
-            lastName: String!
-            email: String!
-            password: String!
-
-            class: String!
-        ): Student
-
-        updateStudent(
-            firstName: String
-            lastName: String
-            email: String!
-            password: String
-
-            class: String
-        ): Student
-
-        createSubject(
-            name: String!
-            description: String!
-        ): Subject
-
-        createTeacher(
-            firstName: String!
-            lastName: String!
-            email: String!
-            password: String!
-        ): Teacher
-
-        updateTeacher(
-            firstName: String
-            lastName: String
-            email: String!
-            password: String
-        ): Teacher
-
-        createTeaching(
-            teacher: String!
-            class: String!
-            subject: String!
-        ): Teaching
-
-        createAuthToken(
-            email: String!
-            password: String!
-        ): AuthToken
-
-        createAdmin(
-            firstName: String!
-            lastName: String!
-            email: String!
-            password: String!
-        ): Admin
-
-        updateAdmin(
-            firstName: String
-            lastName: String
-            email: String!
-            password: String
-        ): Admin
-    }
-`;
-
-const resolvers: IResolvers = {
+const resolvers = {
     Query: {
         admins: Resolver.init<Admin>([ "admin" ], Admin.list),
         class: Resolver.init<Class>([ "admin", "teacher" ], async args =>
