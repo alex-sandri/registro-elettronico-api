@@ -110,6 +110,19 @@ export default class Student extends User implements ISerializable
         return new Student({ ...user.data, ...student, type: "student" });
     }
 
+    public static async list(): Promise<Student[]>
+    {
+        const db = Database.client;
+
+        const students = await db.student.findMany({
+            include: {
+                User: true,
+            },
+        });
+
+        return students.map(_ => new Student({ ..._, ..._.User, type: "student" }));
+    }
+
     public async update(data: IUpdateStudent): Promise<Student>
     {
         const result = STUDENT_UPDATE_SCHEMA.validate(data);

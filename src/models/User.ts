@@ -81,6 +81,15 @@ export default class User implements ISerializable
         return new User(user);
     }
 
+    public static async list(): Promise<User[]>
+    {
+        const db = Database.client;
+
+        const users = await db.user.findMany();
+
+        return users.map(_ => new User(_));
+    }
+
     public async update(data: IUpdateUser): Promise<User>
     {
         const result = USER_UPDATE_SCHEMA.validate(data);

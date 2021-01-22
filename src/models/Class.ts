@@ -73,6 +73,15 @@ export default class Class implements ISerializable
         return new Class(retrievedClass);
     }
 
+    public static async list(): Promise<Class[]>
+    {
+        const db = Database.client;
+
+        const classes = await db.class.findMany();
+
+        return classes.map(_ => new Class(_));
+    }
+
     public static async for(teacher: Teacher): Promise<Class[]>
     {
         const db = Database.client;

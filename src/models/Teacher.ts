@@ -81,6 +81,15 @@ export default class Teacher extends User implements ISerializable
         return new Teacher({ ...user.data, type: "teacher" });
     }
 
+    public static async list(): Promise<Teacher[]>
+    {
+        const teachers = await super.list();
+
+        return teachers
+            .filter(_ => _.data.type === "teacher")
+            .map(_ => new Teacher({ ..._.data, type: "teacher" }));
+    }
+
     public async update(data: IUpdateTeacher): Promise<Teacher>
     {
         await super.update({

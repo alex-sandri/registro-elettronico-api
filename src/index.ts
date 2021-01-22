@@ -100,15 +100,21 @@ const typeDefs = gql`
 
     type Query
     {
+        admins: [Admin!]!
+
         class(id: ID!): Class
+        classes: [Class!]!
 
         student(id: ID!): Student
+        students: [Student!]!
 
         subjects: [Subject!]!
 
         teacher(id: ID!): Teacher
+        teachers: [Teacher!]!
 
         user(id: ID!): User
+        users: [User!]!
     }
 
     type Mutation
@@ -192,7 +198,8 @@ const typeDefs = gql`
 
 const resolvers: IResolvers = {
     Query: {
-        class: Resolver.init([ "admin", "teacher" ], async args =>
+        admins: Resolver.init<Admin>([ "admin" ], Admin.list),
+        class: Resolver.init<Class>([ "admin", "teacher" ], async args =>
         {
             const retrievedClass = await Class.retrieve(args.id);
 
@@ -203,7 +210,8 @@ const resolvers: IResolvers = {
 
             return retrievedClass;
         }),
-        student: Resolver.init([ "admin", "teacher", "student" ], async args =>
+        classes: Resolver.init<Class>([ "admin" ], Class.list),
+        student: Resolver.init<Student>([ "admin", "teacher", "student" ], async args =>
         {
             const student = await Student.retrieve(args.id);
 
@@ -214,8 +222,9 @@ const resolvers: IResolvers = {
 
             return student;
         }),
-        subjects: Resolver.init([ "admin", "teacher", "student" ], Subject.list),
-        teacher: Resolver.init([ "admin", "teacher" ], async args =>
+        students: Resolver.init<Student>([ "admin" ], Student.list),
+        subjects: Resolver.init<Subject>([ "admin", "teacher", "student" ], Subject.list),
+        teacher: Resolver.init<Teacher>([ "admin", "teacher" ], async args =>
         {
             const teacher = await Teacher.retrieve(args.id);
 
@@ -226,7 +235,8 @@ const resolvers: IResolvers = {
 
             return teacher;
         }),
-        user: Resolver.init([ "admin", "teacher", "student" ], async args =>
+        teachers: Resolver.init<Teacher>([ "admin" ], Teacher.list),
+        user: Resolver.init<User>([ "admin", "teacher", "student" ], async args =>
         {
             let user = await User.retrieve(args.id);
 
@@ -244,6 +254,7 @@ const resolvers: IResolvers = {
 
             return user;
         }),
+        users: Resolver.init<User>([ "admin" ], User.list),
     },
     Mutation: {
         createClass: Resolver.init([ "admin" ], Class.create),
