@@ -9,7 +9,7 @@ import Grade from "./models/Grade";
 import Class from "./models/Class";
 import Subject from "./models/Subject";
 import Teacher from "./models/Teacher";
-//import Teaching from "./models/Teaching";
+import Teaching from "./models/Teaching";
 import AuthToken, { TAuthTokenType } from "./models/AuthToken";
 import Admin from "./models/Admin";
 import Database from "./utilities/Database";
@@ -93,13 +93,6 @@ const checkAuth = (types: TAuthTokenType[]): (token: string, response: Response)
                 password: args.password,
             });
         }),
-        createTeaching: Resolver.init([ "admin" ], Teaching.create),
-        createAuthToken: async (parent: any, args: any, context: any, info: any) =>
-        {
-            const token = await AuthToken.create(args);
-
-            return token.serialize();
-        },
         createAdmin: Resolver.init([ "admin" ], Admin.create),
         updateAdmin: Resolver.init([ "admin" ], async (args, token) =>
         {
@@ -338,6 +331,31 @@ const api = new Api({
                 }
 
                 response.body.data = await teacher.serialize();
+
+                response.send();
+            },
+        },
+        {
+            method: "POST",
+            url: "/teachings",
+            checkAuth: checkAuth([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const teaching = await Teaching.create(request.body);
+
+                response.body.data = await teaching.serialize();
+
+                response.send();
+            },
+        },
+        {
+            method: "POST",
+            url: "/tokens",
+            callback: async (request, response) =>
+            {
+                const token = await AuthToken.create(request.body);
+
+                response.body.data = await token.serialize();
 
                 response.send();
             },
