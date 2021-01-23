@@ -1,93 +1,48 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import bearerToken from "express-bearer-token";
+import Api from "@alex-sandri/api";
+import Response from "@alex-sandri/api/lib/utilities/Response";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 import Student from "./models/Student";
-import Grade from "./models/Grade";
+//import Grade from "./models/Grade";
 import Class from "./models/Class";
 import Subject from "./models/Subject";
 import Teacher from "./models/Teacher";
-import Resolver from "./utilities/Resolver";
-import Teaching from "./models/Teaching";
-import AuthToken from "./models/AuthToken";
+//import Teaching from "./models/Teaching";
+import AuthToken, { TAuthTokenType } from "./models/AuthToken";
 import Admin from "./models/Admin";
 import Database from "./utilities/Database";
 import User from "./models/User";
 
 Database.init();
 
-const app = express();
+const checkAuth = (types: TAuthTokenType[]): (token: string, response: Response) => Promise<boolean> =>
+{
+    return async (token: string, response: Response) =>
+    {
+        const authToken = await AuthToken.retrieve(token);
 
-app.use(cors());
-app.use(helmet());
-app.use(bearerToken());
-
-app.use(express.json());
-
-const resolvers = {
-    Query: {
-        admins: Resolver.init<Admin>([ "admin" ], Admin.list),
-        class: Resolver.init<Class>([ "admin", "teacher" ], async args =>
+        if (!authToken)
         {
-            const retrievedClass = await Class.retrieve(args.id);
+            response.unauthorized();
 
-            if (!retrievedClass)
-            {
-                throw new Error("This class does not exist");
-            }
+            return false;
+        }
 
-            return retrievedClass;
-        }),
-        classes: Resolver.init<Class>([ "admin" ], Class.list),
-        student: Resolver.init<Student>([ "admin", "teacher", "student" ], async args =>
+        if (!types.includes(authToken.type))
         {
-            const student = await Student.retrieve(args.id);
+            response.forbidden();
 
-            if (!student)
-            {
-                throw new Error("This student does not exist");
-            }
+            return false;
+        }
 
-            return student;
-        }),
-        students: Resolver.init<Student>([ "admin" ], Student.list),
-        subjects: Resolver.init<Subject>([ "admin", "teacher", "student" ], Subject.list),
-        teacher: Resolver.init<Teacher>([ "admin", "teacher" ], async args =>
-        {
-            const teacher = await Teacher.retrieve(args.id);
+        return true;
+    }
+}
 
-            if (!teacher)
-            {
-                throw new Error("This teacher does not exist");
-            }
-
-            return teacher;
-        }),
-        teachers: Resolver.init<Teacher>([ "admin" ], Teacher.list),
-        user: Resolver.init<User>([ "admin", "teacher", "student" ], async args =>
-        {
-            let user = await User.retrieve(args.id);
-
-            if (!user)
-            {
-                throw new Error("This user does not exist");
-            }
-
-            switch (user.data.type)
-            {
-                case "admin": user = await Admin.retrieve(args.id) as Admin; break;
-                case "student": user = await Student.retrieve(args.id) as Student; break;
-                case "teacher": user = await Teacher.retrieve(args.id) as Teacher; break;
-            }
-
-            return user;
-        }),
-        users: Resolver.init<User>([ "admin" ], User.list),
-    },
+/*
+const endpoints = {
     Mutation: {
         createClass: Resolver.init([ "admin" ], Class.create),
         createGrade: Resolver.init([ "teacher" ], args =>
@@ -199,17 +154,235 @@ const resolvers = {
         },
     },
 };
+*/
 
-const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    context: ({ req }) =>
-    {
-        // Save the Bearer Token in the context
-        const token = req.headers.authorization?.split(" ")[1] ?? "";
+const api = new Api({
+    port: 4000,
+    endpoints: [
+        {
+            method: "GET",
+            url: "/admins",
+            checkAuth: checkAuth([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const admins = await Admin.list();
 
-        return { token };
-    },
+                response.body.data = [];
+
+                for (const admin of admins)
+                {
+                    response.body.data.push(await admin.serialize());
+                }
+
+                response.send();
+            },
+        },
+        {
+            method: "GET",
+            url: "/admins/:id",
+            checkAuth: checkAuth([ "admin", "teacher" ]),
+            callback: async (request, response) =>
+            {
+                const admin = await Admin.retrieve(request.params.id);
+
+                if (!admin)
+                {
+                    response.notFound();
+
+                    return;
+                }
+
+                response.body.data = await admin.serialize();
+
+                response.send();
+            },
+        },
+        {
+            method: "GET",
+            url: "/classes",
+            checkAuth: checkAuth([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const classes = await Class.list();
+
+                response.body.data = [];
+
+                for (const item of classes)
+                {
+                    response.body.data.push(await item.serialize());
+                }
+
+                response.send();
+            },
+        },
+        {
+            method: "GET",
+            url: "/classes/:id",
+            checkAuth: checkAuth([ "admin", "teacher" ]),
+            callback: async (request, response) =>
+            {
+                const retrievedClass = await Class.retrieve(request.params.id);
+
+                if (!retrievedClass)
+                {
+                    response.notFound();
+
+                    return;
+                }
+
+                response.body.data = await retrievedClass.serialize();
+
+                response.send();
+            },
+        },
+        {
+            method: "GET",
+            url: "/students",
+            checkAuth: checkAuth([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const students = await Teacher.list();
+
+                response.body.data = [];
+
+                for (const student of students)
+                {
+                    response.body.data.push(await student.serialize());
+                }
+
+                response.send();
+            },
+        },
+        {
+            method: "GET",
+            url: "/students/:id",
+            checkAuth: checkAuth([ "admin", "teacher", "student" ]),
+            callback: async (request, response) =>
+            {
+                const student = await Student.retrieve(request.params.id);
+
+                if (!student)
+                {
+                    response.notFound();
+
+                    return;
+                }
+
+                // TODO:
+                // Check that the authenticated user can access this user data
+
+                response.body.data = await student.serialize();
+
+                response.send();
+            },
+        },
+        {
+            method: "GET",
+            url: "/subjects",
+            checkAuth: checkAuth([ "admin", "teacher", "student" ]),
+            callback: async (request, response) =>
+            {
+                const subjects = await Subject.list();
+
+                response.body.data = [];
+
+                for (const subject of subjects)
+                {
+                    response.body.data.push(await subject.serialize());
+                }
+
+                response.send();
+            },
+        },
+        {
+            method: "GET",
+            url: "/teachers",
+            checkAuth: checkAuth([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const teachers = await Teacher.list();
+
+                response.body.data = [];
+
+                for (const teacher of teachers)
+                {
+                    response.body.data.push(await teacher.serialize());
+                }
+
+                response.send();
+            },
+        },
+        {
+            method: "GET",
+            url: "/teachers/:id",
+            checkAuth: checkAuth([ "admin", "teacher" ]),
+            callback: async (request, response) =>
+            {
+                const teacher = await Teacher.retrieve(request.params.id);
+
+                if (!teacher)
+                {
+                    response.notFound();
+
+                    return;
+                }
+
+                response.body.data = await teacher.serialize();
+
+                response.send();
+            },
+        },
+        {
+            method: "GET",
+            url: "/users",
+            checkAuth: checkAuth([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const users = await User.list();
+
+                response.body.data = [];
+
+                for (const user of users)
+                {
+                    response.body.data.push(await user.serialize());
+                }
+
+                response.send();
+            },
+        },
+        {
+            method: "GET",
+            url: "/users/:id",
+            checkAuth: checkAuth([ "admin", "teacher", "student" ]),
+            callback: async (request, response) =>
+            {
+                const id = request.params.id;
+
+                let user = await User.retrieve(id);
+
+                if (!user)
+                {
+                    response.notFound();
+
+                    return;
+                }
+
+                // TODO:
+                // Check that the authenticated user can access this user data
+
+                switch (user.data.type)
+                {
+                    case "admin": user = await Admin.retrieve(id) as Admin; break;
+                    case "student": user = await Student.retrieve(id) as Student; break;
+                    case "teacher": user = await Teacher.retrieve(id) as Teacher; break;
+                }
+
+                response.body.data = await user.serialize();
+
+                response.send();
+            },
+        },
+    ],
 });
 
-server.listen({ port: 4000 });
+api.listen();
