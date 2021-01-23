@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import Student from "./models/Student";
-//import Grade from "./models/Grade";
+import Grade from "./models/Grade";
 import Class from "./models/Class";
 import Subject from "./models/Subject";
 import Teacher from "./models/Teacher";
@@ -42,15 +42,6 @@ const checkAuth = (types: TAuthTokenType[]): (token: string, response: Response)
 }
 
 /*
-const endpoints = {
-    Mutation: {
-        createClass: Resolver.init([ "admin" ], Class.create),
-        createGrade: Resolver.init([ "teacher" ], args =>
-        {
-            args.timestamp = new Date(args.timestamp);
-
-            return Grade.create(args);
-        }),
         createStudent: Resolver.init([ "admin" ], Student.create),
         updateStudent: Resolver.init([ "admin", "student" ], async (args, token) =>
         {
@@ -77,7 +68,6 @@ const endpoints = {
                 class: args.class,
             });
         }),
-        createSubject: Resolver.init([ "admin" ], Subject.create),
         createTeacher: Resolver.init([ "admin" ], Teacher.create),
         updateTeacher: Resolver.init([ "admin", "teacher" ], async (args, token) =>
         {
@@ -135,25 +125,6 @@ const endpoints = {
                 password: args.password,
             });
         }),
-    },
-    User: {
-        __resolveType(obj: any, context: any, info: any)
-        {
-            if (obj.class)
-            {
-                return "Student";
-            }
-            else if (obj.teachings)
-            {
-                return "Teacher";
-            }
-            else
-            {
-                return "Admin";
-            }
-        },
-    },
-};
 */
 
 const api = new Api({
@@ -236,6 +207,32 @@ const api = new Api({
             },
         },
         {
+            method: "POST",
+            url: "/classes",
+            checkAuth: checkAuth([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const createdClass = await Class.create(request.body);
+
+                response.body.data = await createdClass.serialize();
+
+                response.send();
+            },
+        },
+        {
+            method: "POST",
+            url: "/grades",
+            checkAuth: checkAuth([ "teacher" ]),
+            callback: async (request, response) =>
+            {
+                const grade = await Grade.create(request.body);
+
+                response.body.data = await grade.serialize();
+
+                response.send();
+            },
+        },
+        {
             method: "GET",
             url: "/students",
             checkAuth: checkAuth([ "admin" ]),
@@ -290,6 +287,19 @@ const api = new Api({
                 {
                     response.body.data.push(await subject.serialize());
                 }
+
+                response.send();
+            },
+        },
+        {
+            method: "POST",
+            url: "/subjects",
+            checkAuth: checkAuth([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const subject = await Subject.create(request.body);
+
+                response.body.data = await subject.serialize();
 
                 response.send();
             },
