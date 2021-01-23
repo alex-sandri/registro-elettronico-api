@@ -42,7 +42,6 @@ const checkAuth = (types: TAuthTokenType[]): (token: string, response: Response)
 }
 
 /*
-        createStudent: Resolver.init([ "admin" ], Student.create),
         updateStudent: Resolver.init([ "admin", "student" ], async (args, token) =>
         {
             if (token.type === "student")
@@ -68,7 +67,6 @@ const checkAuth = (types: TAuthTokenType[]): (token: string, response: Response)
                 class: args.class,
             });
         }),
-        createTeacher: Resolver.init([ "admin" ], Teacher.create),
         updateTeacher: Resolver.init([ "admin", "teacher" ], async (args, token) =>
         {
             if (token.type === "teacher")
@@ -93,7 +91,6 @@ const checkAuth = (types: TAuthTokenType[]): (token: string, response: Response)
                 password: args.password,
             });
         }),
-        createAdmin: Resolver.init([ "admin" ], Admin.create),
         updateAdmin: Resolver.init([ "admin" ], async (args, token) =>
         {
             if (token.type === "admin")
@@ -155,6 +152,19 @@ const api = new Api({
 
                     return;
                 }
+
+                response.body.data = await admin.serialize();
+
+                response.send();
+            },
+        },
+        {
+            method: "POST",
+            url: "/admins",
+            checkAuth: checkAuth([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const admin = await Admin.create(request.body);
 
                 response.body.data = await admin.serialize();
 
@@ -267,6 +277,19 @@ const api = new Api({
             },
         },
         {
+            method: "POST",
+            url: "/students",
+            checkAuth: checkAuth([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const student = await Student.create(request.body);
+
+                response.body.data = await student.serialize();
+
+                response.send();
+            },
+        },
+        {
             method: "GET",
             url: "/subjects",
             checkAuth: checkAuth([ "admin", "teacher", "student" ]),
@@ -329,6 +352,19 @@ const api = new Api({
 
                     return;
                 }
+
+                response.body.data = await teacher.serialize();
+
+                response.send();
+            },
+        },
+        {
+            method: "POST",
+            url: "/teachers",
+            checkAuth: checkAuth([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const teacher = await Teacher.create(request.body);
 
                 response.body.data = await teacher.serialize();
 
