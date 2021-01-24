@@ -115,10 +115,21 @@ const api = new Api({
         new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/classes",
-            retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response) =>
+            retrieveToken: retrieveToken([ "admin", "teacher" ]),
+            callback: async (request, response, token) =>
             {
-                const classes = await Class.list();
+                let classes: Class[];
+
+                if (token.type === "teacher")
+                {
+                    const teacher = await Teacher.retrieve(token.user.data.email);
+
+                    classes = await Class.for(teacher!);
+                }
+                else
+                {
+                    classes = await Class.list();
+                }
 
                 response.body.data = [];
 
