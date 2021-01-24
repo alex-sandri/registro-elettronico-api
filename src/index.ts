@@ -1,5 +1,4 @@
-import Api from "@alex-sandri/api";
-import Response from "@alex-sandri/api/lib/utilities/Response";
+import Api, { Endpoint, AuthenticatedEndpoint } from "@alex-sandri/api";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -17,27 +16,23 @@ import User from "./models/User";
 
 Database.init();
 
-const checkAuth = (types: TAuthTokenType[]): (token: string, response: Response) => Promise<boolean> =>
+const retrieveToken = (types: TAuthTokenType[]): (token: string) => Promise<AuthToken | null> =>
 {
-    return async (token: string, response: Response) =>
+    return async (id: string) =>
     {
-        const authToken = await AuthToken.retrieve(token);
+        const authToken = await AuthToken.retrieve(id);
 
         if (!authToken)
         {
-            response.unauthorized();
-
-            return false;
+            return null;
         }
 
         if (!types.includes(authToken.type))
         {
-            response.forbidden();
-
-            return false;
+            return null;
         }
 
-        return true;
+        return authToken;
     }
 }
 
@@ -120,11 +115,11 @@ const checkAuth = (types: TAuthTokenType[]): (token: string, response: Response)
 const api = new Api({
     port: 4000,
     endpoints: [
-        {
+        new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/admins",
-            checkAuth: checkAuth([ "admin" ]),
-            callback: async (request, response) =>
+            retrieveToken: retrieveToken([ "admin" ]),
+            callback: async (request, response, token) =>
             {
                 const admins = await Admin.list();
 
@@ -137,11 +132,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/admins/:id",
-            checkAuth: checkAuth([ "admin", "teacher" ]),
+            retrieveToken: retrieveToken([ "admin", "teacher" ]),
             callback: async (request, response) =>
             {
                 const admin = await Admin.retrieve(request.params.id);
@@ -157,11 +152,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "POST",
             url: "/admins",
-            checkAuth: checkAuth([ "admin" ]),
+            retrieveToken: retrieveToken([ "admin" ]),
             callback: async (request, response) =>
             {
                 const admin = await Admin.create(request.body);
@@ -170,11 +165,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/classes",
-            checkAuth: checkAuth([ "admin" ]),
+            retrieveToken: retrieveToken([ "admin" ]),
             callback: async (request, response) =>
             {
                 const classes = await Class.list();
@@ -188,11 +183,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/classes/:id",
-            checkAuth: checkAuth([ "admin", "teacher" ]),
+            retrieveToken: retrieveToken([ "admin", "teacher" ]),
             callback: async (request, response) =>
             {
                 const retrievedClass = await Class.retrieve(request.params.id);
@@ -208,11 +203,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "POST",
             url: "/classes",
-            checkAuth: checkAuth([ "admin" ]),
+            retrieveToken: retrieveToken([ "admin" ]),
             callback: async (request, response) =>
             {
                 const createdClass = await Class.create(request.body);
@@ -221,11 +216,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "POST",
             url: "/grades",
-            checkAuth: checkAuth([ "teacher" ]),
+            retrieveToken: retrieveToken([ "teacher" ]),
             callback: async (request, response) =>
             {
                 const grade = await Grade.create(request.body);
@@ -234,11 +229,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/students",
-            checkAuth: checkAuth([ "admin" ]),
+            retrieveToken: retrieveToken([ "admin" ]),
             callback: async (request, response) =>
             {
                 const students = await Teacher.list();
@@ -252,11 +247,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/students/:id",
-            checkAuth: checkAuth([ "admin", "teacher", "student" ]),
+            retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
             callback: async (request, response) =>
             {
                 const student = await Student.retrieve(request.params.id);
@@ -275,11 +270,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "POST",
             url: "/students",
-            checkAuth: checkAuth([ "admin" ]),
+            retrieveToken: retrieveToken([ "admin" ]),
             callback: async (request, response) =>
             {
                 const student = await Student.create(request.body);
@@ -288,11 +283,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/subjects",
-            checkAuth: checkAuth([ "admin", "teacher", "student" ]),
+            retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
             callback: async (request, response) =>
             {
                 const subjects = await Subject.list();
@@ -306,11 +301,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "POST",
             url: "/subjects",
-            checkAuth: checkAuth([ "admin" ]),
+            retrieveToken: retrieveToken([ "admin" ]),
             callback: async (request, response) =>
             {
                 const subject = await Subject.create(request.body);
@@ -319,11 +314,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/teachers",
-            checkAuth: checkAuth([ "admin" ]),
+            retrieveToken: retrieveToken([ "admin" ]),
             callback: async (request, response) =>
             {
                 const teachers = await Teacher.list();
@@ -337,11 +332,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/teachers/:id",
-            checkAuth: checkAuth([ "admin", "teacher" ]),
+            retrieveToken: retrieveToken([ "admin", "teacher" ]),
             callback: async (request, response) =>
             {
                 const teacher = await Teacher.retrieve(request.params.id);
@@ -357,11 +352,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "POST",
             url: "/teachers",
-            checkAuth: checkAuth([ "admin" ]),
+            retrieveToken: retrieveToken([ "admin" ]),
             callback: async (request, response) =>
             {
                 const teacher = await Teacher.create(request.body);
@@ -370,11 +365,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "POST",
             url: "/teachings",
-            checkAuth: checkAuth([ "admin" ]),
+            retrieveToken: retrieveToken([ "admin" ]),
             callback: async (request, response) =>
             {
                 const teaching = await Teaching.create(request.body);
@@ -383,8 +378,8 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new Endpoint<AuthToken>({
             method: "POST",
             url: "/tokens",
             callback: async (request, response) =>
@@ -395,11 +390,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/users",
-            checkAuth: checkAuth([ "admin" ]),
+            retrieveToken: retrieveToken([ "admin" ]),
             callback: async (request, response) =>
             {
                 const users = await User.list();
@@ -413,11 +408,11 @@ const api = new Api({
 
                 response.send();
             },
-        },
-        {
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
             method: "GET",
             url: "/users/:id",
-            checkAuth: checkAuth([ "admin", "teacher", "student" ]),
+            retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
             callback: async (request, response) =>
             {
                 const id = request.params.id;
@@ -445,7 +440,7 @@ const api = new Api({
 
                 response.send();
             },
-        },
+        }),
     ],
 });
 
