@@ -36,61 +36,6 @@ const retrieveToken = (types: TAuthTokenType[]): (token: string) => Promise<Auth
     }
 }
 
-/*
-        updateStudent: Resolver.init([ "admin", "student" ], async (args, token) =>
-        {
-            
-        }),
-        updateTeacher: Resolver.init([ "admin", "teacher" ], async (args, token) =>
-        {
-            if (token.type === "teacher")
-            {
-                if (args.email !== token.user.data.email)
-                {
-                    throw new ForbiddenError("Forbidden");
-                }
-            }
-
-            const teacher = await Teacher.retrieve(args.email);
-
-            if (!teacher)
-            {
-                throw new Error("This teacher does not exist");
-            }
-
-            return teacher.update({
-                firstName: args.firstName,
-                lastName: args.lastName,
-                email: args.email,
-                password: args.password,
-            });
-        }),
-        updateAdmin: Resolver.init([ "admin" ], async (args, token) =>
-        {
-            if (token.type === "admin")
-            {
-                if (args.email !== token.user.data.email)
-                {
-                    throw new ForbiddenError("Forbidden");
-                }
-            }
-
-            const admin = await Admin.retrieve(args.email);
-
-            if (!admin)
-            {
-                throw new Error("This admin does not exist");
-            }
-
-            return admin.update({
-                firstName: args.firstName,
-                lastName: args.lastName,
-                email: args.email,
-                password: args.password,
-            });
-        }),
-*/
-
 const api = new Api({
     port: 4000,
     endpoints: [
@@ -139,6 +84,28 @@ const api = new Api({
             callback: async (request, response) =>
             {
                 const admin = await Admin.create(request.body);
+
+                response.body.data = await admin.serialize();
+
+                response.send();
+            },
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
+            method: "PUT",
+            url: "/admins/:id",
+            retrieveToken: retrieveToken([ "admin" ]),
+            callback: async (request, response) =>
+            {
+                const admin = await Admin.retrieve(request.params.id);
+
+                if (!admin)
+                {
+                    response.notFound();
+
+                    return;
+                }
+
+                await admin.update(request.body);
 
                 response.body.data = await admin.serialize();
 
@@ -375,6 +342,38 @@ const api = new Api({
             callback: async (request, response) =>
             {
                 const teacher = await Teacher.create(request.body);
+
+                response.body.data = await teacher.serialize();
+
+                response.send();
+            },
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
+            method: "PUT",
+            url: "/teachers/:id",
+            retrieveToken: retrieveToken([ "admin", "teacher" ]),
+            callback: async (request, response, token) =>
+            {
+                const teacher = await Teacher.retrieve(request.params.id);
+
+                if (!teacher)
+                {
+                    response.notFound();
+
+                    return;
+                }
+
+                if (token.type === "teacher")
+                {
+                    if (teacher.data.email !== token.user.data.email)
+                    {
+                        response.forbidden();
+
+                        return;
+                    }
+                }
+
+                await teacher.update(request.body);
 
                 response.body.data = await teacher.serialize();
 
