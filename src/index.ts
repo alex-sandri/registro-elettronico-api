@@ -182,7 +182,7 @@ const api = new Api({
             retrieveToken: retrieveToken([ "admin" ]),
             callback: async (request, response) =>
             {
-                const students = await Teacher.list();
+                const students = await Student.list();
 
                 response.body.data = [];
 
