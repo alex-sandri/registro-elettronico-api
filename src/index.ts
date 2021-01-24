@@ -379,7 +379,7 @@ const api = new Api({
                 response.send();
             },
         }),
-        new Endpoint<AuthToken>({
+        new Endpoint({
             method: "POST",
             url: "/tokens",
             callback: async (request, response) =>
