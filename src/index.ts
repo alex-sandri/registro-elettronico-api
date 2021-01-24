@@ -252,7 +252,7 @@ const api = new Api({
             method: "GET",
             url: "/students/:id",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
-            callback: async (request, response) =>
+            callback: async (request, response, token) =>
             {
                 const student = await Student.retrieve(request.params.id);
 
@@ -263,8 +263,12 @@ const api = new Api({
                     return;
                 }
 
-                // TODO:
-                // Check that the authenticated user can access this user data
+                if (token.type === "student" && student.data.email !== token.user.data.email)
+                {
+                    response.forbidden();
+
+                    return;
+                }
 
                 response.body.data = await student.serialize();
 
@@ -413,7 +417,7 @@ const api = new Api({
             method: "GET",
             url: "/users/:id",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
-            callback: async (request, response) =>
+            callback: async (request, response, token) =>
             {
                 const id = request.params.id;
 
@@ -426,8 +430,12 @@ const api = new Api({
                     return;
                 }
 
-                // TODO:
-                // Check that the authenticated user can access this user data
+                if (token.type === "student" && user.data.email !== token.user.data.email)
+                {
+                    response.forbidden();
+
+                    return;
+                }
 
                 switch (user.data.type)
                 {
