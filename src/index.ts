@@ -39,28 +39,7 @@ const retrieveToken = (types: TAuthTokenType[]): (token: string) => Promise<Auth
 /*
         updateStudent: Resolver.init([ "admin", "student" ], async (args, token) =>
         {
-            if (token.type === "student")
-            {
-                if (args.email !== token.user.data.email)
-                {
-                    throw new ForbiddenError("Forbidden");
-                }
-            }
-
-            const student = await Student.retrieve(args.email);
-
-            if (!student)
-            {
-                throw new Error("This student does not exist");
-            }
-
-            return student.update({
-                firstName: args.firstName,
-                lastName: args.lastName,
-                email: args.email,
-                password: args.password,
-                class: args.class,
-            });
+            
         }),
         updateTeacher: Resolver.init([ "admin", "teacher" ], async (args, token) =>
         {
@@ -282,6 +261,38 @@ const api = new Api({
             callback: async (request, response) =>
             {
                 const student = await Student.create(request.body);
+
+                response.body.data = await student.serialize();
+
+                response.send();
+            },
+        }),
+        new AuthenticatedEndpoint<AuthToken>({
+            method: "PUT",
+            url: "/students/:id",
+            retrieveToken: retrieveToken([ "admin", "student" ]),
+            callback: async (request, response, token) =>
+            {
+                const student = await Student.retrieve(request.params.id);
+
+                if (!student)
+                {
+                    response.notFound();
+
+                    return;
+                }
+
+                if (token.type === "student")
+                {
+                    if (student.data.email !== token.user.data.email)
+                    {
+                        response.forbidden();
+
+                        return;
+                    }
+                }
+
+                await student.update(request.body);
 
                 response.body.data = await student.serialize();
 
