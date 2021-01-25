@@ -1,5 +1,5 @@
 import * as jwt from "jsonwebtoken";
-import ISerializable from "../common/ISerializable";
+import { ISerializable } from "@alex-sandri/api";
 import User, { ISerializedUser } from "./User";
 import Utilities from "../utilities/Utilities";
 import { AUTH_TOKEN_CREATE_SCHEMA } from "../config/Schemas";

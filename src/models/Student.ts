@@ -1,4 +1,4 @@
-import ISerializable from "../common/ISerializable";
+import { ISerializable } from "@alex-sandri/api";
 import { STUDENT_CREATE_SCHEMA, STUDENT_UPDATE_SCHEMA } from "../config/Schemas";
 import Database from "../utilities/Database";
 import Class, { ISerializedClass } from "./Class";

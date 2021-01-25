@@ -1,4 +1,4 @@
-import ISerializable from "../common/ISerializable";
+import { ISerializable } from "@alex-sandri/api";
 import Database from "../utilities/Database";
 import Class, { ISerializedClass } from "./Class";
 import Teaching, { ISerializedTeaching } from "./Teaching";
