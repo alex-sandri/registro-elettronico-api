@@ -39,25 +39,13 @@ const retrieveToken = (types: TAuthTokenType[]): (token: string) => Promise<Auth
 const api = new Api({
     port: 4000,
     endpoints: [
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Admin, AuthToken>({
             method: "GET",
             url: "/admins",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response, token) =>
-            {
-                const admins = await Admin.list();
-
-                response.body.data = [];
-
-                for (const admin of admins)
-                {
-                    response.body.data.push(await admin.serialize());
-                }
-
-                response.send();
-            },
+            callback: (request, response, token) => Admin.list(),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Admin, AuthToken>({
             method: "GET",
             url: "/admins/:id",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
@@ -69,28 +57,19 @@ const api = new Api({
                 {
                     response.notFound();
 
-                    return;
+                    return null;
                 }
 
-                response.body.data = await admin.serialize();
-
-                response.send();
+                return admin;
             },
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Admin, AuthToken>({
             method: "POST",
             url: "/admins",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response) =>
-            {
-                const admin = await Admin.create(request.body);
-
-                response.body.data = await admin.serialize();
-
-                response.send();
-            },
+            callback: (request, response) => Admin.create(request.body),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Admin, AuthToken>({
             method: "PUT",
             url: "/admins/:id",
             retrieveToken: retrieveToken([ "admin" ]),
@@ -102,17 +81,15 @@ const api = new Api({
                 {
                     response.notFound();
 
-                    return;
+                    return null;
                 }
 
                 await admin.update(request.body);
 
-                response.body.data = await admin.serialize();
-
-                response.send();
+                return admin;
             },
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Class, AuthToken>({
             method: "GET",
             url: "/classes",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
@@ -131,17 +108,10 @@ const api = new Api({
                     classes = await Class.list();
                 }
 
-                response.body.data = [];
-
-                for (const item of classes)
-                {
-                    response.body.data.push(await item.serialize());
-                }
-
-                response.send();
+                return classes;
             },
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Class, AuthToken>({
             method: "GET",
             url: "/classes/:id",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
@@ -153,59 +123,31 @@ const api = new Api({
                 {
                     response.notFound();
 
-                    return;
+                    return null;
                 }
 
-                response.body.data = await retrievedClass.serialize();
-
-                response.send();
+                return retrievedClass;
             },
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Class, AuthToken>({
             method: "POST",
             url: "/classes",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response) =>
-            {
-                const createdClass = await Class.create(request.body);
-
-                response.body.data = await createdClass.serialize();
-
-                response.send();
-            },
+            callback: (request, response) => Class.create(request.body),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Grade, AuthToken>({
             method: "POST",
             url: "/grades",
             retrieveToken: retrieveToken([ "teacher" ]),
-            callback: async (request, response) =>
-            {
-                const grade = await Grade.create(request.body);
-
-                response.body.data = await grade.serialize();
-
-                response.send();
-            },
+            callback: (request, response) => Grade.create(request.body),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Student, AuthToken>({
             method: "GET",
             url: "/students",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response) =>
-            {
-                const students = await Student.list();
-
-                response.body.data = [];
-
-                for (const student of students)
-                {
-                    response.body.data.push(await student.serialize());
-                }
-
-                response.send();
-            },
+            callback: (request, response) => Student.list(),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Student, AuthToken>({
             method: "GET",
             url: "/students/:id",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
@@ -217,35 +159,26 @@ const api = new Api({
                 {
                     response.notFound();
 
-                    return;
+                    return null;
                 }
 
                 if (token.type === "student" && student.data.email !== token.user.data.email)
                 {
                     response.forbidden();
 
-                    return;
+                    return null;
                 }
 
-                response.body.data = await student.serialize();
-
-                response.send();
+                return student;
             },
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Student, AuthToken>({
             method: "POST",
             url: "/students",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response) =>
-            {
-                const student = await Student.create(request.body);
-
-                response.body.data = await student.serialize();
-
-                response.send();
-            },
+            callback: (request, response) => Student.create(request.body),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Student, AuthToken>({
             method: "PUT",
             url: "/students/:id",
             retrieveToken: retrieveToken([ "admin", "student" ]),
@@ -257,7 +190,7 @@ const api = new Api({
                 {
                     response.notFound();
 
-                    return;
+                    return null;
                 }
 
                 if (token.type === "student")
@@ -266,67 +199,34 @@ const api = new Api({
                     {
                         response.forbidden();
 
-                        return;
+                        return null;
                     }
                 }
 
                 await student.update(request.body);
 
-                response.body.data = await student.serialize();
-
-                response.send();
+                return student;
             },
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Subject, AuthToken>({
             method: "GET",
             url: "/subjects",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
-            callback: async (request, response) =>
-            {
-                const subjects = await Subject.list();
-
-                response.body.data = [];
-
-                for (const subject of subjects)
-                {
-                    response.body.data.push(await subject.serialize());
-                }
-
-                response.send();
-            },
+            callback: (request, response) => Subject.list(),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Subject, AuthToken>({
             method: "POST",
             url: "/subjects",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response) =>
-            {
-                const subject = await Subject.create(request.body);
-
-                response.body.data = await subject.serialize();
-
-                response.send();
-            },
+            callback: (request, response) => Subject.create(request.body),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Teacher, AuthToken>({
             method: "GET",
             url: "/teachers",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response) =>
-            {
-                const teachers = await Teacher.list();
-
-                response.body.data = [];
-
-                for (const teacher of teachers)
-                {
-                    response.body.data.push(await teacher.serialize());
-                }
-
-                response.send();
-            },
+            callback: (request, response) => Teacher.list(),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Teacher, AuthToken>({
             method: "GET",
             url: "/teachers/:id",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
@@ -338,28 +238,19 @@ const api = new Api({
                 {
                     response.notFound();
 
-                    return;
+                    return null;
                 }
 
-                response.body.data = await teacher.serialize();
-
-                response.send();
+                return teacher;
             },
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Teacher, AuthToken>({
             method: "POST",
             url: "/teachers",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response) =>
-            {
-                const teacher = await Teacher.create(request.body);
-
-                response.body.data = await teacher.serialize();
-
-                response.send();
-            },
+            callback: (request, response) => Teacher.create(request.body),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Teacher, AuthToken>({
             method: "PUT",
             url: "/teachers/:id",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
@@ -371,7 +262,7 @@ const api = new Api({
                 {
                     response.notFound();
 
-                    return;
+                    return null;
                 }
 
                 if (token.type === "teacher")
@@ -380,61 +271,33 @@ const api = new Api({
                     {
                         response.forbidden();
 
-                        return;
+                        return null;
                     }
                 }
 
                 await teacher.update(request.body);
 
-                response.body.data = await teacher.serialize();
-
-                response.send();
+                return teacher;
             },
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<Teaching, AuthToken>({
             method: "POST",
             url: "/teachings",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response) =>
-            {
-                const teaching = await Teaching.create(request.body);
-
-                response.body.data = await teaching.serialize();
-
-                response.send();
-            },
+            callback: (request, response) => Teaching.create(request.body),
         }),
-        new Endpoint({
+        new Endpoint<AuthToken>({
             method: "POST",
             url: "/tokens",
-            callback: async (request, response) =>
-            {
-                const token = await AuthToken.create(request.body);
-
-                response.body.data = await token.serialize();
-
-                response.send();
-            },
+            callback: (request, response) => AuthToken.create(request.body),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<User, AuthToken>({
             method: "GET",
             url: "/users",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response) =>
-            {
-                const users = await User.list();
-
-                response.body.data = [];
-
-                for (const user of users)
-                {
-                    response.body.data.push(await user.serialize());
-                }
-
-                response.send();
-            },
+            callback: (request, response) => User.list(),
         }),
-        new AuthenticatedEndpoint<AuthToken>({
+        new AuthenticatedEndpoint<User, AuthToken>({
             method: "GET",
             url: "/users/:id",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
@@ -448,14 +311,14 @@ const api = new Api({
                 {
                     response.notFound();
 
-                    return;
+                    return null;
                 }
 
                 if (token.type === "student" && user.data.email !== token.user.data.email)
                 {
                     response.forbidden();
 
-                    return;
+                    return null;
                 }
 
                 switch (user.data.type)
@@ -465,9 +328,7 @@ const api = new Api({
                     case "teacher": user = await Teacher.retrieve(id) as Teacher; break;
                 }
 
-                response.body.data = await user.serialize();
-
-                response.send();
+                return user;
             },
         }),
     ],
