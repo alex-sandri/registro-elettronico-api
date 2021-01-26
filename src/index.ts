@@ -13,6 +13,7 @@ import AuthToken, { TAuthTokenType } from "./models/AuthToken";
 import Admin from "./models/Admin";
 import Database from "./utilities/Database";
 import User from "./models/User";
+import { CLASS_CREATE_SCHEMA } from "./config/Schemas";
 
 Database.init();
 
@@ -132,6 +133,7 @@ const api = new Api({
         new AuthenticatedEndpoint<Class, AuthToken>({
             method: "POST",
             url: "/classes",
+            schema: CLASS_CREATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin" ]),
             callback: (request, response) => Class.create(request.body),
         }),
