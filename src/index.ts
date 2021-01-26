@@ -409,13 +409,6 @@ const api = new Api({
                     return null;
                 }
 
-                if (token.type === "student" && user.data.email !== token.user.data.email)
-                {
-                    response.forbidden();
-
-                    return null;
-                }
-
                 response.redirect(`/${user.data.type}s/${id}`);
 
                 return null;
