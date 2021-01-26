@@ -201,6 +201,31 @@ const api = new Api({
                 return student;
             },
         }),
+        new AuthenticatedEndpoint<Grade, AuthToken>({
+            method: "GET",
+            url: "/students/:id/grades",
+            retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
+            callback: async (request, response, token) =>
+            {
+                const student = await Student.retrieve(request.params.id);
+
+                if (!student)
+                {
+                    response.notFound();
+
+                    return null;
+                }
+
+                if (token.type === "student" && student.data.email !== token.user.data.email)
+                {
+                    response.forbidden();
+
+                    return null;
+                }
+
+                return Grade.for(student);
+            },
+        }),
         new AuthenticatedEndpoint<Student, AuthToken>({
             method: "POST",
             url: "/students",
