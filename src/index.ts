@@ -13,7 +13,7 @@ import AuthToken, { TAuthTokenType } from "./models/AuthToken";
 import Admin from "./models/Admin";
 import Database from "./utilities/Database";
 import User from "./models/User";
-import { AUTH_TOKEN_CREATE_SCHEMA, CLASS_CREATE_SCHEMA, GRADE_CREATE_SCHEMA } from "./config/Schemas";
+import { AUTH_TOKEN_CREATE_SCHEMA, CLASS_CREATE_SCHEMA, GRADE_CREATE_SCHEMA, STUDENT_CREATE_SCHEMA, STUDENT_UPDATE_SCHEMA } from "./config/Schemas";
 
 Database.init();
 
@@ -178,12 +178,14 @@ const api = new Api({
         new AuthenticatedEndpoint<Student, AuthToken>({
             method: "POST",
             url: "/students",
+            schema: STUDENT_CREATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin" ]),
             callback: (request, response) => Student.create(request.body),
         }),
         new AuthenticatedEndpoint<Student, AuthToken>({
             method: "PUT",
             url: "/students/:id",
+            schema: STUDENT_UPDATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin", "student" ]),
             callback: async (request, response, token) =>
             {

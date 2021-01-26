@@ -1,5 +1,4 @@
 import { ISerializable } from "@alex-sandri/api";
-import { STUDENT_CREATE_SCHEMA, STUDENT_UPDATE_SCHEMA } from "../config/Schemas";
 import Database from "../utilities/Database";
 import Class, { ISerializedClass } from "./Class";
 import Grade, { ISerializedGrade } from "./Grade";
@@ -50,13 +49,6 @@ export default class Student extends User implements ISerializable
 
     public static async create(data: IStudent): Promise<Student>
     {
-        const result = STUDENT_CREATE_SCHEMA.validate(data);
-
-        if (result.error)
-        {
-            throw new Error(result.error.message);
-        }
-
         const db = Database.client;
 
         await super.create({
@@ -125,13 +117,6 @@ export default class Student extends User implements ISerializable
 
     public async update(data: IUpdateStudent): Promise<Student>
     {
-        const result = STUDENT_UPDATE_SCHEMA.validate(data);
-
-        if (result.error)
-        {
-            throw new Error(result.error.message);
-        }
-
         const db = Database.client;
 
         await super.update({
