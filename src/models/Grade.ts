@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { ISerializable } from "@alex-sandri/api";
-import { GRADE_CREATE_SCHEMA } from "../config/Schemas";
 import Database from "../utilities/Database";
 import Student from "./Student";
 import Subject, { ISerializedSubject } from "./Subject";
@@ -42,13 +41,6 @@ export default class Grade implements ISerializable
 
     public static async create(data: IGrade): Promise<Grade>
     {
-        const result = GRADE_CREATE_SCHEMA.validate(data);
-
-        if (result.error)
-        {
-            throw new Error(result.error.message);
-        }
-
         const db = Database.client;
 
         await db.grade.create({
