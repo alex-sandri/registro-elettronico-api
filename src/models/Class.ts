@@ -1,6 +1,5 @@
 import { ISerializable } from "@alex-sandri/api";
 import Database from "../utilities/Database";
-import Student, { ISerializedStudent } from "./Student";
 import Teacher from "./Teacher";
 
 interface IClass
@@ -11,7 +10,6 @@ interface IClass
 export interface ISerializedClass
 {
     name: string;
-    students: ISerializedStudent[];
 }
 
 export default class Class implements ISerializable
@@ -19,18 +17,10 @@ export default class Class implements ISerializable
     private constructor(public data: IClass)
     {}
 
-    public async serialize(includeStudents = true): Promise<ISerializedClass>
+    public async serialize(): Promise<ISerializedClass>
     {
-        let students: Student[] = [];
-
-        if (includeStudents)
-        {
-            students = await Student.for(this);
-        }
-
         return {
             name: this.data.name,
-            students: await Promise.all(students.map(_ => _.serialize())),
         };
     }
 

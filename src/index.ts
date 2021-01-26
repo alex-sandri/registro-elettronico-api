@@ -138,6 +138,24 @@ const api = new Api({
                 return retrievedClass;
             },
         }),
+        new AuthenticatedEndpoint<Student, AuthToken>({
+            method: "GET",
+            url: "/classes/:id/students",
+            retrieveToken: retrieveToken([ "admin", "teacher" ]),
+            callback: async (request, response) =>
+            {
+                const retrievedClass = await Class.retrieve(request.params.id);
+
+                if (!retrievedClass)
+                {
+                    response.notFound();
+
+                    return null;
+                }
+
+                return Student.for(retrievedClass);
+            },
+        }),
         new AuthenticatedEndpoint<Class, AuthToken>({
             method: "POST",
             url: "/classes",

@@ -43,7 +43,7 @@ export default class Student extends User implements ISerializable
         return {
             ...await super.serialize(),
             grades: await Promise.all(grades.map(_ => _.serialize())),
-            class: await studentClass!.serialize(false),
+            class: await studentClass!.serialize(),
         };
     }
 
