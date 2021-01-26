@@ -416,14 +416,9 @@ const api = new Api({
                     return null;
                 }
 
-                switch (user.data.type)
-                {
-                    case "admin": user = await Admin.retrieve(id) as Admin; break;
-                    case "student": user = await Student.retrieve(id) as Student; break;
-                    case "teacher": user = await Teacher.retrieve(id) as Teacher; break;
-                }
+                response.redirect(`/${user.data.type}s/${id}`);
 
-                return user;
+                return null;
             },
         }),
     ],
