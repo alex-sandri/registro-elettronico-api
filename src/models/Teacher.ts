@@ -1,6 +1,5 @@
 import { ISerializable } from "@alex-sandri/api";
 import Database from "../utilities/Database";
-import Class, { ISerializedClass } from "./Class";
 import User, { ISerializedUser, IUpdateUser, IUser } from "./User";
 
 interface ITeacher extends IUser
@@ -12,9 +11,7 @@ interface IUpdateTeacher extends IUpdateUser
 {}
 
 export interface ISerializedTeacher extends ISerializedUser
-{
-    classes: ISerializedClass[];
-}
+{}
 
 export default class Teacher extends User implements ISerializable
 {
@@ -31,11 +28,8 @@ export default class Teacher extends User implements ISerializable
 
     public async serialize(): Promise<ISerializedTeacher>
     {
-        const classes = await Class.for(this);
-
         return {
             ...await super.serialize(),
-            classes: await Promise.all(classes.map(_ => _.serialize())),
         };
     }
 
