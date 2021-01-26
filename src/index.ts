@@ -301,6 +301,24 @@ const api = new Api({
                 return teacher;
             },
         }),
+        new AuthenticatedEndpoint<Teaching, AuthToken>({
+            method: "GET",
+            url: "/teachers/:id/teachings",
+            retrieveToken: retrieveToken([ "admin", "teacher" ]),
+            callback: async (request, response) =>
+            {
+                const teacher = await Teacher.retrieve(request.params.id);
+
+                if (!teacher)
+                {
+                    response.notFound();
+
+                    return null;
+                }
+
+                return Teaching.for(teacher);
+            },
+        }),
         new AuthenticatedEndpoint<Teacher, AuthToken>({
             method: "POST",
             url: "/teachers",

@@ -30,7 +30,7 @@ export default class Teaching implements ISerializable
         const subject = await Subject.retrieve(this.data.subject);
 
         return {
-            teacher: await teacher!.serialize(false),
+            teacher: await teacher!.serialize(),
             class: await teachingClass!.serialize(),
             subject: await subject!.serialize(),
         };
