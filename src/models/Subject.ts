@@ -1,5 +1,4 @@
 import { ISerializable } from "@alex-sandri/api";
-import { SUBJECT_CREATE_SCHEMA } from "../config/Schemas";
 import Database from "../utilities/Database";
 
 interface ISubject
@@ -29,13 +28,6 @@ export default class Subject implements ISerializable
 
     public static async create(data: ISubject): Promise<Subject>
     {
-        const result = SUBJECT_CREATE_SCHEMA.validate(data);
-
-        if (result.error)
-        {
-            throw new Error(result.error.message);
-        }
-
         const db = Database.client;
 
         await db.subject.create({
