@@ -64,9 +64,7 @@ const api = new Api({
 
                 if (!admin)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
                 return admin;
@@ -88,9 +86,7 @@ const api = new Api({
 
                 if (!admin)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
                 await admin.update(request.body);
@@ -130,9 +126,7 @@ const api = new Api({
 
                 if (!retrievedClass)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
                 return retrievedClass;
@@ -148,9 +142,7 @@ const api = new Api({
 
                 if (!retrievedClass)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
                 return Student.for(retrievedClass);
@@ -186,16 +178,12 @@ const api = new Api({
 
                 if (!student)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
                 if (token.type === "student" && student.data.email !== token.user.data.email)
                 {
-                    response.forbidden();
-
-                    return null;
+                    return response.forbidden();
                 }
 
                 return student;
@@ -211,16 +199,12 @@ const api = new Api({
 
                 if (!student)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
                 if (token.type === "student" && student.data.email !== token.user.data.email)
                 {
-                    response.forbidden();
-
-                    return null;
+                    return response.forbidden();
                 }
 
                 return Grade.for(student);
@@ -244,18 +228,14 @@ const api = new Api({
 
                 if (!student)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
                 if (token.type === "student")
                 {
                     if (student.data.email !== token.user.data.email)
                     {
-                        response.forbidden();
-
-                        return null;
+                        return response.forbidden();
                     }
                 }
 
@@ -293,9 +273,7 @@ const api = new Api({
 
                 if (!teacher)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
                 return teacher;
@@ -311,9 +289,7 @@ const api = new Api({
 
                 if (!teacher)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
                 return Class.for(teacher);
@@ -329,9 +305,7 @@ const api = new Api({
 
                 if (!teacher)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
                 return Teaching.for(teacher);
@@ -353,18 +327,14 @@ const api = new Api({
 
                 if (!teacher)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
                 if (token.type === "teacher")
                 {
                     if (teacher.data.email !== token.user.data.email)
                     {
-                        response.forbidden();
-
-                        return null;
+                        return response.forbidden();
                     }
                 }
 
@@ -404,14 +374,10 @@ const api = new Api({
 
                 if (!user)
                 {
-                    response.notFound();
-
-                    return null;
+                    return response.notFound();
                 }
 
-                response.redirect(`/${user.data.type}s/${id}`);
-
-                return null;
+                return response.redirect(`/${user.data.type}s/${id}`);
             },
         }),
     ],
