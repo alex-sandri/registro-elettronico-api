@@ -1,4 +1,4 @@
-import Api, { Endpoint, AuthenticatedEndpoint } from "@alex-sandri/api";
+import Api, { Endpoint, UnauthenticatedEndpoint } from "@alex-sandri/api";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -48,19 +48,19 @@ const retrieveToken = (types: TAuthTokenType[]): (token: string) => Promise<Auth
 const api = new Api({
     port: 4000,
     endpoints: [
-        new AuthenticatedEndpoint<Admin, AuthToken>({
+        new Endpoint<Admin, AuthToken>({
             method: "GET",
             url: "/admins",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (request, response, token) => Admin.list(),
+            callback: (response, context) => Admin.list(),
         }),
-        new AuthenticatedEndpoint<Admin, AuthToken>({
+        new Endpoint<Admin, AuthToken>({
             method: "GET",
             url: "/admins/:id",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (request, response) =>
+            callback: async (response, context) =>
             {
-                const admin = await Admin.retrieve(request.params.id);
+                const admin = await Admin.retrieve(context.params.id);
 
                 if (!admin)
                 {
@@ -70,41 +70,41 @@ const api = new Api({
                 return admin;
             },
         }),
-        new AuthenticatedEndpoint<Admin, AuthToken>({
+        new Endpoint<Admin, AuthToken>({
             method: "POST",
             url: "/admins",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (request, response) => Admin.create(request.body),
+            callback: (response, context) => Admin.create(context.body),
         }),
-        new AuthenticatedEndpoint<Admin, AuthToken>({
+        new Endpoint<Admin, AuthToken>({
             method: "PUT",
             url: "/admins/:id",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (request, response) =>
+            callback: async (response, context) =>
             {
-                const admin = await Admin.retrieve(request.params.id);
+                const admin = await Admin.retrieve(context.params.id);
 
                 if (!admin)
                 {
                     return response.notFound();
                 }
 
-                await admin.update(request.body);
+                await admin.update(context.body);
 
                 return admin;
             },
         }),
-        new AuthenticatedEndpoint<Class, AuthToken>({
+        new Endpoint<Class, AuthToken>({
             method: "GET",
             url: "/classes",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (request, response, token) =>
+            callback: async (response, context) =>
             {
                 let classes: Class[];
 
-                if (token.type === "teacher")
+                if (context.token.type === "teacher")
                 {
-                    const teacher = await Teacher.retrieve(token.user.data.email);
+                    const teacher = await Teacher.retrieve(context.token.user.data.email);
 
                     classes = await Class.for(teacher!);
                 }
@@ -116,13 +116,13 @@ const api = new Api({
                 return classes;
             },
         }),
-        new AuthenticatedEndpoint<Class, AuthToken>({
+        new Endpoint<Class, AuthToken>({
             method: "GET",
             url: "/classes/:id",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (request, response) =>
+            callback: async (response, context) =>
             {
-                const retrievedClass = await Class.retrieve(request.params.id);
+                const retrievedClass = await Class.retrieve(context.params.id);
 
                 if (!retrievedClass)
                 {
@@ -132,13 +132,13 @@ const api = new Api({
                 return retrievedClass;
             },
         }),
-        new AuthenticatedEndpoint<Student, AuthToken>({
+        new Endpoint<Student, AuthToken>({
             method: "GET",
             url: "/classes/:id/students",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (request, response) =>
+            callback: async (response, context) =>
             {
-                const retrievedClass = await Class.retrieve(request.params.id);
+                const retrievedClass = await Class.retrieve(context.params.id);
 
                 if (!retrievedClass)
                 {
@@ -148,40 +148,40 @@ const api = new Api({
                 return Student.for(retrievedClass);
             },
         }),
-        new AuthenticatedEndpoint<Class, AuthToken>({
+        new Endpoint<Class, AuthToken>({
             method: "POST",
             url: "/classes",
             schema: CLASS_CREATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (request, response) => Class.create(request.body),
+            callback: (response, context) => Class.create(context.body),
         }),
-        new AuthenticatedEndpoint<Grade, AuthToken>({
+        new Endpoint<Grade, AuthToken>({
             method: "POST",
             url: "/grades",
             schema: GRADE_CREATE_SCHEMA,
             retrieveToken: retrieveToken([ "teacher" ]),
-            callback: (request, response) => Grade.create(request.body),
+            callback: (response, context) => Grade.create(context.body),
         }),
-        new AuthenticatedEndpoint<Student, AuthToken>({
+        new Endpoint<Student, AuthToken>({
             method: "GET",
             url: "/students",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (request, response) => Student.list(),
+            callback: (response, context) => Student.list(),
         }),
-        new AuthenticatedEndpoint<Student, AuthToken>({
+        new Endpoint<Student, AuthToken>({
             method: "GET",
             url: "/students/:id",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
-            callback: async (request, response, token) =>
+            callback: async (response, context) =>
             {
-                const student = await Student.retrieve(request.params.id);
+                const student = await Student.retrieve(context.params.id);
 
                 if (!student)
                 {
                     return response.notFound();
                 }
 
-                if (token.type === "student" && student.data.email !== token.user.data.email)
+                if (context.token.type === "student" && student.data.email !== context.token.user.data.email)
                 {
                     return response.forbidden();
                 }
@@ -189,20 +189,20 @@ const api = new Api({
                 return student;
             },
         }),
-        new AuthenticatedEndpoint<Grade, AuthToken>({
+        new Endpoint<Grade, AuthToken>({
             method: "GET",
             url: "/students/:id/grades",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
-            callback: async (request, response, token) =>
+            callback: async (response, context) =>
             {
-                const student = await Student.retrieve(request.params.id);
+                const student = await Student.retrieve(context.params.id);
 
                 if (!student)
                 {
                     return response.notFound();
                 }
 
-                if (token.type === "student" && student.data.email !== token.user.data.email)
+                if (context.token.type === "student" && student.data.email !== context.token.user.data.email)
                 {
                     return response.forbidden();
                 }
@@ -210,66 +210,66 @@ const api = new Api({
                 return Grade.for(student);
             },
         }),
-        new AuthenticatedEndpoint<Student, AuthToken>({
+        new Endpoint<Student, AuthToken>({
             method: "POST",
             url: "/students",
             schema: STUDENT_CREATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (request, response) => Student.create(request.body),
+            callback: (response, context) => Student.create(context.body),
         }),
-        new AuthenticatedEndpoint<Student, AuthToken>({
+        new Endpoint<Student, AuthToken>({
             method: "PUT",
             url: "/students/:id",
             schema: STUDENT_UPDATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin", "student" ]),
-            callback: async (request, response, token) =>
+            callback: async (response, context) =>
             {
-                const student = await Student.retrieve(request.params.id);
+                const student = await Student.retrieve(context.params.id);
 
                 if (!student)
                 {
                     return response.notFound();
                 }
 
-                if (token.type === "student")
+                if (context.token.type === "student")
                 {
-                    if (student.data.email !== token.user.data.email)
+                    if (student.data.email !== context.token.user.data.email)
                     {
                         return response.forbidden();
                     }
                 }
 
-                await student.update(request.body);
+                await student.update(context.body);
 
                 return student;
             },
         }),
-        new AuthenticatedEndpoint<Subject, AuthToken>({
+        new Endpoint<Subject, AuthToken>({
             method: "GET",
             url: "/subjects",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
-            callback: (request, response) => Subject.list(),
+            callback: (response, context) => Subject.list(),
         }),
-        new AuthenticatedEndpoint<Subject, AuthToken>({
+        new Endpoint<Subject, AuthToken>({
             method: "POST",
             url: "/subjects",
             schema: SUBJECT_CREATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (request, response) => Subject.create(request.body),
+            callback: (response, context) => Subject.create(context.body),
         }),
-        new AuthenticatedEndpoint<Teacher, AuthToken>({
+        new Endpoint<Teacher, AuthToken>({
             method: "GET",
             url: "/teachers",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (request, response) => Teacher.list(),
+            callback: (response, context) => Teacher.list(),
         }),
-        new AuthenticatedEndpoint<Teacher, AuthToken>({
+        new Endpoint<Teacher, AuthToken>({
             method: "GET",
             url: "/teachers/:id",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (request, response) =>
+            callback: async (response, context) =>
             {
-                const teacher = await Teacher.retrieve(request.params.id);
+                const teacher = await Teacher.retrieve(context.params.id);
 
                 if (!teacher)
                 {
@@ -279,13 +279,13 @@ const api = new Api({
                 return teacher;
             },
         }),
-        new AuthenticatedEndpoint<Class, AuthToken>({
+        new Endpoint<Class, AuthToken>({
             method: "GET",
             url: "/teachers/:id/classes",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (request, response) =>
+            callback: async (response, context) =>
             {
-                const teacher = await Teacher.retrieve(request.params.id);
+                const teacher = await Teacher.retrieve(context.params.id);
 
                 if (!teacher)
                 {
@@ -295,13 +295,13 @@ const api = new Api({
                 return Class.for(teacher);
             },
         }),
-        new AuthenticatedEndpoint<Teaching, AuthToken>({
+        new Endpoint<Teaching, AuthToken>({
             method: "GET",
             url: "/teachers/:id/teachings",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (request, response) =>
+            callback: async (response, context) =>
             {
-                const teacher = await Teacher.retrieve(request.params.id);
+                const teacher = await Teacher.retrieve(context.params.id);
 
                 if (!teacher)
                 {
@@ -311,64 +311,64 @@ const api = new Api({
                 return Teaching.for(teacher);
             },
         }),
-        new AuthenticatedEndpoint<Teacher, AuthToken>({
+        new Endpoint<Teacher, AuthToken>({
             method: "POST",
             url: "/teachers",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (request, response) => Teacher.create(request.body),
+            callback: (response, context) => Teacher.create(context.body),
         }),
-        new AuthenticatedEndpoint<Teacher, AuthToken>({
+        new Endpoint<Teacher, AuthToken>({
             method: "PUT",
             url: "/teachers/:id",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (request, response, token) =>
+            callback: async (response, context) =>
             {
-                const teacher = await Teacher.retrieve(request.params.id);
+                const teacher = await Teacher.retrieve(context.params.id);
 
                 if (!teacher)
                 {
                     return response.notFound();
                 }
 
-                if (token.type === "teacher")
+                if (context.token.type === "teacher")
                 {
-                    if (teacher.data.email !== token.user.data.email)
+                    if (teacher.data.email !== context.token.user.data.email)
                     {
                         return response.forbidden();
                     }
                 }
 
-                await teacher.update(request.body);
+                await teacher.update(context.body);
 
                 return teacher;
             },
         }),
-        new AuthenticatedEndpoint<Teaching, AuthToken>({
+        new Endpoint<Teaching, AuthToken>({
             method: "POST",
             url: "/teachings",
             schema: TEACHING_CREATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (request, response) => Teaching.create(request.body),
+            callback: (response, context) => Teaching.create(context.body),
         }),
-        new Endpoint<AuthToken>({
+        new UnauthenticatedEndpoint<AuthToken>({
             method: "POST",
             url: "/tokens",
             schema: AUTH_TOKEN_CREATE_SCHEMA,
-            callback: (request, response) => AuthToken.create(request.body),
+            callback: (response, context) => AuthToken.create(context.body),
         }),
-        new AuthenticatedEndpoint<User, AuthToken>({
+        new Endpoint<User, AuthToken>({
             method: "GET",
             url: "/users",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (request, response) => User.list(),
+            callback: (response, context) => User.list(),
         }),
-        new AuthenticatedEndpoint<User, AuthToken>({
+        new Endpoint<User, AuthToken>({
             method: "GET",
             url: "/users/:id",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
-            callback: async (request, response, token) =>
+            callback: async (response, context) =>
             {
-                const id = request.params.id;
+                const id = context.params.id;
 
                 let user = await User.retrieve(id);
 
