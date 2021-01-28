@@ -1,4 +1,4 @@
-import { ISerializable } from "@alex-sandri/api";
+import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
 import Teacher from "./Teacher";
 

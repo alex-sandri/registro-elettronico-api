@@ -1,5 +1,5 @@
 import * as jwt from "jsonwebtoken";
-import { ISerializable } from "@alex-sandri/api";
+import { ISerializable } from "../common/ISerializable";
 import User, { ISerializedUser } from "./User";
 import Utilities from "../utilities/Utilities";
 

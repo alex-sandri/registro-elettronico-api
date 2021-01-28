@@ -1,4 +1,5 @@
-import Api, { Endpoint, UnauthenticatedEndpoint } from "@alex-sandri/api";
+import Hapi from "@hapi/hapi";
+import Boom from "@hapi/boom";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -22,8 +23,30 @@ import {
     SUBJECT_CREATE_SCHEMA,
     TEACHING_CREATE_SCHEMA,
 } from "./config/Schemas";
+import { ISerializable } from "./common/ISerializable";
 
 Database.init();
+
+const serialize = async <T extends ISerializable>(data: T | T[]) =>
+{
+    let serialized;
+
+    if (Array.isArray(data))
+    {
+        serialized = [];
+
+        for (const element of data)
+        {
+            serialized.push(await element.serialize());
+        }
+    }
+    else
+    {
+        serialized = await data.serialize();
+    }
+
+    return serialized;
+}
 
 const retrieveToken = (types: TAuthTokenType[]): (token: string) => Promise<AuthToken | null> =>
 {
@@ -45,166 +68,219 @@ const retrieveToken = (types: TAuthTokenType[]): (token: string) => Promise<Auth
     }
 }
 
+const server = Hapi.server({ port: 4000 });
+
+// TODO: Add auth
+
+server.route({
+    // admin
+    method: "GET",
+    path: "/admins",
+    handler: async (request, h) =>
+    {
+        const admins = await Admin.list();
+
+        return h.response(await serialize(admins));
+    },
+});
+
+server.route({
+    // admin, teacher
+    method: "GET",
+    path: "/admins/{id}",
+    handler: async (request, h) =>
+    {
+        const admin = await Admin.retrieve(request.params.id);
+
+        if (!admin)
+        {
+            throw Boom.notFound();
+        }
+
+        return admin;
+    },
+});
+
+server.route({
+    // admin
+    method: "POST",
+    path: "/admins",
+    handler: async (request, h) =>
+    {
+        const admin = await Admin.create(request.payload as any);
+
+        return h.response(await admin.serialize());
+    },
+});
+
+server.route({
+    // admin
+    method: "PUT",
+    path: "/admins/{id}",
+    handler: async (request, h) =>
+    {
+        const admin = await Admin.retrieve(request.params.id);
+
+        if (!admin)
+        {
+            throw Boom.notFound();
+        }
+
+        await admin.update(request.payload as any);
+
+        return h.response(await admin.serialize());
+    },
+});
+/*
+server.route({
+    // admin, teacher
+    method: "GET",
+    path: "/classes",
+    handler: async (request, h) =>
+    {
+        let classes: Class[];
+
+        if (context.token.type === "teacher")
+        {
+            const teacher = await Teacher.retrieve(context.token.user.data.email);
+
+            classes = await Class.for(teacher!);
+        }
+        else
+        {
+            classes = await Class.list();
+        }
+
+        return h.response(await serialize(classes));
+    },
+});
+*/
+server.route({
+    // admin, teacher
+    method: "GET",
+    path: "/classes/{id}",
+    handler: async (request, h) =>
+    {
+        const retrievedClass = await Class.retrieve(request.params.id);
+
+        if (!retrievedClass)
+        {
+            throw Boom.notFound();
+        }
+
+        return h.response(await retrievedClass.serialize());
+    },
+});
+
+server.route({
+    // admin, teacher
+    method: "GET",
+    path: "/classes/{id}/students",
+    handler: async (request, h) =>
+    {
+        const retrievedClass = await Class.retrieve(request.params.id);
+
+        if (!retrievedClass)
+        {
+            throw Boom.notFound();
+        }
+
+        const students = await Student.for(retrievedClass);
+
+        return h.response(await serialize(students));
+    },
+});
+
+server.route({
+    // admin
+    method: "POST",
+    path: "/classes",
+    options: {
+        validate: {
+            payload: CLASS_CREATE_SCHEMA,
+        },
+    },
+    handler: async (request, h) =>
+    {
+        const newClass = await Class.create(request.payload as any);
+
+        return h.response(await newClass.serialize());
+    },
+});
+
+server.route({
+    // teacher
+    method: "POST",
+    path: "/grades",
+    options: {
+        validate: {
+            payload: GRADE_CREATE_SCHEMA,
+        },
+    },
+    handler: async (request, h) =>
+    {
+        const grade = await Grade.create(request.payload as any);
+
+        return h.response(await grade.serialize());
+    },
+});
+
+server.route({
+    // admin
+    method: "GET",
+    path: "/students",
+    handler: async (request, h) =>
+    {
+        const students = await Student.list();
+
+        return h.response(await serialize(students));
+    },
+});
+/*
+server.route({
+    // admin, teacher, student
+    method: "GET",
+    path: "/students/{id}",
+    handler: async (request, h) =>
+    {
+        const student = await Student.retrieve(request.params.id);
+
+        if (!student)
+        {
+            throw Boom.notFound();
+        }
+
+        if (context.token.type === "student" && student.data.email !== context.token.user.data.email)
+        {
+            throw Boom.forbidden();
+        }
+
+        return student;
+    },
+});
+*/
+server.start();
+
+/*
 const api = new Api({
     port: 4000,
     endpoints: [
-        new Endpoint<Admin, AuthToken>({
-            method: "GET",
-            url: "/admins",
-            retrieveToken: retrieveToken([ "admin" ]),
-            callback: (response, context) => Admin.list(),
-        }),
-        new Endpoint<Admin, AuthToken>({
-            method: "GET",
-            url: "/admins/:id",
-            retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (response, context) =>
-            {
-                const admin = await Admin.retrieve(context.params.id);
-
-                if (!admin)
-                {
-                    return response.notFound();
-                }
-
-                return admin;
-            },
-        }),
-        new Endpoint<Admin, AuthToken>({
-            method: "POST",
-            url: "/admins",
-            retrieveToken: retrieveToken([ "admin" ]),
-            callback: (response, context) => Admin.create(context.body),
-        }),
-        new Endpoint<Admin, AuthToken>({
-            method: "PUT",
-            url: "/admins/:id",
-            retrieveToken: retrieveToken([ "admin" ]),
-            callback: async (response, context) =>
-            {
-                const admin = await Admin.retrieve(context.params.id);
-
-                if (!admin)
-                {
-                    return response.notFound();
-                }
-
-                await admin.update(context.body);
-
-                return admin;
-            },
-        }),
-        new Endpoint<Class, AuthToken>({
-            method: "GET",
-            url: "/classes",
-            retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (response, context) =>
-            {
-                let classes: Class[];
-
-                if (context.token.type === "teacher")
-                {
-                    const teacher = await Teacher.retrieve(context.token.user.data.email);
-
-                    classes = await Class.for(teacher!);
-                }
-                else
-                {
-                    classes = await Class.list();
-                }
-
-                return classes;
-            },
-        }),
-        new Endpoint<Class, AuthToken>({
-            method: "GET",
-            url: "/classes/:id",
-            retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (response, context) =>
-            {
-                const retrievedClass = await Class.retrieve(context.params.id);
-
-                if (!retrievedClass)
-                {
-                    return response.notFound();
-                }
-
-                return retrievedClass;
-            },
-        }),
-        new Endpoint<Student, AuthToken>({
-            method: "GET",
-            url: "/classes/:id/students",
-            retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (response, context) =>
-            {
-                const retrievedClass = await Class.retrieve(context.params.id);
-
-                if (!retrievedClass)
-                {
-                    return response.notFound();
-                }
-
-                return Student.for(retrievedClass);
-            },
-        }),
-        new Endpoint<Class, AuthToken>({
-            method: "POST",
-            url: "/classes",
-            schema: CLASS_CREATE_SCHEMA,
-            retrieveToken: retrieveToken([ "admin" ]),
-            callback: (response, context) => Class.create(context.body),
-        }),
         new Endpoint<Grade, AuthToken>({
-            method: "POST",
-            url: "/grades",
-            schema: GRADE_CREATE_SCHEMA,
-            retrieveToken: retrieveToken([ "teacher" ]),
-            callback: (response, context) => Grade.create(context.body),
-        }),
-        new Endpoint<Student, AuthToken>({
             method: "GET",
-            url: "/students",
-            retrieveToken: retrieveToken([ "admin" ]),
-            callback: (response, context) => Student.list(),
-        }),
-        new Endpoint<Student, AuthToken>({
-            method: "GET",
-            url: "/students/:id",
+            path: "/students/{id}/grades",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
-            callback: async (response, context) =>
+            handler: async (request, h) =>
             {
                 const student = await Student.retrieve(context.params.id);
 
                 if (!student)
                 {
-                    return response.notFound();
+                    throw Boom.notFound();
                 }
 
                 if (context.token.type === "student" && student.data.email !== context.token.user.data.email)
                 {
-                    return response.forbidden();
-                }
-
-                return student;
-            },
-        }),
-        new Endpoint<Grade, AuthToken>({
-            method: "GET",
-            url: "/students/:id/grades",
-            retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
-            callback: async (response, context) =>
-            {
-                const student = await Student.retrieve(context.params.id);
-
-                if (!student)
-                {
-                    return response.notFound();
-                }
-
-                if (context.token.type === "student" && student.data.email !== context.token.user.data.email)
-                {
-                    return response.forbidden();
+                    throw Boom.forbidden();
                 }
 
                 return Grade.for(student);
@@ -212,30 +288,30 @@ const api = new Api({
         }),
         new Endpoint<Student, AuthToken>({
             method: "POST",
-            url: "/students",
+            path: "/students",
             schema: STUDENT_CREATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (response, context) => Student.create(context.body),
+            handler: (request, h) => Student.create(context.body),
         }),
         new Endpoint<Student, AuthToken>({
             method: "PUT",
-            url: "/students/:id",
+            path: "/students/{id}",
             schema: STUDENT_UPDATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin", "student" ]),
-            callback: async (response, context) =>
+            handler: async (request, h) =>
             {
                 const student = await Student.retrieve(context.params.id);
 
                 if (!student)
                 {
-                    return response.notFound();
+                    throw Boom.notFound();
                 }
 
                 if (context.token.type === "student")
                 {
                     if (student.data.email !== context.token.user.data.email)
                     {
-                        return response.forbidden();
+                        throw Boom.forbidden();
                     }
                 }
 
@@ -246,34 +322,34 @@ const api = new Api({
         }),
         new Endpoint<Subject, AuthToken>({
             method: "GET",
-            url: "/subjects",
+            path: "/subjects",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
-            callback: (response, context) => Subject.list(),
+            handler: (request, h) => Subject.list(),
         }),
         new Endpoint<Subject, AuthToken>({
             method: "POST",
-            url: "/subjects",
+            path: "/subjects",
             schema: SUBJECT_CREATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (response, context) => Subject.create(context.body),
+            handler: (request, h) => Subject.create(context.body),
         }),
         new Endpoint<Teacher, AuthToken>({
             method: "GET",
-            url: "/teachers",
+            path: "/teachers",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (response, context) => Teacher.list(),
+            handler: (request, h) => Teacher.list(),
         }),
         new Endpoint<Teacher, AuthToken>({
             method: "GET",
-            url: "/teachers/:id",
+            path: "/teachers/{id}",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (response, context) =>
+            handler: async (request, h) =>
             {
                 const teacher = await Teacher.retrieve(context.params.id);
 
                 if (!teacher)
                 {
-                    return response.notFound();
+                    throw Boom.notFound();
                 }
 
                 return teacher;
@@ -281,15 +357,15 @@ const api = new Api({
         }),
         new Endpoint<Class, AuthToken>({
             method: "GET",
-            url: "/teachers/:id/classes",
+            path: "/teachers/{id}/classes",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (response, context) =>
+            handler: async (request, h) =>
             {
                 const teacher = await Teacher.retrieve(context.params.id);
 
                 if (!teacher)
                 {
-                    return response.notFound();
+                    throw Boom.notFound();
                 }
 
                 return Class.for(teacher);
@@ -297,15 +373,15 @@ const api = new Api({
         }),
         new Endpoint<Teaching, AuthToken>({
             method: "GET",
-            url: "/teachers/:id/teachings",
+            path: "/teachers/{id}/teachings",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (response, context) =>
+            handler: async (request, h) =>
             {
                 const teacher = await Teacher.retrieve(context.params.id);
 
                 if (!teacher)
                 {
-                    return response.notFound();
+                    throw Boom.notFound();
                 }
 
                 return Teaching.for(teacher);
@@ -313,28 +389,28 @@ const api = new Api({
         }),
         new Endpoint<Teacher, AuthToken>({
             method: "POST",
-            url: "/teachers",
+            path: "/teachers",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (response, context) => Teacher.create(context.body),
+            handler: (request, h) => Teacher.create(context.body),
         }),
         new Endpoint<Teacher, AuthToken>({
             method: "PUT",
-            url: "/teachers/:id",
+            path: "/teachers/{id}",
             retrieveToken: retrieveToken([ "admin", "teacher" ]),
-            callback: async (response, context) =>
+            handler: async (request, h) =>
             {
                 const teacher = await Teacher.retrieve(context.params.id);
 
                 if (!teacher)
                 {
-                    return response.notFound();
+                    throw Boom.notFound();
                 }
 
                 if (context.token.type === "teacher")
                 {
                     if (teacher.data.email !== context.token.user.data.email)
                     {
-                        return response.forbidden();
+                        throw Boom.forbidden();
                     }
                 }
 
@@ -345,28 +421,28 @@ const api = new Api({
         }),
         new Endpoint<Teaching, AuthToken>({
             method: "POST",
-            url: "/teachings",
+            path: "/teachings",
             schema: TEACHING_CREATE_SCHEMA,
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (response, context) => Teaching.create(context.body),
+            handler: (request, h) => Teaching.create(context.body),
         }),
         new UnauthenticatedEndpoint<AuthToken>({
             method: "POST",
-            url: "/tokens",
+            path: "/tokens",
             schema: AUTH_TOKEN_CREATE_SCHEMA,
-            callback: (response, context) => AuthToken.create(context.body),
+            handler: (request, h) => AuthToken.create(context.body),
         }),
         new Endpoint<User, AuthToken>({
             method: "GET",
-            url: "/users",
+            path: "/users",
             retrieveToken: retrieveToken([ "admin" ]),
-            callback: (response, context) => User.list(),
+            handler: (request, h) => User.list(),
         }),
         new Endpoint<User, AuthToken>({
             method: "GET",
-            url: "/users/:id",
+            path: "/users/{id}",
             retrieveToken: retrieveToken([ "admin", "teacher", "student" ]),
-            callback: async (response, context) =>
+            handler: async (request, h) =>
             {
                 const id = context.params.id;
 
@@ -374,13 +450,11 @@ const api = new Api({
 
                 if (!user)
                 {
-                    return response.notFound();
+                    throw Boom.notFound();
                 }
 
                 return response.redirect(`/${user.data.type}s/${id}`);
             },
         }),
     ],
-});
-
-api.listen();
+});*/

@@ -6,8 +6,7 @@
  * THIS CLASS AROUND
  */
 
-import { ISerializable } from "@alex-sandri/api";
-
+import { ISerializable } from "../common/ISerializable";
 import User, { ISerializedUser, IUpdateUser, IUser } from "./User";
 
 interface IAdmin extends IUser

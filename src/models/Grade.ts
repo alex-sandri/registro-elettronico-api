@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { ISerializable } from "@alex-sandri/api";
+import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
 import Student from "./Student";
 import Subject, { ISerializedSubject } from "./Subject";
