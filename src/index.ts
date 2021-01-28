@@ -80,7 +80,7 @@ server.route({
     {
         const admins = await Admin.list();
 
-        return h.response(await serialize(admins));
+        return serialize(admins);
     },
 });
 
@@ -97,7 +97,7 @@ server.route({
             throw Boom.notFound();
         }
 
-        return admin;
+        return admin.serialize();
     },
 });
 
@@ -109,7 +109,7 @@ server.route({
     {
         const admin = await Admin.create(request.payload as any);
 
-        return h.response(await admin.serialize());
+        return admin.serialize();
     },
 });
 
@@ -128,7 +128,7 @@ server.route({
 
         await admin.update(request.payload as any);
 
-        return h.response(await admin.serialize());
+        return admin.serialize();
     },
 });
 /*
@@ -151,7 +151,7 @@ server.route({
             classes = await Class.list();
         }
 
-        return h.response(await serialize(classes));
+        return serialize(classes);
     },
 });
 */
@@ -168,7 +168,7 @@ server.route({
             throw Boom.notFound();
         }
 
-        return h.response(await retrievedClass.serialize());
+        return retrievedClass.serialize();
     },
 });
 
@@ -187,7 +187,7 @@ server.route({
 
         const students = await Student.for(retrievedClass);
 
-        return h.response(await serialize(students));
+        return serialize(students);
     },
 });
 
@@ -204,7 +204,7 @@ server.route({
     {
         const newClass = await Class.create(request.payload as any);
 
-        return h.response(await newClass.serialize());
+        return newClass.serialize();
     },
 });
 
@@ -221,7 +221,7 @@ server.route({
     {
         const grade = await Grade.create(request.payload as any);
 
-        return h.response(await grade.serialize());
+        return grade.serialize();
     },
 });
 
@@ -233,7 +233,7 @@ server.route({
     {
         const students = await Student.list();
 
-        return h.response(await serialize(students));
+        return serialize(students);
     },
 });
 /*
@@ -255,7 +255,7 @@ server.route({
             throw Boom.forbidden();
         }
 
-        return student;
+        return student.serialize();
     },
 });
 */
