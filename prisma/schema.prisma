@@ -15,11 +15,11 @@ model Class {
 
 model Grade {
   id          String   @id @default(cuid())
+  value       Float
   timestamp   DateTime
   description String
   student     String
   subject     String
-  value       Float
   Student     Student  @relation(fields: [student], references: [email])
   Subject     Subject  @relation(fields: [subject], references: [name])
 }
@@ -46,14 +46,13 @@ model Teacher {
 }
 
 model Teaching {
+  id      String  @id @default(cuid())
   teacher String
   class   String
   subject String
   Class   Class   @relation(fields: [class], references: [name])
   Subject Subject @relation(fields: [subject], references: [name])
   Teacher Teacher @relation(fields: [teacher], references: [email])
-
-  @@id([class, teacher, subject])
 }
 
 model User {

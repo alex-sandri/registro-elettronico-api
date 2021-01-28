@@ -1,77 +1,76 @@
-CREATE TYPE USERTYPE AS ENUM ('admin', 'student', 'teacher');
+create type usertype as enum ('admin', 'student', 'teacher');
 
-CREATE DOMAIN ID AS VARCHAR(255) NOT NULL;
-CREATE DOMAIN GRADE AS NUMERIC(4, 2) NOT NULL CHECK(value between 0 and 10) CHECK(value % 0.25 = 0);
+create domain grade as numeric(4, 2) not null check(value between 0 and 10) check(value % 0.25 = 0);
 
-CREATE TABLE "Class"
+create table "Class"
 (
-    "name" VARCHAR(30) NOT NULL,
+    "name" varchar(30) not null,
 
-    PRIMARY KEY ("name")
+    primary key ("name")
 );
 
-CREATE TABLE "User"
+create table "User"
 (
-    "type" USERTYPE NOT NULL,
-    "firstName" VARCHAR(30) NOT NULL,
-    "lastName" VARCHAR(30) NOT NULL,
-    "email" VARCHAR(255) NOT NULL,
-    "password" VARCHAR(255) NOT NULL,
+    "type" usertype not null,
+    "firstName" varchar(30) not null,
+    "lastName" varchar(30) not null,
+    "email" varchar(255) not null,
+    "password" varchar(255) not null,
 
-    PRIMARY KEY ("email")
+    primary key ("email")
 );
 
-CREATE TABLE "Student"
+create table "Student"
 (
-    "email" VARCHAR(255) NOT NULL,
-    "class" VARCHAR(30) NOT NULL,
+    "email" varchar(255) not null,
+    "class" varchar(30) not null,
 
-    PRIMARY KEY ("email"),
-    FOREIGN KEY ("email") REFERENCES "User" ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY ("class") REFERENCES "Class" ON UPDATE CASCADE
+    primary key ("email"),
+    foreign key ("email") references "User" on update cascade on delete cascade,
+    foreign key ("class") references "Class" on update cascade
 );
 
-CREATE TABLE "Grade"
+create table "Subject"
 (
-    "id" ID NOT NULL,
-    "value" GRADE NOT NULL,
-    "timestamp" TIMESTAMP NOT NULL,
-    "description" VARCHAR(255) NOT NULL,
-    "student" VARCHAR(255) NOT NULL,
-    "subject" VARCHAR(30) NOT NULL,
+    "name" varchar(30) not null,
+    "description" varchar(100) not null,
 
-    PRIMARY KEY ("id"),
-    FOREIGN KEY ("student") REFERENCES "Student" ON UPDATE CASCADE,
-    FOREIGN KEY ("subject") REFERENCES "Subject" ON UPDATE CASCADE,
-
-    CHECK("timestamp" <= CURRENT_DATE)
+    primary key ("name")
 );
 
-CREATE TABLE "Subject"
+create table "Grade"
 (
-    "name" VARCHAR(30) NOT NULL,
-    "description" VARCHAR(100) NOT NULL,
+    "id" varchar(255) not null,
+    "value" grade not null,
+    "timestamp" TIMESTAMP not null,
+    "description" varchar(255) not null,
+    "student" varchar(255) not null,
+    "subject" varchar(30) not null,
 
-    PRIMARY KEY ("name")
+    primary key ("id"),
+    foreign key ("student") references "Student" on update cascade,
+    foreign key ("subject") references "Subject" on update cascade,
+
+    check("timestamp" <= current_date)
 );
 
-CREATE TABLE "Teacher"
+create table "Teacher"
 (
-    "email" VARCHAR(255) NOT NULL,
+    "email" varchar(255) not null,
 
-    PRIMARY KEY ("email"),
-    FOREIGN KEY ("email") REFERENCES "User" ON UPDATE CASCADE ON DELETE CASCADE
+    primary key ("email"),
+    foreign key ("email") references "User" on update cascade on delete cascade
 );
 
-CREATE TABLE "Teaching"
+create table "Teaching"
 (
-    "id" ID NOT NULL,
-    "teacher" VARCHAR(255) NOT NULL,
-    "class" VARCHAR(30) NOT NULL,
-    "subject" VARCHAR(30) NOT NULL,
+    "id" varchar(255) not null,
+    "teacher" varchar(255) not null,
+    "class" varchar(30) not null,
+    "subject" varchar(30) not null,
 
-    PRIMARY KEY ("id"),
-    FOREIGN KEY ("class") REFERENCES "Class" ON UPDATE CASCADE,
-    FOREIGN KEY ("teacher") REFERENCES "Teacher" ON UPDATE CASCADE,
-    FOREIGN KEY ("subject") REFERENCES "Subject" ON UPDATE CASCADE
+    primary key ("id"),
+    foreign key ("class") references "Class" on update cascade,
+    foreign key ("teacher") references "Teacher" on update cascade,
+    foreign key ("subject") references "Subject" on update cascade
 );
