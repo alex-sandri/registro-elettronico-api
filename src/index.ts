@@ -24,30 +24,8 @@ import {
     SUBJECT_CREATE_SCHEMA,
     TEACHING_CREATE_SCHEMA,
 } from "./config/Schemas";
-import { ISerializable } from "./common/ISerializable";
 
 Database.init();
-
-const serialize = async <T extends ISerializable>(data: T | T[]) =>
-{
-    let serialized;
-
-    if (Array.isArray(data))
-    {
-        serialized = [];
-
-        for (const element of data)
-        {
-            serialized.push(await element.serialize());
-        }
-    }
-    else
-    {
-        serialized = await data.serialize();
-    }
-
-    return serialized;
-}
 
 const server = Hapi.server({ port: 4000 });
 
@@ -88,7 +66,7 @@ const init = async () =>
         {
             const admins = await Admin.list();
 
-            return serialize(admins);
+            return Promise.all(admins.map(_ => _.serialize));
         },
     });
 
@@ -149,7 +127,7 @@ const init = async () =>
         {
             const classes = await Class.list();
 
-            return serialize(classes);
+            return Promise.all(classes.map(_ => _.serialize));
         },
     });
 
@@ -193,7 +171,7 @@ const init = async () =>
 
             const students = await Student.for(retrievedClass);
 
-            return serialize(students);
+            return Promise.all(students.map(_ => _.serialize));
         },
     });
 
@@ -239,7 +217,7 @@ const init = async () =>
         {
             const students = await Student.list();
 
-            return serialize(students);
+            return Promise.all(students.map(_ => _.serialize));
         },
     });
 
@@ -296,7 +274,7 @@ const init = async () =>
 
             const grades = await Grade.for(student);
 
-            return serialize(grades);
+            return Promise.all(grades.map(_ => _.serialize));
         },
     });
 
@@ -364,7 +342,7 @@ const init = async () =>
         {
             const subjects = await Subject.list();
 
-            return serialize(subjects);
+            return Promise.all(subjects.map(_ => _.serialize));
         },
     });
 
@@ -391,7 +369,7 @@ const init = async () =>
         {
             const teachers = await Teacher.list();
 
-            return serialize(teachers);
+            return Promise.all(teachers.map(_ => _.serialize));
         },
     });
 
