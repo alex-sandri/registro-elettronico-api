@@ -293,7 +293,10 @@ const init = async () =>
                 throw Boom.forbidden();
             }
             */
-            return Grade.for(student);
+
+            const grades = await Grade.for(student);
+
+            return serialize(grades);
         },
     });
 
@@ -305,7 +308,12 @@ const init = async () =>
                 payload: STUDENT_CREATE_SCHEMA,
             },
         },
-        handler: (request, h) => Student.create(request.payload as any),
+        handler: async (request, h) =>
+        {
+            const student = await Student.create(request.payload as any);
+
+            return student.serialize();
+        },
     });
 
     server.route({
@@ -340,7 +348,7 @@ const init = async () =>
 
             await student.update(request.payload as any);
 
-            return student;
+            return student.serialize();
         },
     });
 
@@ -352,7 +360,12 @@ const init = async () =>
                 scope: [ "admin", "teacher", "student" ],
             },
         },
-        handler: (request, h) => Subject.list(),
+        handler: async (request, h) =>
+        {
+            const subjects = await Subject.list();
+
+            return serialize(subjects);
+        },
     });
 
     server.route({
@@ -363,13 +376,23 @@ const init = async () =>
                 payload: SUBJECT_CREATE_SCHEMA,
             },
         },
-        handler: (request, h) => Subject.create(request.payload as any),
+        handler: async (request, h) =>
+        {
+            const subject = await Subject.create(request.payload as any);
+
+            return subject.serialize();
+        },
     });
 
     server.route({
         method: "GET",
         path: "/teachers",
-        handler: (request, h) => Teacher.list(),
+        handler: async (request, h) =>
+        {
+            const teachers = await Teacher.list();
+
+            return serialize(teachers);
+        },
     });
 
     server.route({
@@ -389,7 +412,7 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            return teacher;
+            return teacher.serialize();
         },
     });
 
@@ -410,7 +433,9 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            return Class.for(teacher);
+            const classes = await Class.for(teacher);
+
+            return Promise.all(classes.map(_ => _.serialize()));
         },
     });
 
@@ -431,14 +456,21 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            return Teaching.for(teacher);
+            const teachings = await Teaching.for(teacher);
+
+            return Promise.all(teachings.map(_ => _.serialize()));
         },
     });
 
     server.route({
         method: "POST",
         path: "/teachers",
-        handler: (request, h) => Teacher.create(request.payload as any),
+        handler: async (request, h) =>
+        {
+            const teacher = await Teacher.create(request.payload as any);
+
+            return teacher.serialize();
+        },
     });
 
     server.route({
@@ -471,7 +503,7 @@ const init = async () =>
 
             await teacher.update(request.payload as any);
 
-            return teacher;
+            return teacher.serialize();
         },
     });
 
@@ -483,7 +515,12 @@ const init = async () =>
                 payload: TEACHING_CREATE_SCHEMA,
             },
         },
-        handler: (request, h) => Teaching.create(request.payload as any),
+        handler: async (request, h) =>
+        {
+            const teaching = await Teaching.create(request.payload as any);
+
+            return teaching.serialize();
+        },
     });
 
     server.route({
@@ -495,13 +532,23 @@ const init = async () =>
                 payload: AUTH_TOKEN_CREATE_SCHEMA,
             },
         },
-        handler: (request, h) => AuthToken.create(request.payload as any),
+        handler: async (request, h) =>
+        {
+            const token = await AuthToken.create(request.payload as any);
+
+            return token.serialize();
+        },
     });
 
     server.route({
         method: "GET",
         path: "/users",
-        handler: (request, h) => User.list(),
+        handler: async (request, h) =>
+        {
+            const users = await User.list();
+
+            return Promise.all(users.map(_ => _.serialize()));
+        },
     });
 
     server.route({
