@@ -1,5 +1,6 @@
 CREATE TYPE USERTYPE AS ENUM ('admin', 'student', 'teacher');
 
+CREATE DOMAIN ID AS VARCHAR(255) NOT NULL;
 CREATE DOMAIN GRADE AS NUMERIC(4, 2) NOT NULL CHECK(value between 0 and 10) CHECK(value % 0.25 = 0);
 
 CREATE TABLE "Class"
@@ -32,7 +33,7 @@ CREATE TABLE "Student"
 
 CREATE TABLE "Grade"
 (
-    "id" VARCHAR(255) NOT NULL,
+    "id" ID NOT NULL,
     "value" GRADE NOT NULL,
     "timestamp" TIMESTAMP NOT NULL,
     "description" VARCHAR(255) NOT NULL,
@@ -64,11 +65,12 @@ CREATE TABLE "Teacher"
 
 CREATE TABLE "Teaching"
 (
+    "id" ID NOT NULL,
     "teacher" VARCHAR(255) NOT NULL,
     "class" VARCHAR(30) NOT NULL,
     "subject" VARCHAR(30) NOT NULL,
 
-    PRIMARY KEY ("class", "teacher", "subject"),
+    PRIMARY KEY ("id"),
     FOREIGN KEY ("class") REFERENCES "Class" ON UPDATE CASCADE,
     FOREIGN KEY ("teacher") REFERENCES "Teacher" ON UPDATE CASCADE,
     FOREIGN KEY ("subject") REFERENCES "Subject" ON UPDATE CASCADE
