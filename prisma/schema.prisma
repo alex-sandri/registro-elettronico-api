@@ -14,7 +14,7 @@ model Class {
 }
 
 model Grade {
-  id          String   @id
+  id          String   @id @default(cuid())
   timestamp   DateTime
   description String
   student     String

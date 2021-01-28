@@ -1,9 +1,9 @@
-import { v4 as uuidv4 } from "uuid";
-
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
 import Student from "./Student";
 import Subject, { ISerializedSubject } from "./Subject";
+
+// TODO: Add teacher info
 
 interface IGrade
 {
@@ -45,7 +45,6 @@ export default class Grade implements ISerializable
 
         await db.grade.create({
             data: {
-                id: uuidv4(),
                 value: data.value,
                 timestamp: data.timestamp,
                 description: data.description,
