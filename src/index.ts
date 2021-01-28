@@ -1,5 +1,6 @@
 import Hapi from "@hapi/hapi";
 import Boom from "@hapi/boom";
+import HapiAuthJwt from "hapi-auth-jwt2";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -48,218 +49,230 @@ const serialize = async <T extends ISerializable>(data: T | T[]) =>
     return serialized;
 }
 
-const retrieveToken = (types: TAuthTokenType[]): (token: string) => Promise<AuthToken | null> =>
-{
-    return async (id: string) =>
-    {
-        const authToken = await AuthToken.retrieve(id);
-
-        if (!authToken)
-        {
-            return null;
-        }
-
-        if (!types.includes(authToken.type))
-        {
-            return null;
-        }
-
-        return authToken;
-    }
-}
-
 const server = Hapi.server({ port: 4000 });
 
-// TODO: Add auth
+const init = async () =>
+{
+    await server.register(HapiAuthJwt);
 
-server.route({
-    // admin
-    method: "GET",
-    path: "/admins",
-    handler: async (request, h) =>
-    {
-        const admins = await Admin.list();
-
-        return serialize(admins);
-    },
-});
-
-server.route({
-    // admin, teacher
-    method: "GET",
-    path: "/admins/{id}",
-    handler: async (request, h) =>
-    {
-        const admin = await Admin.retrieve(request.params.id);
-
-        if (!admin)
+    server.auth.strategy("jwt", "jwt", {
+        key: process.env.TOKEN_SECRET,
+        validate: async (decoded: { type: TAuthTokenType; user: string; }, request, h) =>
         {
-            throw Boom.notFound();
+            const user = await User.retrieve(decoded.user);
+
+            if (!user)
+            {
+                return { isValid: false };
+            }
+
+            return {
+                isValid: true,
+                credentials: {
+                    user,
+                    scope: [ decoded.type ],
+                },
+            };
         }
+    });
 
-        return admin.serialize();
-    },
-});
+    server.auth.default({
+        strategy: "jwt",
+        scope: "admin",
+    });
 
-server.route({
-    // admin
-    method: "POST",
-    path: "/admins",
-    handler: async (request, h) =>
-    {
-        const admin = await Admin.create(request.payload as any);
-
-        return admin.serialize();
-    },
-});
-
-server.route({
-    // admin
-    method: "PUT",
-    path: "/admins/{id}",
-    handler: async (request, h) =>
-    {
-        const admin = await Admin.retrieve(request.params.id);
-
-        if (!admin)
+    server.route({
+        method: "GET",
+        path: "/admins",
+        handler: async (request, h) =>
         {
-            throw Boom.notFound();
-        }
+            const admins = await Admin.list();
 
-        await admin.update(request.payload as any);
-
-        return admin.serialize();
-    },
-});
-/*
-server.route({
-    // admin, teacher
-    method: "GET",
-    path: "/classes",
-    handler: async (request, h) =>
-    {
-        let classes: Class[];
-
-        if (context.token.type === "teacher")
-        {
-            const teacher = await Teacher.retrieve(context.token.user.data.email);
-
-            classes = await Class.for(teacher!);
-        }
-        else
-        {
-            classes = await Class.list();
-        }
-
-        return serialize(classes);
-    },
-});
-*/
-server.route({
-    // admin, teacher
-    method: "GET",
-    path: "/classes/{id}",
-    handler: async (request, h) =>
-    {
-        const retrievedClass = await Class.retrieve(request.params.id);
-
-        if (!retrievedClass)
-        {
-            throw Boom.notFound();
-        }
-
-        return retrievedClass.serialize();
-    },
-});
-
-server.route({
-    // admin, teacher
-    method: "GET",
-    path: "/classes/{id}/students",
-    handler: async (request, h) =>
-    {
-        const retrievedClass = await Class.retrieve(request.params.id);
-
-        if (!retrievedClass)
-        {
-            throw Boom.notFound();
-        }
-
-        const students = await Student.for(retrievedClass);
-
-        return serialize(students);
-    },
-});
-
-server.route({
-    // admin
-    method: "POST",
-    path: "/classes",
-    options: {
-        validate: {
-            payload: CLASS_CREATE_SCHEMA,
+            return serialize(admins);
         },
-    },
-    handler: async (request, h) =>
-    {
-        const newClass = await Class.create(request.payload as any);
+    });
 
-        return newClass.serialize();
-    },
-});
-
-server.route({
-    // teacher
-    method: "POST",
-    path: "/grades",
-    options: {
-        validate: {
-            payload: GRADE_CREATE_SCHEMA,
+    server.route({
+        method: "GET",
+        path: "/admins/{id}",
+        options: {
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
         },
-    },
-    handler: async (request, h) =>
-    {
-        const grade = await Grade.create(request.payload as any);
-
-        return grade.serialize();
-    },
-});
-
-server.route({
-    // admin
-    method: "GET",
-    path: "/students",
-    handler: async (request, h) =>
-    {
-        const students = await Student.list();
-
-        return serialize(students);
-    },
-});
-/*
-server.route({
-    // admin, teacher, student
-    method: "GET",
-    path: "/students/{id}",
-    handler: async (request, h) =>
-    {
-        const student = await Student.retrieve(request.params.id);
-
-        if (!student)
+        handler: async (request, h) =>
         {
-            throw Boom.notFound();
-        }
+            const admin = await Admin.retrieve(request.params.id);
 
-        if (context.token.type === "student" && student.data.email !== context.token.user.data.email)
+            if (!admin)
+            {
+                throw Boom.notFound();
+            }
+
+            return admin.serialize();
+        },
+    });
+
+    server.route({
+        method: "POST",
+        path: "/admins",
+        handler: async (request, h) =>
         {
-            throw Boom.forbidden();
-        }
+            const admin = await Admin.create(request.payload as any);
 
-        return student.serialize();
-    },
-});
-*/
-server.start();
+            return admin.serialize();
+        },
+    });
+
+    server.route({
+        method: "PUT",
+        path: "/admins/{id}",
+        handler: async (request, h) =>
+        {
+            const admin = await Admin.retrieve(request.params.id);
+
+            if (!admin)
+            {
+                throw Boom.notFound();
+            }
+
+            await admin.update(request.payload as any);
+
+            return admin.serialize();
+        },
+    });
+
+    server.route({
+        method: "GET",
+        path: "/classes",
+        handler: async (request, h) =>
+        {
+            const classes = await Class.list();
+
+            return serialize(classes);
+        },
+    });
+
+    server.route({
+        method: "GET",
+        path: "/classes/{id}",
+        options: {
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const retrievedClass = await Class.retrieve(request.params.id);
+
+            if (!retrievedClass)
+            {
+                throw Boom.notFound();
+            }
+
+            return retrievedClass.serialize();
+        },
+    });
+
+    server.route({
+        method: "GET",
+        path: "/classes/{id}/students",
+        options: {
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const retrievedClass = await Class.retrieve(request.params.id);
+
+            if (!retrievedClass)
+            {
+                throw Boom.notFound();
+            }
+
+            const students = await Student.for(retrievedClass);
+
+            return serialize(students);
+        },
+    });
+
+    server.route({
+        method: "POST",
+        path: "/classes",
+        options: {
+            validate: {
+                payload: CLASS_CREATE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const newClass = await Class.create(request.payload as any);
+
+            return newClass.serialize();
+        },
+    });
+
+    server.route({
+        method: "POST",
+        path: "/grades",
+        options: {
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
+            validate: {
+                payload: GRADE_CREATE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const grade = await Grade.create(request.payload as any);
+
+            return grade.serialize();
+        },
+    });
+
+    server.route({
+        method: "GET",
+        path: "/students",
+        handler: async (request, h) =>
+        {
+            const students = await Student.list();
+
+            return serialize(students);
+        },
+    });
+
+    server.route({
+        method: "GET",
+        path: "/students/{id}",
+        options: {
+            auth: {
+                scope: [ "admin", "teacher", "student" ],
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const student = await Student.retrieve(request.params.id);
+
+            if (!student)
+            {
+                throw Boom.notFound();
+            }
+
+            if (context.token.type === "student" && student.data.email !== context.token.user.data.email)
+            {
+                throw Boom.forbidden();
+            }
+
+            return student.serialize();
+        },
+    });
+
+    server.start();
+}
+
+init();
 
 /*
 const api = new Api({
