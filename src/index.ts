@@ -1,7 +1,5 @@
 import Hapi from "@hapi/hapi";
 import Boom from "@hapi/boom";
-import Cookie from "@hapi/cookie";
-//import Crumb from "@hapi/crumb";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -32,28 +30,38 @@ const server = Hapi.server({ port: 4000 });
 
 const init = async () =>
 {
-    await server.register(Cookie);
-    // await server.register(Crumb);
-
-    server.auth.strategy("session", "cookie", {
-        cookie: {
-            name: "session",
-            password: process.env.TOKEN_SECRET,
-            isSecure: process.env.NODE_ENV !== "development",
-        },
-        validateFunc: async (request, session) =>
-        {
-            console.log(session);
-            const user = await Session.retrieve((session as any).id);
-
-            if (!user)
+    server.auth.scheme("token", (server, options) =>
+    {
+        return {
+            authenticate: async (request, h) =>
             {
-                return { valid: false };
-            }
+                const authorization = request.raw.req.headers.authorization;
 
-            return { valid: true, credentials: user };
-        }
+                if (!authorization)
+                {
+                    throw Boom.unauthorized();
+                }
+
+                const session = await Session.retrieve(authorization.split(" ")[1]);
+
+                if (!session)
+                {
+                    throw Boom.unauthorized();
+                }
+
+                const { user } = session;
+
+                return h.authenticated({
+                    credentials: {
+                        user,
+                        scope: [ user.data.type ],
+                    },
+                });
+            },
+        };
     });
+
+    server.auth.strategy("session", "token");
 
     server.auth.default({
         strategy: "session",
