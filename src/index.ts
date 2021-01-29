@@ -91,7 +91,7 @@ const init = async () =>
         {
             const admins = await Admin.list();
 
-            return Promise.all(admins.map(_ => _.serialize));
+            return Promise.all(admins.map(_ => _.serialize()));
         },
     });
 
@@ -162,7 +162,7 @@ const init = async () =>
         {
             const classes = await Class.list();
 
-            return Promise.all(classes.map(_ => _.serialize));
+            return Promise.all(classes.map(_ => _.serialize()));
         },
     });
 
@@ -206,7 +206,7 @@ const init = async () =>
 
             const students = await Student.for(retrievedClass);
 
-            return Promise.all(students.map(_ => _.serialize));
+            return Promise.all(students.map(_ => _.serialize()));
         },
     });
 
@@ -269,7 +269,7 @@ const init = async () =>
         {
             const students = await Student.list();
 
-            return Promise.all(students.map(_ => _.serialize));
+            return Promise.all(students.map(_ => _.serialize()));
         },
     });
 
@@ -326,7 +326,7 @@ const init = async () =>
 
             const grades = await Grade.for(student);
 
-            return Promise.all(grades.map(_ => _.serialize));
+            return Promise.all(grades.map(_ => _.serialize()));
         },
     });
 
@@ -394,7 +394,7 @@ const init = async () =>
         {
             const subjects = await Subject.list();
 
-            return Promise.all(subjects.map(_ => _.serialize));
+            return Promise.all(subjects.map(_ => _.serialize()));
         },
     });
 
@@ -421,7 +421,7 @@ const init = async () =>
         {
             const teachers = await Teacher.list();
 
-            return Promise.all(teachers.map(_ => _.serialize));
+            return Promise.all(teachers.map(_ => _.serialize()));
         },
     });
 
