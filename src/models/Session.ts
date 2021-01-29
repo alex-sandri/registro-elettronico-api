@@ -2,6 +2,7 @@ import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
 import User, { ISerializedUser } from "./User";
 import Utilities from "../utilities/Utilities";
+import { Config } from "../config/Config";
 
 export type TSessionType = "admin" | "student"| "teacher";
 
@@ -56,6 +57,7 @@ export default class Session implements ISerializable
         const db = Database.client;
 
         const expires = new Date();
+        expires.setSeconds(new Date().getSeconds() + Config.SESSION_DURATION);
 
         const session = await db.session.create({
             data: {
