@@ -93,4 +93,9 @@ export default class Session implements ISerializable
 
         return new Session(id, user, session.expires);
     }
+
+    public hasExpired(): boolean
+    {
+        return this.expires < new Date();
+    }
 }

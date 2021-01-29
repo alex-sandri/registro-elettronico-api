@@ -44,7 +44,7 @@ const init = async () =>
 
                 const session = await Session.retrieve(authorization.split(" ")[1]);
 
-                if (!session)
+                if (!session || session.hasExpired())
                 {
                     throw Boom.unauthorized();
                 }
