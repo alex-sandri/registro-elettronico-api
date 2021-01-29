@@ -1,8 +1,7 @@
 import Hapi from "@hapi/hapi";
 import Boom from "@hapi/boom";
 import Cookie from "@hapi/cookie";
-import Crumb from "@hapi/crumb";
-import Yar from "@hapi/yar";
+//import Crumb from "@hapi/crumb";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -34,18 +33,13 @@ const server = Hapi.server({ port: 4000 });
 const init = async () =>
 {
     await server.register(Cookie);
-    await server.register(Crumb);
-    await server.register(Yar);
+    // await server.register(Crumb);
 
     server.auth.strategy("session", "cookie", {
         cookie: {
-            name: 'sid-example',
-
-            // Don't forget to change it to your own secret password!
-            password: 'password-should-be-32-characters',
-
-            // For working via HTTP in localhost
-            isSecure: false
+            name: "session",
+            password: process.env.TOKEN_SECRET,
+            isSecure: process.env.NODE_ENV !== "development",
         },
         validateFunc: async (request, session) =>
         {
@@ -214,6 +208,23 @@ const init = async () =>
             const grade = await Grade.create(request.payload as any);
 
             return grade.serialize();
+        },
+    });
+
+    server.route({
+        method: "POST",
+        path: "/sessions",
+        options: {
+            auth: false,
+            validate: {
+                payload: SESSION_CREATE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const session = await Session.create(request.payload as any);
+
+            return session.serialize();
         },
     });
 
@@ -505,23 +516,6 @@ const init = async () =>
             const teaching = await Teaching.create(request.payload as any);
 
             return teaching.serialize();
-        },
-    });
-
-    server.route({
-        method: "POST",
-        path: "/sessions",
-        options: {
-            auth: false,
-            validate: {
-                payload: SESSION_CREATE_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const session = await Session.create(request.payload as any);
-
-            return session.serialize();
         },
     });
 
