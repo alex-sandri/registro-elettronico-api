@@ -15,12 +15,16 @@ import Admin from "./models/Admin";
 import Database from "./utilities/Database";
 import User from "./models/User";
 import {
+    ADMIN_CREATE_SCHEMA,
+    ADMIN_UPDATE_SCHEMA,
     CLASS_CREATE_SCHEMA,
     GRADE_CREATE_SCHEMA,
     SESSION_CREATE_SCHEMA,
     STUDENT_CREATE_SCHEMA,
     STUDENT_UPDATE_SCHEMA,
     SUBJECT_CREATE_SCHEMA,
+    TEACHER_CREATE_SCHEMA,
+    TEACHER_UPDATE_SCHEMA,
     TEACHING_CREATE_SCHEMA,
 } from "./config/Schemas";
 
@@ -103,6 +107,11 @@ const init = async () =>
     server.route({
         method: "POST",
         path: "/admins",
+        options: {
+            validate: {
+                payload: ADMIN_CREATE_SCHEMA,
+            },
+        },
         handler: async (request, h) =>
         {
             const admin = await Admin.create(request.payload as any);
@@ -114,6 +123,11 @@ const init = async () =>
     server.route({
         method: "PUT",
         path: "/admins/{id}",
+        options: {
+            validate: {
+                payload: ADMIN_UPDATE_SCHEMA,
+            },
+        },
         handler: async (request, h) =>
         {
             const admin = await Admin.retrieve(request.params.id);
@@ -469,6 +483,11 @@ const init = async () =>
     server.route({
         method: "POST",
         path: "/teachers",
+        options: {
+            validate: {
+                payload: TEACHER_CREATE_SCHEMA,
+            },
+        },
         handler: async (request, h) =>
         {
             const teacher = await Teacher.create(request.payload as any);
@@ -483,6 +502,9 @@ const init = async () =>
         options: {
             auth: {
                 scope: [ "admin", "teacher" ],
+            },
+            validate: {
+                payload: TEACHER_UPDATE_SCHEMA,
             },
         },
         handler: async (request, h) =>

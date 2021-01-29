@@ -34,15 +34,6 @@ export const GRADE_CREATE_SCHEMA = Joi.object({
         .required(),
 });
 
-export const STUDENT_CREATE_SCHEMA = Joi.object({
-    class: Joi.string()
-        .required(),
-});
-
-export const STUDENT_UPDATE_SCHEMA = Joi.object({
-    class: Joi.string(),
-});
-
 export const SUBJECT_CREATE_SCHEMA = Joi.object({
     name: Joi.string()
         .required(),
@@ -63,9 +54,6 @@ export const TEACHING_CREATE_SCHEMA = Joi.object({
 });
 
 export const USER_CREATE_SCHEMA = Joi.object({
-    type: Joi.string()
-        .valid("admin", "student", "teacher")
-        .required(),
     firstName: Joi.string()
         .required(),
     lastName: Joi.string()
@@ -84,5 +72,22 @@ export const USER_UPDATE_SCHEMA = Joi.object({
     email: Joi.string()
         .email(),
     password: Joi.string()
-        .min(8),
+        .min(Config.PASSWORD_MIN_LENGTH),
+});
+
+export const ADMIN_CREATE_SCHEMA = USER_CREATE_SCHEMA;
+
+export const ADMIN_UPDATE_SCHEMA = USER_CREATE_SCHEMA;
+
+export const TEACHER_CREATE_SCHEMA = USER_CREATE_SCHEMA;
+
+export const TEACHER_UPDATE_SCHEMA = USER_CREATE_SCHEMA;
+
+export const STUDENT_CREATE_SCHEMA = Joi.object({
+    class: Joi.string()
+        .required(),
+});
+
+export const STUDENT_UPDATE_SCHEMA = Joi.object({
+    class: Joi.string(),
 });
