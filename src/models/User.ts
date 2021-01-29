@@ -1,5 +1,4 @@
 import { ISerializable } from "../common/ISerializable";
-import { USER_CREATE_SCHEMA, USER_UPDATE_SCHEMA } from "../config/Schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 
@@ -47,13 +46,6 @@ export default class User implements ISerializable
 
     public static async create(data: IUser): Promise<User>
     {
-        const result = USER_CREATE_SCHEMA.validate(data);
-
-        if (result.error)
-        {
-            throw new Error(result.error.message);
-        }
-
         const db = Database.client;
 
         data.password = Utilities.hash(data.password);
@@ -92,13 +84,6 @@ export default class User implements ISerializable
 
     public async update(data: IUpdateUser): Promise<User>
     {
-        const result = USER_UPDATE_SCHEMA.validate(data);
-
-        if (result.error)
-        {
-            throw new Error(result.error.message);
-        }
-
         const db = Database.client;
 
         let password: string | undefined;

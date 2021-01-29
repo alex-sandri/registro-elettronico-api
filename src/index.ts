@@ -72,6 +72,18 @@ const init = async () =>
         scope: "admin",
     });
 
+    server.ext("onPreResponse", (request, h) =>
+    {
+        const { response } = request;
+
+        if (response instanceof Boom.Boom)
+        {
+            response.output.payload.message = response.message;
+        }
+
+        return h.continue;
+    });
+
     server.route({
         method: "GET",
         path: "/admins",

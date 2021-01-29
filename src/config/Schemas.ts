@@ -77,17 +77,17 @@ export const USER_UPDATE_SCHEMA = Joi.object({
 
 export const ADMIN_CREATE_SCHEMA = USER_CREATE_SCHEMA;
 
-export const ADMIN_UPDATE_SCHEMA = USER_CREATE_SCHEMA;
+export const ADMIN_UPDATE_SCHEMA = USER_UPDATE_SCHEMA;
 
 export const TEACHER_CREATE_SCHEMA = USER_CREATE_SCHEMA;
 
-export const TEACHER_UPDATE_SCHEMA = USER_CREATE_SCHEMA;
+export const TEACHER_UPDATE_SCHEMA = USER_UPDATE_SCHEMA;
 
-export const STUDENT_CREATE_SCHEMA = Joi.object({
+export const STUDENT_CREATE_SCHEMA = USER_CREATE_SCHEMA.keys({
     class: Joi.string()
         .required(),
 });
 
-export const STUDENT_UPDATE_SCHEMA = Joi.object({
+export const STUDENT_UPDATE_SCHEMA = USER_UPDATE_SCHEMA.keys({
     class: Joi.string(),
 });
