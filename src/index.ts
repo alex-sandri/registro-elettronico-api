@@ -1,6 +1,8 @@
 import Hapi from "@hapi/hapi";
 import Boom from "@hapi/boom";
-import HapiAuthJwt from "hapi-auth-jwt2";
+import Cookie from "@hapi/cookie";
+import Crumb from "@hapi/crumb";
+import Yar from "@hapi/yar";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -11,14 +13,14 @@ import Class from "./models/Class";
 import Subject from "./models/Subject";
 import Teacher from "./models/Teacher";
 import Teaching from "./models/Teaching";
-import AuthToken, { TAuthTokenType } from "./models/AuthToken";
+import Session from "./models/Session";
 import Admin from "./models/Admin";
 import Database from "./utilities/Database";
 import User from "./models/User";
 import {
-    AUTH_TOKEN_CREATE_SCHEMA,
     CLASS_CREATE_SCHEMA,
     GRADE_CREATE_SCHEMA,
+    SESSION_CREATE_SCHEMA,
     STUDENT_CREATE_SCHEMA,
     STUDENT_UPDATE_SCHEMA,
     SUBJECT_CREATE_SCHEMA,
@@ -31,31 +33,36 @@ const server = Hapi.server({ port: 4000 });
 
 const init = async () =>
 {
-    await server.register(HapiAuthJwt);
+    await server.register(Cookie);
+    await server.register(Crumb);
+    await server.register(Yar);
 
-    server.auth.strategy("jwt", "jwt", {
-        key: process.env.TOKEN_SECRET,
-        validate: async (decoded: { type: TAuthTokenType; user: string; }, request, h) =>
+    server.auth.strategy("session", "cookie", {
+        cookie: {
+            name: 'sid-example',
+
+            // Don't forget to change it to your own secret password!
+            password: 'password-should-be-32-characters',
+
+            // For working via HTTP in localhost
+            isSecure: false
+        },
+        validateFunc: async (request, session) =>
         {
-            const user = await User.retrieve(decoded.user);
+            console.log(session);
+            const user = await Session.retrieve((session as any).id);
 
             if (!user)
             {
-                return { isValid: false };
+                return { valid: false };
             }
 
-            return {
-                isValid: true,
-                credentials: {
-                    user,
-                    scope: [ decoded.type ],
-                },
-            };
+            return { valid: true, credentials: user };
         }
     });
 
     server.auth.default({
-        strategy: "jwt",
+        strategy: "session",
         scope: "admin",
     });
 
@@ -503,18 +510,18 @@ const init = async () =>
 
     server.route({
         method: "POST",
-        path: "/tokens",
+        path: "/sessions",
         options: {
             auth: false,
             validate: {
-                payload: AUTH_TOKEN_CREATE_SCHEMA,
+                payload: SESSION_CREATE_SCHEMA,
             },
         },
         handler: async (request, h) =>
         {
-            const token = await AuthToken.create(request.payload as any);
+            const session = await Session.create(request.payload as any);
 
-            return token.serialize();
+            return session.serialize();
         },
     });
 

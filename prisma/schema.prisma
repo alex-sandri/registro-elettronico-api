@@ -59,10 +59,18 @@ model User {
   type      usertype
   firstName String
   lastName  String
-  email     String   @id
+  email     String    @id
   password  String
+  Session   Session[]
   Student   Student?
   Teacher   Teacher?
+}
+
+model Session {
+  id      String   @id @default(cuid())
+  user    String
+  expires DateTime
+  User    User     @relation(fields: [user], references: [email])
 }
 
 enum usertype {

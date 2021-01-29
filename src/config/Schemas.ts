@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { Config } from "./Config";
 
-export const AUTH_TOKEN_CREATE_SCHEMA = Joi.object({
+export const SESSION_CREATE_SCHEMA = Joi.object({
     email: Joi.string()
         .email()
         .required(),

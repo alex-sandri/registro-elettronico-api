@@ -42,7 +42,7 @@ create table "Grade"
 (
     "id" varchar(255) not null,
     "value" grade not null,
-    "timestamp" TIMESTAMP not null,
+    "timestamp" timestamp not null,
     "description" varchar(255) not null,
     "student" varchar(255) not null,
     "subject" varchar(30) not null,
@@ -73,4 +73,16 @@ create table "Teaching"
     foreign key ("class") references "Class" on update cascade,
     foreign key ("teacher") references "Teacher" on update cascade,
     foreign key ("subject") references "Subject" on update cascade
+);
+
+create table "Session"
+(
+    "id" varchar(255) not null,
+    "user" varchar(255) not null,
+    "expires" timestamp not null,
+
+    primary key ("id"),
+    foreign key ("user") references "User" on update cascade on delete cascade,
+
+    check("expires" > current_date)
 );
