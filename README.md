@@ -27,13 +27,5 @@ Create a file named `.env` and set the following variables:
     Use this format: `postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA`
     and replace `USER`, `PASSWORD`, `HOST`, `PORT`, `DATABASE` and `SCHEMA` according to your DB configuration.
 
-- `TOKEN_SECRET`:
-    The **secret** token used to generate JWTs for authorization.\
-    You can generate one using the Node.js CLI with this command:
-    ```javascript
-    require("crypto").randomBytes(64).toString("hex")
-    ```
-    __COPY ONLY THE STRING INSIDE THE QUOTATION MARKS__
-
 ### Install the dependencies
 Run `npm i`.

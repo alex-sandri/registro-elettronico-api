@@ -1,8 +1,5 @@
 import Hapi from "@hapi/hapi";
 import Boom from "@hapi/boom";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 import Student from "./models/Student";
 import Grade from "./models/Grade";
