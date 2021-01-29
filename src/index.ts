@@ -30,7 +30,20 @@ import {
 
 Database.init();
 
-const server = Hapi.server({ port: 4000 });
+const server = Hapi.server({
+    port: 4000,
+    routes: {
+        validate: {
+            options: {
+                abortEarly: false,
+            },
+            failAction: async (request, h, error) =>
+            {
+                throw error;
+            },
+        },
+    },
+});
 
 const init = async () =>
 {
