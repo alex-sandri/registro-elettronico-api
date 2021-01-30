@@ -299,12 +299,13 @@ const init = async () =>
             {
                 throw Boom.notFound();
             }
-            /*
-            TODO
-            if (context.token.type === "student" && student.data.email !== context.token.user.data.email)
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.type === "student" && student.data.email !== user.data.email)
             {
                 throw Boom.forbidden();
-            }*/
+            }
 
             return student.serialize();
         },
@@ -326,13 +327,13 @@ const init = async () =>
             {
                 throw Boom.notFound();
             }
-            /*
-            TODO
-            if (context.token.type === "student" && student.data.email !== context.token.user.data.email)
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.type === "student" && student.data.email !== user.data.email)
             {
                 throw Boom.forbidden();
             }
-            */
 
             const grades = await Grade.for(student);
 
@@ -375,16 +376,13 @@ const init = async () =>
             {
                 throw Boom.notFound();
             }
-            /*
-            TODO
-            if (context.token.type === "student")
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.type === "student" && student.data.email !== user.data.email)
             {
-                if (student.data.email !== context.token.user.data.email)
-                {
-                    throw Boom.forbidden();
-                }
+                throw Boom.forbidden();
             }
-            */
 
             await student.update(request.payload as any);
 
@@ -538,16 +536,12 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            /*
-            TODO
-            if (context.token.type === "teacher")
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.type === "teacher" && teacher.data.email !== user.data.email)
             {
-                if (teacher.data.email !== context.token.user.data.email)
-                {
-                    throw Boom.forbidden();
-                }
+                throw Boom.forbidden();
             }
-            */
 
             await teacher.update(request.payload as any);
 
