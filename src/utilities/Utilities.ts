@@ -39,6 +39,6 @@ export default class Utilities
             }
         }
 
-        return `${username}@${Config.EMAIL_DOMAIN}`;
+        return `${username}@${Config.EMAIL_DOMAIN}`.toLowerCase();
     }
 }
