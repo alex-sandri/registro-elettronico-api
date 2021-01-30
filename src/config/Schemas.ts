@@ -16,10 +16,6 @@ export const CLASS_CREATE_SCHEMA = Joi.object({
 });
 
 export const GRADE_CREATE_SCHEMA = Joi.object({
-    student: Joi.string()
-        .required(),
-    subject: Joi.string()
-        .required(),
     value: Joi.number()
         .min(0)
         .max(10)
@@ -31,6 +27,12 @@ export const GRADE_CREATE_SCHEMA = Joi.object({
         .required(),
     description: Joi.string()
         .allow("")
+        .required(),
+    student: Joi.string()
+        .required(),
+    subject: Joi.string()
+        .required(),
+    teacher: Joi.string()
         .required(),
 });
 
