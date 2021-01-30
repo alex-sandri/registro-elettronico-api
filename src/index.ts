@@ -51,7 +51,15 @@ const init = async () =>
     await server.register([
         { plugin: Inert },
         { plugin: Vision },
-        { plugin: HapiSwagger },
+        {
+            plugin: HapiSwagger,
+            options: {
+                info: {
+                    title: "Registro Elettronico API",
+                },
+                documentationPath: "/docs",
+            },
+        },
     ]);
 
     server.auth.scheme("token", (server, options) =>
@@ -107,6 +115,9 @@ const init = async () =>
     server.route({
         method: "GET",
         path: "/admins",
+        options: {
+            tags: [ "api" ],
+        },
         handler: async (request, h) =>
         {
             const admins = await Admin.list();
@@ -119,6 +130,7 @@ const init = async () =>
         method: "GET",
         path: "/admins/{id}",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
             },
@@ -140,6 +152,7 @@ const init = async () =>
         method: "POST",
         path: "/admins",
         options: {
+            tags: [ "api" ],
             validate: {
                 payload: ADMIN_CREATE_SCHEMA,
             },
@@ -156,6 +169,7 @@ const init = async () =>
         method: "PUT",
         path: "/admins/{id}",
         options: {
+            tags: [ "api" ],
             validate: {
                 payload: ADMIN_UPDATE_SCHEMA,
             },
@@ -178,6 +192,9 @@ const init = async () =>
     server.route({
         method: "GET",
         path: "/classes",
+        options: {
+            tags: [ "api" ],
+        },
         handler: async (request, h) =>
         {
             const classes = await Class.list();
@@ -190,6 +207,7 @@ const init = async () =>
         method: "GET",
         path: "/classes/{id}",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
             },
@@ -211,6 +229,7 @@ const init = async () =>
         method: "GET",
         path: "/classes/{id}/students",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
             },
@@ -234,6 +253,7 @@ const init = async () =>
         method: "POST",
         path: "/classes",
         options: {
+            tags: [ "api" ],
             validate: {
                 payload: CLASS_CREATE_SCHEMA,
             },
@@ -250,6 +270,7 @@ const init = async () =>
         method: "POST",
         path: "/grades",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
             },
@@ -269,6 +290,7 @@ const init = async () =>
         method: "POST",
         path: "/sessions",
         options: {
+            tags: [ "api" ],
             auth: false,
             validate: {
                 payload: SESSION_CREATE_SCHEMA,
@@ -285,6 +307,9 @@ const init = async () =>
     server.route({
         method: "GET",
         path: "/students",
+        options: {
+            tags: [ "api" ],
+        },
         handler: async (request, h) =>
         {
             const students = await Student.list();
@@ -297,6 +322,7 @@ const init = async () =>
         method: "GET",
         path: "/students/{id}",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher", "student" ],
             },
@@ -325,6 +351,7 @@ const init = async () =>
         method: "GET",
         path: "/students/{id}/grades",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher", "student" ],
             },
@@ -355,6 +382,7 @@ const init = async () =>
         method: "POST",
         path: "/students",
         options: {
+            tags: [ "api" ],
             validate: {
                 payload: STUDENT_CREATE_SCHEMA,
             },
@@ -371,6 +399,7 @@ const init = async () =>
         method: "PUT",
         path: "/students/{id}",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "student" ],
             },
@@ -404,6 +433,7 @@ const init = async () =>
         method: "GET",
         path: "/subjects",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher", "student" ],
             },
@@ -420,6 +450,7 @@ const init = async () =>
         method: "POST",
         path: "/subjects",
         options: {
+            tags: [ "api" ],
             validate: {
                 payload: SUBJECT_CREATE_SCHEMA,
             },
@@ -435,6 +466,9 @@ const init = async () =>
     server.route({
         method: "GET",
         path: "/teachers",
+        options: {
+            tags: [ "api" ],
+        },
         handler: async (request, h) =>
         {
             const teachers = await Teacher.list();
@@ -447,6 +481,7 @@ const init = async () =>
         method: "GET",
         path: "/teachers/{id}",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
             },
@@ -468,6 +503,7 @@ const init = async () =>
         method: "GET",
         path: "/teachers/{id}/classes",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
             },
@@ -491,6 +527,7 @@ const init = async () =>
         method: "GET",
         path: "/teachers/{id}/teachings",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
             },
@@ -514,6 +551,7 @@ const init = async () =>
         method: "POST",
         path: "/teachers",
         options: {
+            tags: [ "api" ],
             validate: {
                 payload: TEACHER_CREATE_SCHEMA,
             },
@@ -530,6 +568,7 @@ const init = async () =>
         method: "PUT",
         path: "/teachers/{id}",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
             },
@@ -563,6 +602,7 @@ const init = async () =>
         method: "POST",
         path: "/teachings",
         options: {
+            tags: [ "api" ],
             validate: {
                 payload: TEACHING_CREATE_SCHEMA,
             },
@@ -578,6 +618,9 @@ const init = async () =>
     server.route({
         method: "GET",
         path: "/users",
+        options: {
+            tags: [ "api" ],
+        },
         handler: async (request, h) =>
         {
             const users = await User.list();
@@ -590,6 +633,7 @@ const init = async () =>
         method: "GET",
         path: "/users/{id}",
         options: {
+            tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher", "student" ],
             },
