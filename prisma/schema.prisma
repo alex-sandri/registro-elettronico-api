@@ -20,8 +20,10 @@ model Grade {
   description String
   student     String
   subject     String
+  teacher     String
   Student     Student  @relation(fields: [student], references: [email])
   Subject     Subject  @relation(fields: [subject], references: [name])
+  Teacher     Teacher  @relation(fields: [teacher], references: [email])
 }
 
 model Student {
@@ -42,6 +44,7 @@ model Subject {
 model Teacher {
   email    String     @id
   User     User       @relation(fields: [email], references: [email])
+  Grade    Grade[]
   Teaching Teaching[]
 }
 

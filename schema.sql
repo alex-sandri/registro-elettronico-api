@@ -38,6 +38,14 @@ create table "Subject"
     primary key ("name")
 );
 
+create table "Teacher"
+(
+    "email" varchar(255) not null,
+
+    primary key ("email"),
+    foreign key ("email") references "User" on update cascade on delete cascade
+);
+
 create table "Grade"
 (
     "id" varchar(255) not null,
@@ -46,20 +54,14 @@ create table "Grade"
     "description" varchar(255) not null,
     "student" varchar(255) not null,
     "subject" varchar(30) not null,
+    "teacher" varchar(255) not null,
 
     primary key ("id"),
     foreign key ("student") references "Student" on update cascade,
     foreign key ("subject") references "Subject" on update cascade,
+    foreign key ("teacher") references "Teacher" on update cascade,
 
     check("timestamp" <= current_date)
-);
-
-create table "Teacher"
-(
-    "email" varchar(255) not null,
-
-    primary key ("email"),
-    foreign key ("email") references "User" on update cascade on delete cascade
 );
 
 create table "Teaching"

@@ -2,16 +2,16 @@ import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
 import Student from "./Student";
 import Subject, { ISerializedSubject } from "./Subject";
-
-// TODO: Add teacher info
+import Teacher, { ISerializedTeacher } from "./Teacher";
 
 interface IGrade
 {
-    student: string;
-    subject: string;
     value: number;
     timestamp: Date;
     description: string;
+    student: string;
+    subject: string;
+    teacher: string;
 }
 
 export interface ISerializedGrade
@@ -20,6 +20,7 @@ export interface ISerializedGrade
     timestamp: string;
     description: string;
     subject: ISerializedSubject;
+    teacher: ISerializedTeacher;
 }
 
 export default class Grade implements ISerializable
@@ -30,12 +31,14 @@ export default class Grade implements ISerializable
     public async serialize(): Promise<ISerializedGrade>
     {
         const subject = await Subject.retrieve(this.data.subject);
+        const teacher = await Teacher.retrieve(this.data.teacher);
 
         return {
             value: this.data.value,
             timestamp: this.data.timestamp.toISOString(),
             description: this.data.description,
             subject: await subject!.serialize(),
+            teacher: await teacher!.serialize(),
         };
     }
 
@@ -56,6 +59,11 @@ export default class Grade implements ISerializable
                 Subject: {
                     connect: {
                         name: data.subject,
+                    },
+                },
+                Teacher: {
+                    connect: {
+                        email: data.teacher,
                     },
                 },
             },
