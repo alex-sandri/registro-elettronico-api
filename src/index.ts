@@ -30,6 +30,7 @@ Database.init();
 const server = Hapi.server({
     port: 4000,
     routes: {
+        cors: true,
         validate: {
             options: {
                 abortEarly: false,
