@@ -1,6 +1,10 @@
 import Joi from "joi";
 import { Config } from "./Config";
 
+// --------------------------------
+// REQUEST SCHEMAS
+// --------------------------------
+
 export const SESSION_CREATE_SCHEMA = Joi.object({
     email: Joi.string()
         .email()
@@ -92,4 +96,21 @@ export const STUDENT_CREATE_SCHEMA = USER_CREATE_SCHEMA.keys({
 
 export const STUDENT_UPDATE_SCHEMA = USER_UPDATE_SCHEMA.keys({
     class: Joi.string(),
+});
+
+// --------------------------------
+// RESPONSE SCHEMAS
+// --------------------------------
+
+export const USER_SCHEMA = Joi.object({
+    type: Joi.string()
+        .valid("admin", "student", "teacher")
+        .required(),
+    firstName: Joi.string()
+        .required(),
+    lastName: Joi.string()
+        .required(),
+    email: Joi.string()
+        .email()
+        .required(),
 });

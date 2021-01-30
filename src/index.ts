@@ -26,6 +26,7 @@ import {
     TEACHER_CREATE_SCHEMA,
     TEACHER_UPDATE_SCHEMA,
     TEACHING_CREATE_SCHEMA,
+    USER_SCHEMA,
 } from "./config/Schemas";
 
 Database.init();
@@ -636,6 +637,9 @@ const init = async () =>
             tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher", "student" ],
+            },
+            response: {
+                schema: USER_SCHEMA,
             },
         },
         handler: async (request, h) =>
