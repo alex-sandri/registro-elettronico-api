@@ -1,5 +1,8 @@
 import Hapi from "@hapi/hapi";
 import Boom from "@hapi/boom";
+import Inert from "@hapi/inert";
+import Vision from "@hapi/vision";
+import HapiSwagger from "hapi-swagger";
 
 import Student from "./models/Student";
 import Grade from "./models/Grade";
@@ -45,6 +48,12 @@ const server = Hapi.server({
 
 const init = async () =>
 {
+    await server.register([
+        { plugin: Inert },
+        { plugin: Vision },
+        { plugin: HapiSwagger },
+    ]);
+
     server.auth.scheme("token", (server, options) =>
     {
         return {

@@ -13,6 +13,8 @@
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.1.0",
+    "@hapi/inert": "^6.0.3",
+    "@hapi/vision": "^6.0.1",
     "@prisma/client": "^2.15.0",
     "bcrypt": "^5.0.0",
     "joi": "^17.3.0"
@@ -21,7 +23,10 @@
     "@prisma/cli": "^2.15.0",
     "@types/bcrypt": "^3.0.0",
     "@types/hapi__hapi": "^20.0.5",
+    "@types/hapi__inert": "^5.2.2",
+    "@types/hapi__vision": "^5.5.2",
     "concurrently": "^5.3.0",
+    "hapi-swagger": "^14.1.0",
     "nodemon": "^2.0.7",
     "typescript": "^4.1.3"
   }
