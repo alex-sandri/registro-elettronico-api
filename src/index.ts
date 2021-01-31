@@ -32,6 +32,11 @@ import {
     TEACHING_CREATE_SCHEMA,
     USER_SCHEMA,
 } from "./config/Schemas";
+import {
+    GET_ADMIN_HANDLER,
+    GET_STUDENT_HANDLER,
+    GET_TEACHER_HANDLER
+} from "./config/Handlers";
 
 Database.init();
 
@@ -140,17 +145,7 @@ const init = async () =>
                 scope: [ "admin", "teacher" ],
             },
         },
-        handler: async (request, h) =>
-        {
-            const admin = await Admin.retrieve(request.params.id);
-
-            if (!admin)
-            {
-                throw Boom.notFound();
-            }
-
-            return admin.serialize();
-        },
+        handler: GET_ADMIN_HANDLER,
     });
 
     server.route({
@@ -332,24 +327,7 @@ const init = async () =>
                 scope: [ "admin", "teacher", "student" ],
             },
         },
-        handler: async (request, h) =>
-        {
-            const student = await Student.retrieve(request.params.id);
-
-            if (!student)
-            {
-                throw Boom.notFound();
-            }
-
-            const user = request.auth.credentials.user as User;
-
-            if (user.data.type === "student" && student.data.email !== user.data.email)
-            {
-                throw Boom.forbidden();
-            }
-
-            return student.serialize();
-        },
+        handler: GET_STUDENT_HANDLER,
     });
 
     server.route({
@@ -491,17 +469,7 @@ const init = async () =>
                 scope: [ "admin", "teacher" ],
             },
         },
-        handler: async (request, h) =>
-        {
-            const teacher = await Teacher.retrieve(request.params.id);
-
-            if (!teacher)
-            {
-                throw Boom.notFound();
-            }
-
-            return teacher.serialize();
-        },
+        handler: GET_TEACHER_HANDLER,
     });
 
     server.route({
