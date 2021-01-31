@@ -102,39 +102,49 @@ export const STUDENT_UPDATE_SCHEMA = USER_UPDATE_SCHEMA.keys({
 // RESPONSE SCHEMAS
 // --------------------------------
 
-export const USER_SCHEMA = Joi.object({
-    type: Joi.string()
-        .valid("admin", "student", "teacher")
-        .required(),
-    firstName: Joi.string()
-        .required(),
-    lastName: Joi.string()
-        .required(),
-    email: Joi.string()
-        .email()
-        .required(),
-});
+export const USER_SCHEMA = Joi
+    .object({
+        type: Joi.string()
+            .valid("admin", "student", "teacher")
+            .required(),
+        firstName: Joi.string()
+            .required(),
+        lastName: Joi.string()
+            .required(),
+        email: Joi.string()
+            .email()
+            .required(),
+    })
+    .label("User");
 
-export const ADMIN_SCHEMA = USER_SCHEMA.keys({
-    type: Joi.string()
-        .valid("admin")
-        .required(),
-});
+export const ADMIN_SCHEMA = USER_SCHEMA
+    .keys({
+        type: Joi.string()
+            .valid("admin")
+            .required(),
+    })
+    .label("Admin");
 
-export const CLASS_SCHEMA = Joi.object({
-    name: Joi.string()
-        .required(),
-});
+export const CLASS_SCHEMA = Joi
+    .object({
+        name: Joi.string()
+            .required(),
+    })
+    .label("Class");
 
-export const STUDENT_SCHEMA = USER_SCHEMA.keys({
-    type: Joi.string()
-        .valid("student")
-        .required(),
-    class: CLASS_SCHEMA,
-});
+export const STUDENT_SCHEMA = USER_SCHEMA
+    .keys({
+        type: Joi.string()
+            .valid("student")
+            .required(),
+        class: CLASS_SCHEMA,
+    })
+    .label("Student");
 
-export const TEACHER_SCHEMA = USER_SCHEMA.keys({
-    type: Joi.string()
-        .valid("teacher")
-        .required(),
-});
+export const TEACHER_SCHEMA = USER_SCHEMA
+    .keys({
+        type: Joi.string()
+            .valid("teacher")
+            .required(),
+    })
+    .label("Teacher");

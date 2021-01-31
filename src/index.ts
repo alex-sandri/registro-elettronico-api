@@ -132,7 +132,7 @@ const init = async () =>
         options: {
             tags: [ "api" ],
             response: {
-                schema: Joi.array().items(ADMIN_SCHEMA).required(),
+                schema: Joi.array().items(ADMIN_SCHEMA).required().label("Admins"),
             },
         },
         handler: async (request, h) =>
@@ -211,7 +211,7 @@ const init = async () =>
         options: {
             tags: [ "api" ],
             response: {
-                schema: Joi.array().items(CLASS_SCHEMA).required(),
+                schema: Joi.array().items(CLASS_SCHEMA).required().label("Classes"),
             },
         },
         handler: async (request, h) =>
@@ -256,7 +256,7 @@ const init = async () =>
                 scope: [ "admin", "teacher" ],
             },
             response: {
-                schema: Joi.array().items(STUDENT_SCHEMA).required(),
+                schema: Joi.array().items(STUDENT_SCHEMA).required().label("Students"),
             },
         },
         handler: async (request, h) =>
@@ -338,7 +338,7 @@ const init = async () =>
         options: {
             tags: [ "api" ],
             response: {
-                schema: Joi.array().items(STUDENT_SCHEMA).required(),
+                schema: Joi.array().items(STUDENT_SCHEMA).required().label("Students"),
             },
         },
         handler: async (request, h) =>
@@ -492,7 +492,7 @@ const init = async () =>
         options: {
             tags: [ "api" ],
             response: {
-                schema: Joi.array().items(TEACHER_SCHEMA).required(),
+                schema: Joi.array().items(TEACHER_SCHEMA).required().label("Teachers"),
             },
         },
         handler: async (request, h) =>
@@ -527,7 +527,7 @@ const init = async () =>
                 scope: [ "admin", "teacher" ],
             },
             response: {
-                schema: Joi.array().items(CLASS_SCHEMA).required(),
+                schema: Joi.array().items(CLASS_SCHEMA).required().label("Classes"),
             },
         },
         handler: async (request, h) =>
@@ -649,7 +649,7 @@ const init = async () =>
         options: {
             tags: [ "api" ],
             response: {
-                schema: Joi.array().items(USER_SCHEMA).required(),
+                schema: Joi.array().items(USER_SCHEMA).required().label("Users"),
             },
         },
         handler: async (request, h) =>
@@ -674,7 +674,7 @@ const init = async () =>
                 }),
             },
             response: {
-                schema: Joi.alternatives().try(ADMIN_SCHEMA, STUDENT_SCHEMA, TEACHER_SCHEMA).required(),
+                schema: Joi.alternatives().try(ADMIN_SCHEMA, STUDENT_SCHEMA, TEACHER_SCHEMA).required().label("User"),
             },
         },
         handler: async (request, h) =>
