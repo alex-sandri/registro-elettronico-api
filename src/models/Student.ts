@@ -101,18 +101,10 @@ export default class Student extends User implements ISerializable
 
         this.data.class = data.class ?? this.data.password;
 
-        await db.student.update({
-            where: {
-                email: this.data.email,
-            },
-            data: {
-                Class: {
-                    connect: {
-                        name: this.data.class,
-                    },
-                },
-            },
-        });
+        await db.query(
+            "update students set class = $1 where email = $2",
+            [ this.data.class, this.data.email ],
+        );
 
         return this;
     }
