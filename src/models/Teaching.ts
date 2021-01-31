@@ -13,6 +13,7 @@ interface ITeaching
 
 export interface ISerializedTeaching
 {
+    id: string;
     teacher: ISerializedTeacher;
     class: ISerializedClass;
     subject: ISerializedSubject;
@@ -20,7 +21,7 @@ export interface ISerializedTeaching
 
 export default class Teaching implements ISerializable
 {
-    private constructor(public data: ITeaching)
+    private constructor(public id: string, public data: ITeaching)
     {}
 
     public async serialize(): Promise<ISerializedTeaching>
@@ -30,6 +31,7 @@ export default class Teaching implements ISerializable
         const subject = await Subject.retrieve(this.data.subject);
 
         return {
+            id: this.id,
             teacher: await teacher!.serialize(),
             class: await teachingClass!.serialize(),
             subject: await subject!.serialize(),
@@ -55,7 +57,7 @@ export default class Teaching implements ISerializable
             throw new Error("This teacher does not exist");
         }
 
-        await db.teaching.create({
+        const teaching = await db.teaching.create({
             data: {
                 Class: {
                     connect: {
@@ -75,7 +77,7 @@ export default class Teaching implements ISerializable
             },
         });
 
-        return new Teaching(data);
+        return new Teaching(teaching.id, data);
     }
 
     public static async for(teacher: Teacher): Promise<Teaching[]>
@@ -88,6 +90,6 @@ export default class Teaching implements ISerializable
             },
         });
 
-        return teachings.map(_ => new Teaching(_));
+        return teachings.map(_ => new Teaching(_.id, _));
     }
 }
