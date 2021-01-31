@@ -39,6 +39,8 @@ import {
     GET_TEACHER_HANDLER
 } from "./config/Handlers";
 
+const pkg = require('../package.json');
+
 Database.init();
 
 const server = Hapi.server({
@@ -67,6 +69,7 @@ const init = async () =>
             options: {
                 info: {
                     title: "Registro Elettronico API",
+                    version: pkg.version,
                 },
                 documentationPath: "/docs",
             },
