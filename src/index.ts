@@ -4,6 +4,9 @@ import Inert from "@hapi/inert";
 import Vision from "@hapi/vision";
 import HapiSwagger from "hapi-swagger";
 import Joi from "joi";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 import Student from "./models/Student";
 import Grade from "./models/Grade";
@@ -681,7 +684,7 @@ const init = async () =>
         {
             const id = request.params.id;
 
-            let user = await User.retrieve(id);
+            const user = await User.retrieve(id);
 
             if (!user)
             {
@@ -694,6 +697,40 @@ const init = async () =>
                 case "student": return GET_STUDENT_HANDLER(request, h);
                 case "teacher": return GET_TEACHER_HANDLER(request, h);
             }
+        },
+    });
+
+    server.route({
+        method: "DELETE",
+        path: "/users/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: Joi.string().required(),
+                }),
+            },
+            response: {
+                status: {
+                    204: Joi.string().empty(""),
+                },
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const id = request.params.id;
+
+            const user = await User.retrieve(id);
+
+            if (!user)
+            {
+                throw Boom.notFound();
+            }
+
+            return user.delete();
         },
     });
 

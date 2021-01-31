@@ -102,4 +102,11 @@ export default class User implements ISerializable
 
         return this;
     }
+
+    public async delete(): Promise<void>
+    {
+        const db = Database.client;
+
+        await db.$executeRaw`delete from users where email=${this.data.email}`;
+    }
 }

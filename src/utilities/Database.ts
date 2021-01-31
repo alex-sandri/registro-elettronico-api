@@ -1,11 +1,11 @@
-import { PrismaClient } from "@prisma/client";
+import { Client } from "pg";
 
 export default class Database
 {
-    public static client: PrismaClient;
+    public static client: Client;
 
     public static init(): void
     {
-        Database.client = new PrismaClient();
+        Database.client = new Client({ connectionString: process.env.DATABASE_URL });
     }
 }
