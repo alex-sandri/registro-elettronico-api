@@ -1,5 +1,6 @@
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
+import Utilities from "../utilities/Utilities";
 import Student from "./Student";
 import Subject, { ISerializedSubject } from "./Subject";
 import Teacher, { ISerializedTeacher } from "./Teacher";
@@ -47,8 +48,8 @@ export default class Grade implements ISerializable
         const db = Database.client;
 
         await db.query(
-            "insert into grades (value, timestamp, description, student, subject, teacher) values ($1, $2, $3, $4, $5, $6)",
-            [ data.value, data.timestamp, data.description, data.student, data.subject, data.teacher ],
+            "insert into grades (id, value, timestamp, description, student, subject, teacher) values ($1, $2, $3, $4, $5, $6, $7)",
+            [ Utilities.id(), data.value, data.timestamp, data.description, data.student, data.subject, data.teacher ],
         );
 
         return new Grade(data);
