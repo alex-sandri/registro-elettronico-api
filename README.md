@@ -10,7 +10,7 @@
 Use [`schema.sql`](schema.sql) to create the required tables.
 
 ### Create the first ADMIN user
-In the `User` table add a new entry with the required fields and type `admin`.
+In the `users` table add a new entry with the required fields and type `admin`.
 
 For the password field use the Node.js CLI to hash the password with this command:
 ```javascript
