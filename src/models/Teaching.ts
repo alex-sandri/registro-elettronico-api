@@ -40,6 +40,21 @@ export default class Teaching implements ISerializable
     {
         const db = Database.client;
 
+        if (await Class.retrieve(data.class) === null)
+        {
+            throw new Error("This class does not exist");
+        }
+
+        if (await Subject.retrieve(data.subject) === null)
+        {
+            throw new Error("This subject does not exist");
+        }
+
+        if (await Teacher.retrieve(data.teacher) === null)
+        {
+            throw new Error("This teacher does not exist");
+        }
+
         await db.teaching.create({
             data: {
                 Class: {
