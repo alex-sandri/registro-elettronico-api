@@ -59,41 +59,36 @@ export default class Session implements ISerializable
         const expires = new Date();
         expires.setSeconds(new Date().getSeconds() + Config.SESSION_DURATION);
 
-        const session = await db.session.create({
-            data: {
-                expires,
-                User: {
-                    connect: {
-                        email: data.email,
-                    },
-                },
-            },
-        });
+        const result = await db.query(
+            "insert into sessions (id, email, expires) values ($1, $2, $3)",
+            [ Utilities.id(), data.email, expires ],
+        );
 
-        return new Session(session.id, user, expires);
+        return new Session(result.rows[0].id, user, expires);
     }
 
     public static async retrieve(id: string): Promise<Session | null>
     {
         const db = Database.client;
 
-        const session = await db.session.findUnique({
-            where: { id },
-        });
+        const result = await db.query(
+            "select * from sessions where id = $1",
+            [ id ],
+        );
 
-        if (!session)
+        if (result.rowCount === 0)
         {
             return null;
         }
 
-        const user = await User.retrieve(session.user);
+        const user = await User.retrieve(result.rows[0].user);
 
         if (!user)
         {
             return null;
         }
 
-        return new Session(id, user, session.expires);
+        return new Session(id, user, result.rows[0].expires);
     }
 
     public hasExpired(): boolean
