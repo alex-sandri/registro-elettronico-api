@@ -633,7 +633,12 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            return h.redirect(`/${user.data.type}s/${id}`);
+            switch (user.data.type)
+            {
+                case "admin": return GET_ADMIN_HANDLER(request, h);
+                case "student": return GET_STUDENT_HANDLER(request, h);
+                case "teacher": return GET_TEACHER_HANDLER(request, h);
+            }
         },
     });
 
