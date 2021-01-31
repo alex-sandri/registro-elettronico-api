@@ -20,6 +20,7 @@ import {
     ADMIN_SCHEMA,
     ADMIN_UPDATE_SCHEMA,
     CLASS_CREATE_SCHEMA,
+    CLASS_SCHEMA,
     GRADE_CREATE_SCHEMA,
     SESSION_CREATE_SCHEMA,
     STUDENT_CREATE_SCHEMA,
@@ -127,6 +128,9 @@ const init = async () =>
         path: "/admins",
         options: {
             tags: [ "api" ],
+            response: {
+                schema: Joi.array().items(ADMIN_SCHEMA).required(),
+            },
         },
         handler: async (request, h) =>
         {
@@ -144,6 +148,9 @@ const init = async () =>
             auth: {
                 scope: [ "admin", "teacher" ],
             },
+            response: {
+                schema: ADMIN_SCHEMA,
+            },
         },
         handler: GET_ADMIN_HANDLER,
     });
@@ -155,6 +162,9 @@ const init = async () =>
             tags: [ "api" ],
             validate: {
                 payload: ADMIN_CREATE_SCHEMA,
+            },
+            response: {
+                schema: ADMIN_SCHEMA,
             },
         },
         handler: async (request, h) =>
@@ -172,6 +182,9 @@ const init = async () =>
             tags: [ "api" ],
             validate: {
                 payload: ADMIN_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: ADMIN_SCHEMA,
             },
         },
         handler: async (request, h) =>
@@ -194,6 +207,9 @@ const init = async () =>
         path: "/classes",
         options: {
             tags: [ "api" ],
+            response: {
+                schema: Joi.array().items(CLASS_SCHEMA).required(),
+            },
         },
         handler: async (request, h) =>
         {
@@ -210,6 +226,9 @@ const init = async () =>
             tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
+            },
+            response: {
+                schema: CLASS_SCHEMA,
             },
         },
         handler: async (request, h) =>
@@ -232,6 +251,9 @@ const init = async () =>
             tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
+            },
+            response: {
+                schema: Joi.array().items(STUDENT_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>
@@ -256,6 +278,9 @@ const init = async () =>
             tags: [ "api" ],
             validate: {
                 payload: CLASS_CREATE_SCHEMA,
+            },
+            response: {
+                schema: CLASS_SCHEMA,
             },
         },
         handler: async (request, h) =>
@@ -309,6 +334,9 @@ const init = async () =>
         path: "/students",
         options: {
             tags: [ "api" ],
+            response: {
+                schema: Joi.array().items(STUDENT_SCHEMA).required(),
+            },
         },
         handler: async (request, h) =>
         {
@@ -325,6 +353,9 @@ const init = async () =>
             tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher", "student" ],
+            },
+            response: {
+                schema: STUDENT_SCHEMA,
             },
         },
         handler: GET_STUDENT_HANDLER,
@@ -369,6 +400,9 @@ const init = async () =>
             validate: {
                 payload: STUDENT_CREATE_SCHEMA,
             },
+            response: {
+                schema: STUDENT_SCHEMA,
+            },
         },
         handler: async (request, h) =>
         {
@@ -388,6 +422,9 @@ const init = async () =>
             },
             validate: {
                 payload: STUDENT_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: STUDENT_SCHEMA,
             },
         },
         handler: async (request, h) =>
@@ -451,6 +488,9 @@ const init = async () =>
         path: "/teachers",
         options: {
             tags: [ "api" ],
+            response: {
+                schema: Joi.array().items(TEACHER_SCHEMA).required(),
+            },
         },
         handler: async (request, h) =>
         {
@@ -468,6 +508,9 @@ const init = async () =>
             auth: {
                 scope: [ "admin", "teacher" ],
             },
+            response: {
+                schema: TEACHER_SCHEMA,
+            },
         },
         handler: GET_TEACHER_HANDLER,
     });
@@ -479,6 +522,9 @@ const init = async () =>
             tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
+            },
+            response: {
+                schema: Joi.array().items(CLASS_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>
@@ -528,6 +574,9 @@ const init = async () =>
             validate: {
                 payload: TEACHER_CREATE_SCHEMA,
             },
+            response: {
+                schema: TEACHER_SCHEMA,
+            },
         },
         handler: async (request, h) =>
         {
@@ -547,6 +596,9 @@ const init = async () =>
             },
             validate: {
                 payload: TEACHER_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: TEACHER_SCHEMA,
             },
         },
         handler: async (request, h) =>
@@ -641,7 +693,6 @@ const init = async () =>
             }
         },
     });
-
 
     server.start();
 }
