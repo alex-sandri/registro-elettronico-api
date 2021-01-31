@@ -3,6 +3,7 @@ import Boom from "@hapi/boom";
 import Inert from "@hapi/inert";
 import Vision from "@hapi/vision";
 import HapiSwagger from "hapi-swagger";
+import Joi from "joi";
 
 import Student from "./models/Student";
 import Grade from "./models/Grade";
@@ -621,6 +622,9 @@ const init = async () =>
         path: "/users",
         options: {
             tags: [ "api" ],
+            response: {
+                schema: Joi.array().items(USER_SCHEMA).required(),
+            },
         },
         handler: async (request, h) =>
         {
@@ -638,8 +642,10 @@ const init = async () =>
             auth: {
                 scope: [ "admin", "teacher", "student" ],
             },
-            response: {
-                schema: USER_SCHEMA,
+            validate: {
+                params: Joi.object({
+                    id: Joi.string().required(),
+                }),
             },
         },
         handler: async (request, h) =>
