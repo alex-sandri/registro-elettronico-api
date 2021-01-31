@@ -28,11 +28,10 @@ export default class Class implements ISerializable
     {
         const db = Database.client;
 
-        await db.class.create({
-            data: {
-                name: data.name,
-            },
-        });
+        await db.query(
+            "insert into classes (name) values ($1)",
+            [ data.name ],
+        );
 
         return new Class(data);
     }
@@ -41,42 +40,37 @@ export default class Class implements ISerializable
     {
         const db = Database.client;
 
-        const retrievedClass = await db.class.findUnique({
-            where: {
-                name: id,
-            },
-        });
+        const result = await db.query(
+            "select * from classes where name=$1",
+            [ id ],
+        );
 
-        if (!retrievedClass)
+        if (result.rowCount === 0)
         {
             return null;
         }
 
-        return new Class(retrievedClass);
+        return new Class(result.rows[0]);
     }
 
     public static async list(): Promise<Class[]>
     {
         const db = Database.client;
 
-        const classes = await db.class.findMany();
+        const result = await db.query("select * from classes");
 
-        return classes.map(_ => new Class(_));
+        return result.rows.map(_ => new Class(_));
     }
 
     public static async for(teacher: Teacher): Promise<Class[]>
     {
         const db = Database.client;
 
-        const classes = await db.teaching.findMany({
-            where: {
-                teacher: teacher.data.email,
-            },
-            include: {
-                Class: true,
-            },
-        });
+        const result = await db.query(
+            "select * from teachings as t inner join classes as c on c.name=t.class where t.teacher=$1",
+            [ teacher.data.email ],
+        );
 
-        return classes.map(_ => new Class(_.Class));
+        return result.rows.map(_ => new Class(_.Class));
     }
 }
