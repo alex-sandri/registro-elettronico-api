@@ -41,7 +41,7 @@ export default class Class implements ISerializable
         const db = Database.client;
 
         const result = await db.query(
-            "select * from classes where name=$1",
+            "select * from classes where name = $1",
             [ id ],
         );
 
@@ -67,7 +67,7 @@ export default class Class implements ISerializable
         const db = Database.client;
 
         const result = await db.query(
-            "select * from teachings as t inner join classes as c on c.name=t.class where t.teacher=$1",
+            "select * from teachings as t inner join classes as c on c.name = t.class where t.teacher=$1",
             [ teacher.data.email ],
         );
 

@@ -46,28 +46,10 @@ export default class Grade implements ISerializable
     {
         const db = Database.client;
 
-        await db.grade.create({
-            data: {
-                value: data.value,
-                timestamp: data.timestamp,
-                description: data.description,
-                Student: {
-                    connect: {
-                        email: data.student,
-                    },
-                },
-                Subject: {
-                    connect: {
-                        name: data.subject,
-                    },
-                },
-                Teacher: {
-                    connect: {
-                        email: data.teacher,
-                    },
-                },
-            },
-        });
+        await db.query(
+            "insert into grades (value, timestamp, description, student, subject, teacher) values ($1, $2, $3, $4, $5, $6)",
+            [ data.value, data.timestamp, data.description, data.student, data.subject, data.teacher ],
+        );
 
         return new Grade(data);
     }
@@ -76,12 +58,11 @@ export default class Grade implements ISerializable
     {
         const db = Database.client;
 
-        const grades = await db.grade.findMany({
-            where: {
-                student: student.data.email,
-            },
-        });
+        const result = await db.query(
+            "select * from grades where student = $1",
+            [ student.data.email ],
+        );
 
-        return grades.map(_ => new Grade(_));
+        return result.rows.map(_ => new Grade(_));
     }
 }
