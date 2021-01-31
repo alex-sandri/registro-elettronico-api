@@ -54,20 +54,10 @@ export default class Student extends User implements ISerializable
             password: data.password,
         });
 
-        await db.student.create({
-            data: {
-                User: {
-                    connect: {
-                        email: data.email,
-                    },
-                },
-                Class: {
-                    connect: {
-                        name: data.class,
-                    },
-                },
-            },
-        });
+        await db.query(
+            "insert into students (type, 'firstName', 'lastName', email, password, class) values ('student', $1, $2, $3, $4, $5)",
+            [ data.firstName, data.lastName, data.email, data.password, data.class ],
+        );
 
         return new Student(data);
     }
@@ -76,38 +66,26 @@ export default class Student extends User implements ISerializable
     {
         const db = Database.client;
 
-        const user = await super.retrieve(id);
+        const result = await db.query(
+            "select * from users natural join students where email = $1",
+            [ id ],
+        );
 
-        if (!user || user.data.type !== "student")
+        if (result.rowCount === 0)
         {
             return null;
         }
 
-        const student = await db.student.findUnique({
-            where: {
-                email: id,
-            },
-        });
-
-        if (!student)
-        {
-            return null;
-        }
-
-        return new Student({ ...user.data, ...student, type: "student" });
+        return new Student(result.rows[0]);
     }
 
     public static async list(): Promise<Student[]>
     {
         const db = Database.client;
 
-        const students = await db.student.findMany({
-            include: {
-                User: true,
-            },
-        });
+        const result = await db.query("select * from users natural join students");
 
-        return students.map(_ => new Student({ ..._, ..._.User, type: "student" }));
+        return result.rows.map(_ => new Student(_));
     }
 
     public async update(data: IUpdateStudent): Promise<Student>
@@ -143,15 +121,11 @@ export default class Student extends User implements ISerializable
     {
         const db = Database.client;
 
-        const students = await db.student.findMany({
-            where: {
-                class: studentClass.data.name,
-            },
-            include: {
-                User: true,
-            },
-        });
+        const result = await db.query(
+            "select s.* from (users natural join students) as s inner join classes as c on s.class = c.name where s.class = $1",
+            [ studentClass.data.name ],
+        );
 
-        return students.map(_ => new Student({ ..._.User, class: _.class, type: "student" }));
+        return result.rows.map(_ => new Student(_));
     }
 }
