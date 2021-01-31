@@ -114,3 +114,27 @@ export const USER_SCHEMA = Joi.object({
         .email()
         .required(),
 });
+
+export const ADMIN_SCHEMA = USER_SCHEMA.keys({
+    type: Joi.string()
+        .valid("admin")
+        .required(),
+});
+
+export const CLASS_SCHEMA = Joi.object({
+    name: Joi.string()
+        .required(),
+});
+
+export const STUDENT_SCHEMA = USER_SCHEMA.keys({
+    type: Joi.string()
+        .valid("student")
+        .required(),
+    class: CLASS_SCHEMA,
+});
+
+export const TEACHER_SCHEMA = USER_SCHEMA.keys({
+    type: Joi.string()
+        .valid("teacher")
+        .required(),
+});

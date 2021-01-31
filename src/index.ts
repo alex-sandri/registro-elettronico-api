@@ -17,14 +17,17 @@ import Database from "./utilities/Database";
 import User from "./models/User";
 import {
     ADMIN_CREATE_SCHEMA,
+    ADMIN_SCHEMA,
     ADMIN_UPDATE_SCHEMA,
     CLASS_CREATE_SCHEMA,
     GRADE_CREATE_SCHEMA,
     SESSION_CREATE_SCHEMA,
     STUDENT_CREATE_SCHEMA,
+    STUDENT_SCHEMA,
     STUDENT_UPDATE_SCHEMA,
     SUBJECT_CREATE_SCHEMA,
     TEACHER_CREATE_SCHEMA,
+    TEACHER_SCHEMA,
     TEACHER_UPDATE_SCHEMA,
     TEACHING_CREATE_SCHEMA,
     USER_SCHEMA,
@@ -646,6 +649,9 @@ const init = async () =>
                 params: Joi.object({
                     id: Joi.string().required(),
                 }),
+            },
+            response: {
+                schema: Joi.alternatives().try(ADMIN_SCHEMA, STUDENT_SCHEMA, TEACHER_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>
