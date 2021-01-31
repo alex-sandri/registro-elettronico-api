@@ -44,7 +44,7 @@ export const SUBJECT_CREATE_SCHEMA = Joi.object({
     name: Joi.string()
         .required(),
     description: Joi.string()
-        .valid("")
+        .allow("")
         .required(),
 });
 
