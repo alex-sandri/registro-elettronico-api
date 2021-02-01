@@ -55,8 +55,8 @@ export default class Student extends User implements ISerializable
         });
 
         await db.query(
-            "insert into students (type, 'firstName', 'lastName', email, password, class) values ('student', $1, $2, $3, $4, $5)",
-            [ data.firstName, data.lastName, data.email, data.password, data.class ],
+            "insert into students (email, class) values ($1, $2)",
+            [ data.email, data.class ],
         );
 
         return new Student(data);

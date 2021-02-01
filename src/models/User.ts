@@ -50,7 +50,10 @@ export default class User implements ISerializable
 
         data.password = Utilities.hash(data.password);
 
-        await db.user.create({ data });
+        await db.query(
+            "insert into users (type, 'firstName', 'lastName', email, password) values ($1, $2, $3, $4, $5)",
+            [ data.type, data.firstName, data.lastName, data.email, data.password ],
+        );
 
         return new User(data);
     }
@@ -59,27 +62,26 @@ export default class User implements ISerializable
     {
         const db = Database.client;
 
-        const user = await db.user.findUnique({
-            where: {
-                email: id,
-            },
-        });
+        const result = await db.query(
+            "select * from users where email = $1",
+            [ id ],
+        );
 
-        if (!user)
+        if (result.rowCount === 0)
         {
             return null;
         }
 
-        return new User(user);
+        return new User(result.rows[0]);
     }
 
     public static async list(): Promise<User[]>
     {
         const db = Database.client;
 
-        const users = await db.user.findMany();
+        const result = await db.query("select * from users");
 
-        return users.map(_ => new User(_));
+        return result.rows.map(_ => new User(_));
     }
 
     public async update(data: IUpdateUser): Promise<User>
@@ -98,7 +100,10 @@ export default class User implements ISerializable
         this.data.email = data.email ?? this.data.email;
         this.data.password = password ?? this.data.password;
 
-        await db.user.update({ where: { email: this.data.email }, data });
+        await db.query(
+            "update users set 'firstName' = $1, 'lastName' = $2, email = $3, password = $4 where email = $",
+            [ this.data.firstName, this.data.lastName, this.data.email, this.data.password, this.data.email ],
+        );
 
         return this;
     }
@@ -107,6 +112,9 @@ export default class User implements ISerializable
     {
         const db = Database.client;
 
-        await db.$executeRaw`delete from users where email=${this.data.email}`;
+        await db.query(
+            "delete from users where email = $1",
+            [ this.data.email ],
+        );
     }
 }
