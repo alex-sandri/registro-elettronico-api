@@ -64,7 +64,7 @@ export default class Student extends User implements ISerializable
             [ data.email, data.class ],
         );
 
-        return new Student(data);
+        return new Student({ ...data, type: "student" });
     }
 
     public static async retrieve(id: string): Promise<Student | null>
