@@ -30,12 +30,10 @@ export default class Subject implements ISerializable
     {
         const db = Database.client;
 
-        await db.subject.create({
-            data: {
-                name: data.name,
-                description: data.description,
-            },
-        });
+        await db.query(
+            "insert into subjects (name, description) values ($1, $2)",
+            [ data.name, data.description ],
+        );
 
         return new Subject(data);
     }
@@ -44,26 +42,25 @@ export default class Subject implements ISerializable
     {
         const db = Database.client;
 
-        const subject = await db.subject.findUnique({
-            where: {
-                name: id,
-            },
-        });
+        const result = await db.query(
+            "select * from subjects where name = $1",
+            [ id ],
+        );
 
-        if (!subject)
+        if (result.rowCount === 0)
         {
             return null;
         }
 
-        return new Subject(subject);
+        return new Subject(result.rows[0]);
     }
 
     public static async list(): Promise<Subject[]>
     {
         const db = Database.client;
 
-        const subjects = await db.subject.findMany();
+        const result = await db.query("select * from subjects");
 
-        return subjects.map(_ => new Subject(_));
+        return result.rows.map(_ => new Subject(_));
     }
 }
