@@ -7,6 +7,7 @@
  */
 
 import { ISerializable } from "../common/ISerializable";
+import Database from "../utilities/Database";
 import User, { ISerializedUser, IUpdateUser, IUser } from "./User";
 
 interface IAdmin extends IUser
@@ -55,14 +56,19 @@ export default class Admin extends User implements ISerializable
 
     public static async retrieve(id: string): Promise<Admin | null>
     {
-        const user = await super.retrieve(id);
+        const db = Database.client;
 
-        if (!user || user.data.type !== "admin")
+        const result = await db.query(
+            "select * from users where type = 'admin' and email = $1",
+            [ id ],
+        );
+
+        if (result.rowCount === 0)
         {
             return null;
         }
 
-        return new Admin({ ...user.data, type: "admin" });
+        return new Admin(result.rows[0]);
     }
 
     public static async list(): Promise<Admin[]>
