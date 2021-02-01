@@ -1,3 +1,5 @@
+create extension "pgcrypto";
+
 create type usertype as enum ('admin', 'student', 'teacher');
 
 create domain grade as numeric(4, 2) not null check(value between 0 and 10) check(value % 0.25 = 0);
@@ -48,7 +50,7 @@ create table "teachers"
 
 create table "grades"
 (
-    "id" varchar(255) not null,
+    "id" uuid default gen_random_uuid(),
     "value" grade not null,
     "timestamp" timestamp not null,
     "description" varchar(255) not null,
@@ -66,7 +68,7 @@ create table "grades"
 
 create table "teachings"
 (
-    "id" varchar(255) not null,
+    "id" uuid default gen_random_uuid(),
     "teacher" varchar(255) not null,
     "class" varchar(30) not null,
     "subject" varchar(30) not null,
@@ -79,7 +81,7 @@ create table "teachings"
 
 create table "sessions"
 (
-    "id" varchar(255) not null,
+    "id" uuid default gen_random_uuid(),
     "user" varchar(255) not null,
     "expires" timestamp not null,
 
