@@ -1,6 +1,5 @@
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
-import Utilities from "../utilities/Utilities";
 import Class, { ISerializedClass } from "./Class";
 import Subject, { ISerializedSubject } from "./Subject";
 import Teacher, { ISerializedTeacher } from "./Teacher";
@@ -58,14 +57,12 @@ export default class Teaching implements ISerializable
             throw new Error("This teacher does not exist");
         }
 
-        const id = Utilities.id();
-
-        await db.query(
-            "insert into teachings (id, class, subject, teacher) values ($1, $2, $3, $4)",
-            [ id, data.class, data.subject, data.teacher ],
+        const result = await db.query(
+            "insert into teachings (class, subject, teacher) values ($1, $2, $3) returning id",
+            [ data.class, data.subject, data.teacher ],
         );
 
-        return new Teaching(id, data);
+        return new Teaching(result.rows[0].id, data);
     }
 
     public static async for(teacher: Teacher): Promise<Teaching[]>

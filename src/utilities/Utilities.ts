@@ -1,5 +1,4 @@
 import { hashSync, compareSync } from "bcrypt";
-import cuid from "cuid";
 import { Config } from "../config/Config";
 
 export default class Utilities
@@ -41,10 +40,5 @@ export default class Utilities
         }
 
         return `${username}@${Config.EMAIL_DOMAIN}`.toLowerCase();
-    }
-
-    public static id(): string
-    {
-        return cuid();
     }
 }
