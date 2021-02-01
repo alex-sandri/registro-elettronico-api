@@ -47,6 +47,39 @@ export default class Grade implements ISerializable
     {
         const db = Database.client;
 
+        const student = await Student.retrieve(data.student);
+
+        if (!student)
+        {
+            throw new Error("This student does not exist");
+        }
+
+        const subject = await Subject.retrieve(data.subject);
+
+        if (!subject)
+        {
+            throw new Error("This subject does not exist");
+        }
+
+        const teacher = await Teacher.retrieve(data.teacher);
+
+        if (!teacher)
+        {
+            throw new Error("This teacher does not exist");
+        }
+        else
+        {
+            const result = await db.query(
+                "select * from teachings where teacher = $1 and subject = $2",
+                [ teacher.data.email, subject.data.name ],
+            );
+
+            if (result.rowCount === 0)
+            {
+                throw new Error(`'${subject.data.name}' is not taught by '${teacher.data.email}'`)
+            }
+        }
+
         await db.query(
             "insert into grades (id, value, timestamp, description, student, subject, teacher) values ($1, $2, $3, $4, $5, $6, $7)",
             [ Utilities.id(), data.value, data.timestamp, data.description, data.student, data.subject, data.teacher ],
