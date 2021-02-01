@@ -44,8 +44,6 @@ import {
 
 const pkg = require('../package.json');
 
-Database.init();
-
 const server = Hapi.server({
     port: 4000,
     routes: {
@@ -64,6 +62,8 @@ const server = Hapi.server({
 
 const init = async () =>
 {
+    await Database.init();
+
     await server.register([
         { plugin: Inert },
         { plugin: Vision },
