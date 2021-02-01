@@ -60,7 +60,7 @@ export default class Session implements ISerializable
         expires.setSeconds(new Date().getSeconds() + Config.SESSION_DURATION);
 
         const result = await db.query(
-            "insert into sessions (id, email, expires) values ($1, $2, $3)",
+            `insert into sessions ("id", "user", "expires") values ($1, $2, $3)`,
             [ Utilities.id(), data.email, expires ],
         );
 
