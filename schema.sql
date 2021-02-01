@@ -61,7 +61,7 @@ create table "grades"
     foreign key ("subject") references "subjects" on update cascade,
     foreign key ("teacher") references "teachers" on update cascade,
 
-    check("timestamp" <= current_date)
+    check("timestamp" <= current_timestamp)
 );
 
 create table "teachings"
@@ -86,5 +86,5 @@ create table "sessions"
     primary key ("id"),
     foreign key ("user") references "users" on update cascade on delete cascade,
 
-    check("expires" > current_date)
+    check("expires" > current_timestamp)
 );
