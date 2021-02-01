@@ -61,7 +61,7 @@ export default class Teaching implements ISerializable
         const id = Utilities.id();
 
         await db.query(
-            "insert into teachings (id, class, subject, teacher) values ($1, $2, $3)",
+            "insert into teachings (id, class, subject, teacher) values ($1, $2, $3, $4)",
             [ id, data.class, data.subject, data.teacher ],
         );
 
