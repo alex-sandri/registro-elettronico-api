@@ -714,9 +714,7 @@ const init = async () =>
                 }),
             },
             response: {
-                status: {
-                    204: Joi.string().empty(""),
-                },
+                emptyStatusCode: 204,
             },
         },
         handler: async (request, h) =>
@@ -730,7 +728,9 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            return user.delete();
+            await user.delete();
+
+            return h.response();
         },
     });
 
