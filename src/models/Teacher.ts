@@ -50,7 +50,7 @@ export default class Teacher extends User implements ISerializable
             [ data.email ],
         );
 
-        return new Teacher(data);
+        return new Teacher({ ...data, type: "teacher" });
     }
 
     public static async retrieve(id: string): Promise<Teacher | null>
