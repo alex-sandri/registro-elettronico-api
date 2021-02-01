@@ -46,6 +46,11 @@ export default class Student extends User implements ISerializable
     {
         const db = Database.client;
 
+        if (await Class.retrieve(data.class) === null)
+        {
+            throw new Error("This class does not exist");
+        }
+
         await super.create({
             type: "student",
             firstName: data.firstName,
