@@ -73,11 +73,11 @@ export default class Admin extends User implements ISerializable
 
     public static async list(): Promise<Admin[]>
     {
-        const admins = await super.list();
+        const db = Database.client;
 
-        return admins
-            .filter(_ => _.data.type === "admin")
-            .map(_ => new Admin({ ..._.data, type: "admin" }));
+        const result = await db.query("select * from users where type = 'admin'");
+
+        return result.rows.map(_ => new Admin(_));
     }
 
     public async update(data: IUpdateAdmin): Promise<Admin>
