@@ -1,5 +1,6 @@
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
+import Teacher from "./Teacher";
 
 interface ISubject
 {
@@ -60,6 +61,18 @@ export default class Subject implements ISerializable
         const db = Database.client;
 
         const result = await db.query("select * from subjects");
+
+        return result.rows.map(_ => new Subject(_));
+    }
+
+    public static async for(teacher: Teacher): Promise<Subject[]>
+    {
+        const db = Database.client;
+
+        const result = await db.query(
+            "select s.* from teachings as t inner join subjects as s on s.name = t.subject where t.teacher = $1",
+            [ teacher.data.email ],
+        );
 
         return result.rows.map(_ => new Subject(_));
     }

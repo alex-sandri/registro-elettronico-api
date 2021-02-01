@@ -573,6 +573,30 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/teachers/{id}/subjects",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const teacher = await Teacher.retrieve(request.params.id);
+
+            if (!teacher)
+            {
+                throw Boom.notFound();
+            }
+
+            const subjects = await Subject.for(teacher);
+
+            return Promise.all(subjects.map(_ => _.serialize()));
+        },
+    });
+
+    server.route({
         method: "POST",
         path: "/teachers",
         options: {
