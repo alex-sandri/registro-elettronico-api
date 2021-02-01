@@ -45,42 +45,38 @@ export default class Teacher extends User implements ISerializable
             password: data.password,
         });
 
-        await db.teacher.create({
-            data: {
-                User: {
-                    connect: {
-                        email: data.email,
-                    },
-                },
-            },
-        });
+        await db.query(
+            "insert into teachers (email) values ($1)",
+            [ data.email ],
+        );
 
         return new Teacher(data);
     }
 
     public static async retrieve(id: string): Promise<Teacher | null>
     {
-        const user = await super.retrieve(id);
+        const db = Database.client;
 
-        if (!user || user.data.type !== "teacher")
+        const result = await db.query(
+            "select * from users natural join teachers where email = $1",
+            [ id ],
+        );
+
+        if (result.rowCount === 0)
         {
             return null;
         }
 
-        return new Teacher({ ...user.data, type: "teacher" });
+        return new Teacher(result.rows[0]);
     }
 
     public static async list(): Promise<Teacher[]>
     {
         const db = Database.client;
 
-        const teachers = await db.teacher.findMany({
-            include: {
-                User: true,
-            },
-        });
+        const result = await db.query("select * from users natural join teachers");
 
-        return teachers.map(_ => new Teacher({ ..._, ..._.User, type: "teacher" }));
+        return result.rows.map(_ => new Teacher(_));
     }
 
     public async update(data: IUpdateTeacher): Promise<Teacher>
