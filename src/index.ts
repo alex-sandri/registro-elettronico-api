@@ -24,6 +24,7 @@ import {
     ADMIN_UPDATE_SCHEMA,
     CLASS_CREATE_SCHEMA,
     CLASS_SCHEMA,
+    EMAIL_SCHEMA,
     GRADE_CREATE_SCHEMA,
     SESSION_CREATE_SCHEMA,
     STUDENT_CREATE_SCHEMA,
@@ -154,6 +155,11 @@ const init = async () =>
             auth: {
                 scope: [ "admin", "teacher" ],
             },
+            validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
+            },
             response: {
                 schema: ADMIN_SCHEMA,
             },
@@ -187,6 +193,9 @@ const init = async () =>
         options: {
             tags: [ "api" ],
             validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
                 payload: ADMIN_UPDATE_SCHEMA,
             },
             response: {
@@ -360,6 +369,11 @@ const init = async () =>
             auth: {
                 scope: [ "admin", "teacher", "student" ],
             },
+            validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
+            },
             response: {
                 schema: STUDENT_SCHEMA,
             },
@@ -374,6 +388,11 @@ const init = async () =>
             tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher", "student" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
             },
         },
         handler: async (request, h) =>
@@ -427,6 +446,9 @@ const init = async () =>
                 scope: [ "admin", "student" ],
             },
             validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
                 payload: STUDENT_UPDATE_SCHEMA,
             },
             response: {
@@ -514,6 +536,11 @@ const init = async () =>
             auth: {
                 scope: [ "admin", "teacher" ],
             },
+            validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
+            },
             response: {
                 schema: TEACHER_SCHEMA,
             },
@@ -528,6 +555,11 @@ const init = async () =>
             tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
             },
             response: {
                 schema: Joi.array().items(CLASS_SCHEMA).required().label("Classes"),
@@ -556,6 +588,11 @@ const init = async () =>
             auth: {
                 scope: [ "admin", "teacher" ],
             },
+            validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
+            },
         },
         handler: async (request, h) =>
         {
@@ -579,6 +616,11 @@ const init = async () =>
             tags: [ "api" ],
             auth: {
                 scope: [ "admin", "teacher" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
             },
         },
         handler: async (request, h) =>
@@ -625,6 +667,9 @@ const init = async () =>
                 scope: [ "admin", "teacher" ],
             },
             validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
                 payload: TEACHER_UPDATE_SCHEMA,
             },
             response: {
@@ -697,7 +742,7 @@ const init = async () =>
             },
             validate: {
                 params: Joi.object({
-                    id: Joi.string().required(),
+                    id: EMAIL_SCHEMA.required(),
                 }),
             },
             response: {
@@ -734,7 +779,7 @@ const init = async () =>
             },
             validate: {
                 params: Joi.object({
-                    id: Joi.string().required(),
+                    id: EMAIL_SCHEMA.required(),
                 }),
             },
             response: {
