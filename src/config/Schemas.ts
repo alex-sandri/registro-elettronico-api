@@ -2,16 +2,22 @@ import Joi from "joi";
 import { Config } from "./Config";
 
 // --------------------------------
+// MISC
+// --------------------------------
+
+export const EMAIL_SCHEMA = Joi.string().email();
+
+export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
+
+export const UUID_SCHEMA = Joi.string().uuid({ version: "uuidv4" });
+
+// --------------------------------
 // REQUEST SCHEMAS
 // --------------------------------
 
 export const SESSION_CREATE_SCHEMA = Joi.object({
-    email: Joi.string()
-        .email()
-        .required(),
-    password: Joi.string()
-        .min(Config.PASSWORD_MIN_LENGTH)
-        .required(),
+    email: EMAIL_SCHEMA.required(),
+    password: PASSWORD_SCHEMA.required(),
 });
 
 export const CLASS_CREATE_SCHEMA = Joi.object({
@@ -32,12 +38,10 @@ export const GRADE_CREATE_SCHEMA = Joi.object({
     description: Joi.string()
         .allow("")
         .required(),
-    student: Joi.string()
-        .required(),
+    student: EMAIL_SCHEMA.required(),
     subject: Joi.string()
         .required(),
-    teacher: Joi.string()
-        .required(),
+    teacher: EMAIL_SCHEMA.required(),
 });
 
 export const SUBJECT_CREATE_SCHEMA = Joi.object({
@@ -49,8 +53,7 @@ export const SUBJECT_CREATE_SCHEMA = Joi.object({
 });
 
 export const TEACHING_CREATE_SCHEMA = Joi.object({
-    teacher: Joi.string()
-        .required(),
+    teacher: EMAIL_SCHEMA.required(),
     class: Joi.string()
         .required(),
     subject: Joi.string()
@@ -62,21 +65,15 @@ export const USER_CREATE_SCHEMA = Joi.object({
         .required(),
     lastName: Joi.string()
         .required(),
-    email: Joi.string()
-        .email()
-        .required(),
-    password: Joi.string()
-        .min(Config.PASSWORD_MIN_LENGTH)
-        .required(),
+    email: EMAIL_SCHEMA.required(),
+    password: PASSWORD_SCHEMA.required(),
 });
 
 export const USER_UPDATE_SCHEMA = Joi.object({
     firstName: Joi.string(),
     lastName: Joi.string(),
-    email: Joi.string()
-        .email(),
-    password: Joi.string()
-        .min(Config.PASSWORD_MIN_LENGTH),
+    email: EMAIL_SCHEMA,
+    password: PASSWORD_SCHEMA,
 });
 
 export const ADMIN_CREATE_SCHEMA = USER_CREATE_SCHEMA;
@@ -109,9 +106,7 @@ export const USER_SCHEMA = Joi
             .required(),
         lastName: Joi.string()
             .required(),
-        email: Joi.string()
-            .email()
-            .required(),
+        email: EMAIL_SCHEMA.required(),
     })
     .label("User");
 
