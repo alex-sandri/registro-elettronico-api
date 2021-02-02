@@ -47,7 +47,8 @@ export default class Grade implements ISerializable
 
         return {
             id: this.data.id,
-            value: this.data.value,
+            // pg returns numbers in a string format
+            value: parseInt(`${this.data.value}`, 10),
             timestamp: this.data.timestamp.toISOString(),
             description: this.data.description,
             subject: await subject!.serialize(),
