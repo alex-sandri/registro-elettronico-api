@@ -26,15 +26,19 @@ import {
     CLASS_SCHEMA,
     EMAIL_SCHEMA,
     GRADE_CREATE_SCHEMA,
+    GRADE_SCHEMA,
     SESSION_CREATE_SCHEMA,
+    SESSION_SCHEMA,
     STUDENT_CREATE_SCHEMA,
     STUDENT_SCHEMA,
     STUDENT_UPDATE_SCHEMA,
     SUBJECT_CREATE_SCHEMA,
+    SUBJECT_SCHEMA,
     TEACHER_CREATE_SCHEMA,
     TEACHER_SCHEMA,
     TEACHER_UPDATE_SCHEMA,
     TEACHING_CREATE_SCHEMA,
+    TEACHING_SCHEMA,
     USER_SCHEMA,
 } from "./config/Schemas";
 import {
@@ -43,7 +47,7 @@ import {
     GET_TEACHER_HANDLER
 } from "./config/Handlers";
 
-const pkg = require('../package.json');
+const pkg = require("../package.json");
 
 const server = Hapi.server({
     port: 4000,
@@ -317,6 +321,9 @@ const init = async () =>
             validate: {
                 payload: GRADE_CREATE_SCHEMA,
             },
+            response: {
+                schema: GRADE_SCHEMA,
+            },
         },
         handler: async (request, h) =>
         {
@@ -334,6 +341,9 @@ const init = async () =>
             auth: false,
             validate: {
                 payload: SESSION_CREATE_SCHEMA,
+            },
+            response: {
+                schema: SESSION_SCHEMA,
             },
         },
         handler: async (request, h) =>
@@ -393,6 +403,9 @@ const init = async () =>
                 params: Joi.object({
                     id: EMAIL_SCHEMA.required(),
                 }),
+            },
+            response: {
+                schema: Joi.array().items(GRADE_SCHEMA).required().label("Grades"),
             },
         },
         handler: async (request, h) =>
@@ -485,6 +498,9 @@ const init = async () =>
             auth: {
                 scope: [ "admin", "teacher", "student" ],
             },
+            response: {
+                schema: Joi.array().items(SUBJECT_SCHEMA).required().label("Subjects"),
+            },
         },
         handler: async (request, h) =>
         {
@@ -501,6 +517,9 @@ const init = async () =>
             tags: [ "api" ],
             validate: {
                 payload: SUBJECT_CREATE_SCHEMA,
+            },
+            response: {
+                schema: SUBJECT_SCHEMA,
             },
         },
         handler: async (request, h) =>
@@ -593,6 +612,9 @@ const init = async () =>
                     id: EMAIL_SCHEMA.required(),
                 }),
             },
+            response: {
+                schema: Joi.array().items(TEACHING_SCHEMA).required().label("Teachings"),
+            },
         },
         handler: async (request, h) =>
         {
@@ -621,6 +643,9 @@ const init = async () =>
                 params: Joi.object({
                     id: EMAIL_SCHEMA.required(),
                 }),
+            },
+            response: {
+                schema: Joi.array().items(SUBJECT_SCHEMA).required().label("Subjects"),
             },
         },
         handler: async (request, h) =>
@@ -705,6 +730,9 @@ const init = async () =>
             tags: [ "api" ],
             validate: {
                 payload: TEACHING_CREATE_SCHEMA,
+            },
+            response: {
+                schema: TEACHING_SCHEMA,
             },
         },
         handler: async (request, h) =>

@@ -130,7 +130,7 @@ export const STUDENT_SCHEMA = USER_SCHEMA
         type: Joi.string()
             .valid("student")
             .required(),
-        class: CLASS_SCHEMA,
+        class: CLASS_SCHEMA.required(),
     })
     .label("Student");
 
@@ -141,3 +141,51 @@ export const TEACHER_SCHEMA = USER_SCHEMA
             .required(),
     })
     .label("Teacher");
+
+export const SUBJECT_SCHEMA = Joi
+    .object({
+        name: Joi.string()
+            .required(),
+        description: Joi.string()
+            .allow("")
+            .required(),
+    })
+    .label("Subject");
+
+export const GRADE_SCHEMA = Joi
+    .object({
+        id: UUID_SCHEMA.required(),
+        value: Joi.number()
+            .min(0)
+            .max(10)
+            .multiple(0.25)
+            .required(),
+        timestamp: Joi.date()
+            .max("now")
+            .iso()
+            .required(),
+        description: Joi.string()
+            .allow("")
+            .required(),
+        subject: SUBJECT_SCHEMA.required(),
+        teacher: TEACHER_SCHEMA.required(),
+    })
+    .label("Grade");
+
+export const SESSION_SCHEMA = Joi
+    .object({
+        id: UUID_SCHEMA.required(),
+        type: Joi.string().valid("admin", "student", "teacher").required(),
+        user: USER_SCHEMA.required(),
+        expires: Joi.date().iso().required(),
+    })
+    .label("Session");
+
+export const TEACHING_SCHEMA = Joi
+    .object({
+        id: UUID_SCHEMA.required(),
+        teacher: TEACHER_SCHEMA.required(),
+        class: CLASS_SCHEMA.required(),
+        subject: SUBJECT_SCHEMA.required(),
+    })
+    .label("Teaching");
