@@ -50,7 +50,7 @@ create table "teachers"
 
 create table "grades"
 (
-    "id" uuid default gen_random_uuid(),
+    "id" uuid not null default gen_random_uuid(),
     "value" grade not null,
     "timestamp" timestamp not null,
     "description" varchar(255) not null,
@@ -68,7 +68,7 @@ create table "grades"
 
 create table "teachings"
 (
-    "id" uuid default gen_random_uuid(),
+    "id" uuid not null default gen_random_uuid(),
     "teacher" varchar(255) not null,
     "class" varchar(30) not null,
     "subject" varchar(30) not null,
@@ -81,7 +81,7 @@ create table "teachings"
 
 create table "sessions"
 (
-    "id" uuid default gen_random_uuid(),
+    "id" uuid not null default gen_random_uuid(),
     "user" varchar(255) not null,
     "expires" timestamp not null,
 
