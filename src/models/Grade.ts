@@ -6,6 +6,17 @@ import Teacher, { ISerializedTeacher } from "./Teacher";
 
 interface IGrade
 {
+    id: string;
+    value: number;
+    timestamp: Date;
+    description: string;
+    student: string;
+    subject: string;
+    teacher: string;
+}
+
+interface ICreateGrade
+{
     value: number;
     timestamp: Date;
     description: string;
@@ -16,6 +27,7 @@ interface IGrade
 
 export interface ISerializedGrade
 {
+    id: string;
     value: number;
     timestamp: string;
     description: string;
@@ -34,6 +46,7 @@ export default class Grade implements ISerializable
         const teacher = await Teacher.retrieve(this.data.teacher);
 
         return {
+            id: this.data.id,
             value: this.data.value,
             timestamp: this.data.timestamp.toISOString(),
             description: this.data.description,
@@ -42,7 +55,7 @@ export default class Grade implements ISerializable
         };
     }
 
-    public static async create(data: IGrade): Promise<Grade>
+    public static async create(data: ICreateGrade): Promise<Grade>
     {
         const db = Database.client;
 
@@ -79,12 +92,12 @@ export default class Grade implements ISerializable
             }
         }
 
-        await db.query(
-            "insert into grades (value, timestamp, description, student, subject, teacher) values ($1, $2, $3, $4, $5, $6)",
+        const result = await db.query(
+            "insert into grades (value, timestamp, description, student, subject, teacher) values ($1, $2, $3, $4, $5, $6) returning id",
             [ data.value, data.timestamp, data.description, data.student, data.subject, data.teacher ],
         );
 
-        return new Grade(data);
+        return new Grade({ ...data, id: result.rows[0].id });
     }
 
     public static async for(student: Student): Promise<Grade[]>
