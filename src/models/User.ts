@@ -54,8 +54,8 @@ export default class User implements ISerializable
         data.password = Utilities.hash(data.password);
 
         await db.query(
-            `insert into users ("type", "firstName", "lastName", "email", "password") values ($1, $2, $3, $4, $5)`,
-            [ data.type, data.firstName, data.lastName, data.email, data.password ],
+            `insert into users ("type", "firstName", "lastName", "email", "password", "birthday") values ($1, $2, $3, $4, $5, $6)`,
+            [ data.type, data.firstName, data.lastName, data.email, data.password, data.birthday ],
         );
 
         return new User(data);
@@ -104,7 +104,7 @@ export default class User implements ISerializable
         this.data.password = password ?? this.data.password;
 
         await db.query(
-            `update users set "firstName" = $1, "lastName" = $2, "email" = $3, "password" = $4 where "email" = $`,
+            `update users set "firstName" = $1, "lastName" = $2, "email" = $3, "password" = $4 where "email" = $5`,
             [ this.data.firstName, this.data.lastName, this.data.email, this.data.password, this.data.email ],
         );
 
