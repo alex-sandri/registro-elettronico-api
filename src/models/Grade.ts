@@ -101,6 +101,23 @@ export default class Grade implements ISerializable
         return new Grade({ ...data, id: result.rows[0].id });
     }
 
+    public static async retrieve(id: string): Promise<Grade | null>
+    {
+        const db = Database.client;
+
+        const result = await db.query(
+            "select * from grades where id = $1",
+            [ id ],
+        );
+
+        if (result.rowCount === 0)
+        {
+            return null;
+        }
+
+        return new Grade(result.rows[0]);
+    }
+
     public static async for(student: Student): Promise<Grade[]>
     {
         const db = Database.client;

@@ -40,6 +40,7 @@ import {
     TEACHING_CREATE_SCHEMA,
     TEACHING_SCHEMA,
     USER_SCHEMA,
+    UUID_SCHEMA,
 } from "./config/Schemas";
 import {
     GET_ADMIN_HANDLER,
@@ -61,6 +62,9 @@ const server = Hapi.server({
             {
                 throw error;
             },
+        },
+        response: {
+            emptyStatusCode: 204,
         },
     },
 });
@@ -330,6 +334,35 @@ const init = async () =>
             const grade = await Grade.create(request.payload as any);
 
             return grade.serialize();
+        },
+    });
+
+    server.route({
+        method: "DELETE",
+        path: "/grades/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const grade = await Grade.retrieve(request.params.id);
+
+            if (!grade)
+            {
+                throw Boom.notFound();
+            }
+
+            await grade.delete();
+
+            return h.response();
         },
     });
 
@@ -809,9 +842,6 @@ const init = async () =>
                 params: Joi.object({
                     id: EMAIL_SCHEMA.required(),
                 }),
-            },
-            response: {
-                emptyStatusCode: 204,
             },
         },
         handler: async (request, h) =>
