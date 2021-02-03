@@ -192,6 +192,11 @@ export const TEACHING_SCHEMA = Joi
 
 export const STUDENT_REPORT_SCHEMA = Joi
     .object({
-        // TODO
+        grades: Joi.array()
+            .items(Joi.object({
+                subject: Joi.string().required(),
+                average: Joi.number().min(0).max(10).required(),
+            }))
+            .required(),
     })
     .label("Student Report");

@@ -1,7 +1,6 @@
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
 import Class, { ISerializedClass } from "./Class";
-import { ISerializedSubject } from "./Subject";
 import User, { ISerializedUser, IUpdateUser, IUser } from "./User";
 
 interface IStudent extends IUser
@@ -127,8 +126,22 @@ export default class Student extends User implements ISerializable
         return result.rows.map(_ => new Student(_));
     }
 
-    public async report(): Promise</*{ grades: { subject: ISerializedSubject; average: number; }[] }*/void>
+    public async report(): Promise<{ grades: { subject: string; average: number; }[] }>
     {
-        // TODO
+        const db = Database.client;
+
+        const result = await db.query(
+            "select subject, round(avg(value), 2) as average from grades where student = $1 group by subject",
+            [ this.data.email ],
+        );
+
+        return {
+            grades: result.rows.map(row =>
+            {
+                row.average = parseFloat(row.average);
+
+                return row;
+            }),
+        };
     }
 }
