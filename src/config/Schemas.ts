@@ -11,6 +11,8 @@ export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
 
 export const UUID_SCHEMA = Joi.string().uuid({ version: "uuidv4" });
 
+export const DATE_SCHEMA = Joi.date().iso();
+
 // --------------------------------
 // REQUEST SCHEMAS
 // --------------------------------
@@ -31,10 +33,7 @@ export const GRADE_CREATE_SCHEMA = Joi.object({
         .max(10)
         .multiple(0.25)
         .required(),
-    timestamp: Joi.date()
-        .max("now")
-        .iso()
-        .required(),
+    timestamp: DATE_SCHEMA.max("now").required(),
     description: Joi.string()
         .allow("")
         .required(),
@@ -67,6 +66,7 @@ export const USER_CREATE_SCHEMA = Joi.object({
         .required(),
     email: EMAIL_SCHEMA.required(),
     password: PASSWORD_SCHEMA.required(),
+    birthday: DATE_SCHEMA.max("now").required(),
 });
 
 export const USER_UPDATE_SCHEMA = Joi.object({
@@ -107,6 +107,7 @@ export const USER_SCHEMA = Joi
         lastName: Joi.string()
             .required(),
         email: EMAIL_SCHEMA.required(),
+        birthday: DATE_SCHEMA.max("now").required(),
     })
     .label("User");
 
@@ -177,7 +178,7 @@ export const SESSION_SCHEMA = Joi
         id: UUID_SCHEMA.required(),
         type: Joi.string().valid("admin", "student", "teacher").required(),
         user: USER_SCHEMA.required(),
-        expires: Joi.date().iso().required(),
+        expires: DATE_SCHEMA.required(),
     })
     .label("Session");
 

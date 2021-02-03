@@ -11,6 +11,7 @@ export interface IUser
     lastName: string;
     email: string;
     password: string;
+    birthday: Date;
 }
 
 export interface IUpdateUser
@@ -27,6 +28,7 @@ export interface ISerializedUser
     firstName: string;
     lastName: string;
     email: string;
+    birthday: string;
 }
 
 export default class User implements ISerializable
@@ -41,6 +43,7 @@ export default class User implements ISerializable
             firstName: this.data.firstName,
             lastName: this.data.lastName,
             email: this.data.email,
+            birthday: this.data.birthday.toISOString(),
         };
     }
 

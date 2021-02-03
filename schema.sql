@@ -18,8 +18,11 @@ create table "users"
     "lastName" varchar(30) not null,
     "email" varchar(255) not null,
     "password" varchar(255) not null,
+    "birthday" date not null,
 
-    primary key ("email")
+    primary key ("email"),
+
+    check ("birthday" < current_date)
 );
 
 create table "students"

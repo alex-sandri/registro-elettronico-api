@@ -23,6 +23,7 @@ export default class Teacher extends User implements ISerializable
             lastName: data.lastName,
             email: data.email,
             password: data.password,
+            birthday: data.birthday,
         });
     }
 
@@ -43,6 +44,7 @@ export default class Teacher extends User implements ISerializable
             lastName: data.lastName,
             email: data.email,
             password: data.password,
+            birthday: data.birthday,
         });
 
         await db.query(

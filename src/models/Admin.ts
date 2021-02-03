@@ -31,6 +31,7 @@ export default class Admin extends User implements ISerializable
             lastName: data.lastName,
             email: data.email,
             password: data.password,
+            birthday: data.birthday,
         });
     }
 
@@ -49,6 +50,7 @@ export default class Admin extends User implements ISerializable
             lastName: data.lastName,
             email: data.email,
             password: data.password,
+            birthday: data.birthday,
         });
 
         return new Admin(data);
