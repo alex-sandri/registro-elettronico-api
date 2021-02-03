@@ -112,4 +112,14 @@ export default class Grade implements ISerializable
 
         return result.rows.map(_ => new Grade(_));
     }
+
+    public async delete(): Promise<void>
+    {
+        const db = Database.client;
+
+        await db.query(
+            "delete from grades where id = $1",
+            [ this.data.id ],
+        );
+    }
 }
