@@ -189,3 +189,9 @@ export const TEACHING_SCHEMA = Joi
         subject: SUBJECT_SCHEMA.required(),
     })
     .label("Teaching");
+
+export const STUDENT_REPORT_SCHEMA = Joi
+    .object({
+        // TODO
+    })
+    .label("Student Report");

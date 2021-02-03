@@ -30,6 +30,7 @@ import {
     SESSION_CREATE_SCHEMA,
     SESSION_SCHEMA,
     STUDENT_CREATE_SCHEMA,
+    STUDENT_REPORT_SCHEMA,
     STUDENT_SCHEMA,
     STUDENT_UPDATE_SCHEMA,
     SUBJECT_CREATE_SCHEMA,
@@ -496,6 +497,43 @@ const init = async () =>
             const grades = await Grade.for(student);
 
             return Promise.all(grades.map(_ => _.serialize()));
+        },
+    });
+
+    server.route({
+        method: "GET",
+        path: "/students/{id}/report",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher", "student" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
+            },
+            response: {
+                schema: STUDENT_REPORT_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const student = await Student.retrieve(request.params.id);
+
+            if (!student)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.type === "student" && student.data.email !== user.data.email)
+            {
+                throw Boom.forbidden();
+            }
+
+            return student.report();
         },
     });
 
