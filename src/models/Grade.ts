@@ -83,13 +83,13 @@ export default class Grade implements ISerializable
         else
         {
             const result = await db.query(
-                "select * from teachings where teacher = $1 and subject = $2",
-                [ teacher.data.email, subject.data.name ],
+                "select * from teachings where class = $1 and teacher = $2 and subject = $3",
+                [ student.data.class, teacher.data.email, subject.data.name ],
             );
 
             if (result.rowCount === 0)
             {
-                throw new Error(`'${subject.data.name}' is not taught by '${teacher.data.email}'`)
+                throw new Error(`'${subject.data.name}' is not taught by '${teacher.data.email}' in '${student.data.class}'`)
             }
         }
 
