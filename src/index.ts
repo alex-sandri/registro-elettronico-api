@@ -388,6 +388,42 @@ const init = async () =>
     });
 
     server.route({
+        method: "DELETE",
+        path: "/sessions/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher", "student" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const session = await Session.retrieve(request.params.id);
+
+            if (!session)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            if (session.user.data.email !== user.data.email)
+            {
+                throw Boom.forbidden();
+            }
+
+            await session.delete();
+
+            return h.response();
+        },
+    });
+
+    server.route({
         method: "GET",
         path: "/students",
         options: {

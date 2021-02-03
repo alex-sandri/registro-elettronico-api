@@ -91,6 +91,16 @@ export default class Session implements ISerializable
         return new Session(id, user, result.rows[0].expires);
     }
 
+    public async delete(): Promise<void>
+    {
+        const db = Database.client;
+
+        await db.query(
+            "delete from sessions where id = $1",
+            [ this.id ],
+        );
+    }
+
     public hasExpired(): boolean
     {
         return this.expires < new Date();
