@@ -28,6 +28,7 @@ create table "students"
     "class" varchar(30) not null,
 
     primary key ("email"),
+
     foreign key ("email") references "users" on update cascade on delete cascade,
     foreign key ("class") references "classes" on update cascade
 );
@@ -45,6 +46,7 @@ create table "teachers"
     "email" varchar(255) not null,
 
     primary key ("email"),
+
     foreign key ("email") references "users" on update cascade on delete cascade
 );
 
@@ -59,6 +61,7 @@ create table "grades"
     "teacher" varchar(255) not null,
 
     primary key ("id"),
+
     foreign key ("student") references "students" on update cascade,
     foreign key ("subject") references "subjects" on update cascade,
     foreign key ("teacher") references "teachers" on update cascade,
@@ -74,6 +77,9 @@ create table "teachings"
     "subject" varchar(30) not null,
 
     primary key ("id"),
+
+    unique ("teacher", "class", "subject"),
+
     foreign key ("class") references "classes" on update cascade,
     foreign key ("teacher") references "teachers" on update cascade,
     foreign key ("subject") references "subjects" on update cascade
@@ -86,6 +92,7 @@ create table "sessions"
     "expires" timestamp not null,
 
     primary key ("id"),
+
     foreign key ("user") references "users" on update cascade on delete cascade,
 
     check("expires" > current_timestamp)
