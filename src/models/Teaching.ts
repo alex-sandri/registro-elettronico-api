@@ -42,19 +42,37 @@ export default class Teaching implements ISerializable
     {
         const db = Database.client;
 
-        if (await Class.retrieve(data.class) === null)
+        const teachingClass = await Class.retrieve(data.class);
+
+        if (!teachingClass)
         {
             throw new Error("This class does not exist");
         }
 
-        if (await Subject.retrieve(data.subject) === null)
+        const teacher = await Teacher.retrieve(data.teacher);
+
+        if (!teacher)
+        {
+            throw new Error("This teacher does not exist");
+        }
+
+        const subject = await Subject.retrieve(data.subject);
+
+        if (!subject)
         {
             throw new Error("This subject does not exist");
         }
-
-        if (await Teacher.retrieve(data.teacher) === null)
+        else
         {
-            throw new Error("This teacher does not exist");
+            const result = await db.query(
+                "select * from teachings where class = $1 and teacher = $2 and subject = $3",
+                [ teachingClass.data.name, teacher.data.email, subject.data.name ],
+            );
+
+            if (result.rowCount > 0)
+            {
+                throw new Error(`'${teacher.data.email}' already teaches '${subject.data.name}' in '${teachingClass.data.name}'`)
+            }
         }
 
         const result = await db.query(
