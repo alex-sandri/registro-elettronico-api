@@ -83,6 +83,23 @@ export default class Teaching implements ISerializable
         return new Teaching(result.rows[0].id, data);
     }
 
+    public static async list(): Promise<Teaching[]>
+    {
+        const db = Database.client;
+
+        const result = await db.query("select * from teachings");
+
+        return result.rows.map(_ => new Teaching(_.id, _));
+    }
+
+    public async delete(): Promise<void>
+    {
+        await Database.client.query(
+            "delete from teachings where id = $1",
+            [ this.id ],
+        );
+    }
+
     public static async for(teacher: Teacher): Promise<Teaching[]>
     {
         const db = Database.client;
