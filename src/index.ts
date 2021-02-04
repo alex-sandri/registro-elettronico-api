@@ -35,6 +35,7 @@ import {
     STUDENT_UPDATE_SCHEMA,
     SUBJECT_CREATE_SCHEMA,
     SUBJECT_SCHEMA,
+    SUBJECT_UPDATE_SCHEMA,
     TEACHER_CREATE_SCHEMA,
     TEACHER_SCHEMA,
     TEACHER_UPDATE_SCHEMA,
@@ -632,6 +633,36 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const subject = await Subject.create(request.payload as any);
+
+            return subject.serialize();
+        },
+    });
+
+    server.route({
+        method: "PUT",
+        path: "/subjects/{id}",
+        options: {
+            tags: [ "api" ],
+            validate: {
+                params: Joi.object({
+                    id: Joi.string().required(),
+                }),
+                payload: SUBJECT_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: SUBJECT_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const subject = await Subject.retrieve(request.params.id);
+
+            if (!subject)
+            {
+                throw Boom.notFound();
+            }
+
+            await subject.update(request.payload as any);
 
             return subject.serialize();
         },

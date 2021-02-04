@@ -53,6 +53,11 @@ export const SUBJECT_CREATE_SCHEMA = Joi.object({
         .required(),
 });
 
+export const SUBJECT_UPDATE_SCHEMA = Joi.object({
+    name: Joi.string(),
+    description: Joi.string().allow(""),
+});
+
 export const TEACHING_CREATE_SCHEMA = Joi.object({
     teacher: EMAIL_SCHEMA.required(),
     class: Joi.string()

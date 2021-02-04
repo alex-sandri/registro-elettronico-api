@@ -76,4 +76,19 @@ export default class Subject implements ISerializable
 
         return result.rows.map(_ => new Subject(_));
     }
+
+    public async update(data: ISubject): Promise<Subject>
+    {
+        const db = Database.client;
+
+        this.data.name = data.name ?? this.data.name;
+        this.data.description = data.description ?? this.data.description;
+
+        await db.query(
+            "update subjects set name = $1, description = $2 where name = $3",
+            [ this.data.name, this.data.description, this.data.name ],
+        );
+
+        return this;
+    }
 }
