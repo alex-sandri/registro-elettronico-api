@@ -1,4 +1,5 @@
 import Joi from "joi";
+import JoiDate from "@joi/date";
 import { Config } from "./Config";
 
 // --------------------------------
@@ -11,7 +12,8 @@ export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
 
 export const UUID_SCHEMA = Joi.string().uuid({ version: "uuidv4" });
 
-export const DATE_SCHEMA = Joi.date().iso();
+export const DATE_SCHEMA = Joi.extend(JoiDate).date().iso().format("YYYY-MM-DD");
+export const DATETIME_SCHEMA = Joi.extend(JoiDate).date().iso().format("YYYY-MM-DDTHH:mm:ssZ");
 
 // --------------------------------
 // REQUEST SCHEMAS
@@ -33,7 +35,7 @@ export const GRADE_CREATE_SCHEMA = Joi.object({
         .max(10)
         .multiple(0.25)
         .required(),
-    timestamp: DATE_SCHEMA.max("now").required(),
+    timestamp: DATETIME_SCHEMA.max("now").required(),
     description: Joi.string()
         .allow("")
         .required(),
@@ -178,7 +180,7 @@ export const SESSION_SCHEMA = Joi
         id: UUID_SCHEMA.required(),
         type: Joi.string().valid("admin", "student", "teacher").required(),
         user: USER_SCHEMA.required(),
-        expires: DATE_SCHEMA.required(),
+        expires: DATETIME_SCHEMA.required(),
     })
     .label("Session");
 
