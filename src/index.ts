@@ -899,6 +899,32 @@ const init = async () =>
     });
 
     server.route({
+        method: "DELETE",
+        path: "/teachings/{id}",
+        options: {
+            tags: [ "api" ],
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const teaching = await Teaching.retrieve(request.params.id);
+
+            if (!teaching)
+            {
+                throw Boom.notFound();
+            }
+
+            await teaching.delete();
+
+            return h.response();
+        },
+    });
+
+    server.route({
         method: "GET",
         path: "/users",
         options: {
@@ -968,9 +994,7 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const id = request.params.id;
-
-            const user = await User.retrieve(id);
+            const user = await User.retrieve(request.params.id);
 
             if (!user)
             {
