@@ -6,6 +6,14 @@ import Teacher, { ISerializedTeacher } from "./Teacher";
 
 interface ITeaching
 {
+    id: string;
+    teacher: string;
+    class: string;
+    subject: string;
+}
+
+interface ICreateTeaching
+{
     teacher: string;
     class: string;
     subject: string;
@@ -21,7 +29,7 @@ export interface ISerializedTeaching
 
 export default class Teaching implements ISerializable
 {
-    private constructor(public id: string, public data: ITeaching)
+    private constructor(public readonly data: ITeaching)
     {}
 
     public async serialize(): Promise<ISerializedTeaching>
@@ -31,14 +39,14 @@ export default class Teaching implements ISerializable
         const subject = await Subject.retrieve(this.data.subject);
 
         return {
-            id: this.id,
+            id: this.data.id,
             teacher: await teacher!.serialize(),
             class: await teachingClass!.serialize(),
             subject: await subject!.serialize(),
         };
     }
 
-    public static async create(data: ITeaching): Promise<Teaching>
+    public static async create(data: ICreateTeaching): Promise<Teaching>
     {
         const db = Database.client;
 
@@ -76,11 +84,11 @@ export default class Teaching implements ISerializable
         }
 
         const result = await db.query(
-            "insert into teachings (class, subject, teacher) values ($1, $2, $3) returning id",
+            "insert into teachings (class, subject, teacher) values ($1, $2, $3) returning *",
             [ data.class, data.subject, data.teacher ],
         );
 
-        return new Teaching(result.rows[0].id, data);
+        return new Teaching(result.rows[0]);
     }
 
     public static async retrieve(id: string): Promise<Teaching | null>
@@ -97,7 +105,7 @@ export default class Teaching implements ISerializable
             return null;
         }
 
-        return new Teaching(result.rows[0].id, result.rows[0]);
+        return new Teaching(result.rows[0]);
     }
 
     public static async list(): Promise<Teaching[]>
@@ -106,14 +114,14 @@ export default class Teaching implements ISerializable
 
         const result = await db.query("select * from teachings");
 
-        return result.rows.map(_ => new Teaching(_.id, _));
+        return result.rows.map(_ => new Teaching(_));
     }
 
     public async delete(): Promise<void>
     {
         await Database.client.query(
             "delete from teachings where id = $1",
-            [ this.id ],
+            [ this.data.id ],
         );
     }
 
@@ -126,6 +134,6 @@ export default class Teaching implements ISerializable
             [ teacher.data.email ],
         );
 
-        return result.rows.map(_ => new Teaching(_.id, _));
+        return result.rows.map(_ => new Teaching(_));
     }
 }
