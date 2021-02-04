@@ -43,7 +43,7 @@ export default class User implements ISerializable
             firstName: this.data.firstName,
             lastName: this.data.lastName,
             email: this.data.email,
-            birthday: this.data.birthday.toISOString(),
+            birthday: this.data.birthday.toISOString().split("T")[0],
         };
     }
 
