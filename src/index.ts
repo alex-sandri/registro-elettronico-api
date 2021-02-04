@@ -862,6 +862,23 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/teachings",
+        options: {
+            tags: [ "api" ],
+            response: {
+                schema: Joi.array().items(TEACHING_SCHEMA).required().label("Teachings"),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const teachings = await Teaching.list();
+
+            return Promise.all(teachings.map(_ => _.serialize()));
+        },
+    });
+
+    server.route({
         method: "POST",
         path: "/teachings",
         options: {
