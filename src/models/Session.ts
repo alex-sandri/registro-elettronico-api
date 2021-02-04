@@ -61,7 +61,7 @@ export default class Session implements ISerializable
 
         const result = await db.query(
             `insert into sessions ("user", "expires") values ($1, $2) returning "id"`,
-            [ data.email, expires ],
+            [ data.email, expires.toISOString() ],
         );
 
         return new Session(result.rows[0].id, user, expires);

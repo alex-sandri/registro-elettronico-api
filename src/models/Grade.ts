@@ -95,7 +95,7 @@ export default class Grade implements ISerializable
 
         const result = await db.query(
             "insert into grades (value, timestamp, description, student, subject, teacher) values ($1, $2, $3, $4, $5, $6) returning id",
-            [ data.value, data.timestamp, data.description, data.student, data.subject, data.teacher ],
+            [ data.value, data.timestamp.toISOString(), data.description, data.student, data.subject, data.teacher ],
         );
 
         return new Grade({ ...data, id: result.rows[0].id });

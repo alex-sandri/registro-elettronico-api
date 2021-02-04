@@ -55,7 +55,7 @@ export default class User implements ISerializable
 
         await db.query(
             `insert into users ("type", "firstName", "lastName", "email", "password", "birthday") values ($1, $2, $3, $4, $5, $6)`,
-            [ data.type, data.firstName, data.lastName, data.email, data.password, data.birthday ],
+            [ data.type, data.firstName, data.lastName, data.email, data.password, data.birthday.toISOString() ],
         );
 
         return new User(data);
