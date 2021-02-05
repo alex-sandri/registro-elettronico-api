@@ -111,6 +111,14 @@ export class CalendarItem implements ISerializable
         return this;
     }
 
+    public async delete(): Promise<void>
+    {
+        await Database.client.query(
+            "delete from calendar_items where id = $1",
+            [ this.data.id ],
+        );
+    }
+
     public static async for(itemClass: Class, from: Date, to: Date): Promise<CalendarItem[]>
     {
         const result = await Database.client.query(

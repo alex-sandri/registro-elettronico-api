@@ -356,6 +356,42 @@ const init = async () =>
     });
 
     server.route({
+        method: "DELETE",
+        path: "/calendar/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const item = await CalendarItem.retrieve(request.params.id);
+
+            if (!item)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.email !== item.data.author)
+            {
+                throw Boom.forbidden();
+            }
+
+            await item.delete();
+
+            return h.response();
+        },
+    });
+
+    server.route({
         method: "GET",
         path: "/classes",
         options: {
