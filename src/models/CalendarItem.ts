@@ -1,6 +1,6 @@
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
-import Class from "./Class";
+import Class, { ISerializedClass } from "./Class";
 import User, { ISerializedUser } from "./User";
 
 interface ICreateCalendarItem
@@ -28,6 +28,7 @@ export interface ISerializedCalendarItem
     title: string;
     content: string;
     author: ISerializedUser;
+    class: ISerializedClass;
 }
 
 export class CalendarItem implements ISerializable
@@ -37,7 +38,8 @@ export class CalendarItem implements ISerializable
 
     public async serialize(): Promise<ISerializedCalendarItem>
     {
-        const user = await User.retrieve(this.data.author)
+        const user = await User.retrieve(this.data.author);
+        const itemClass = await Class.retrieve(this.data.class);
 
         return {
             id: this.data.id,
@@ -47,6 +49,7 @@ export class CalendarItem implements ISerializable
             title: this.data.title,
             content: this.data.content,
             author: await user!.serialize(),
+            class: await itemClass!.serialize(),
         };
     }
 
