@@ -275,7 +275,7 @@ const init = async () =>
                 payload: CALENDAR_ITEM_CREATE_SCHEMA,
             },
             response: {
-                schema: ADMIN_SCHEMA,
+                schema: CALENDAR_ITEM_SCHEMA,
             },
         },
         handler: async (request, h) =>
