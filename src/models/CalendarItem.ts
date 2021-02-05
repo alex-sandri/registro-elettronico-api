@@ -101,10 +101,12 @@ export class CalendarItem implements ISerializable
         this.data.title = data.title ?? this.data.title;
         this.data.content = data.content ?? this.data.content;
 
-        await Database.client.query(
-            `update calendar_items set "type" = $1, "start" = $2, "end" = $3, "title" = $4, "content" = $5 where "id" = $6`,
+        const result = await Database.client.query(
+            `update calendar_items set "type" = $1, "start" = $2, "end" = $3, "title" = $4, "content" = $5 where "id" = $6 returning "lastModified"`,
             [ this.data.type, this.data.start.toISOString(), this.data.end.toISOString(), this.data.title, this.data.content, this.data.id ],
         );
+
+        this.data.lastModified = result.rows[0].lastModified;
 
         return this;
     }
