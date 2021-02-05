@@ -230,5 +230,7 @@ export const CALENDAR_ITEM_SCHEMA = Joi
         content: Joi.string().required(),
         author: USER_SCHEMA.required(),
         class: CLASS_SCHEMA.required(),
+        created: DATETIME_SCHEMA.required(),
+        lastModified: DATETIME_SCHEMA.required(),
     })
     .label("Calendar Item");
