@@ -257,7 +257,33 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            // TODO: Check permissions
+            const user = request.auth.credentials.user as User;
+
+            switch (user.data.type)
+            {
+                case "student":
+                {
+                    const student = await Student.retrieve(user.data.email) as Student;
+
+                    if (student.data.class !== item.data.class)
+                    {
+                        throw Boom.forbidden();
+                    }
+
+                    break;
+                }
+                case "teacher":
+                {
+                    const teacher = await Teacher.retrieve(user.data.email) as Teacher;
+
+                    if (!(await teacher.teachesIn(item.data.class)))
+                    {
+                        throw Boom.forbidden();
+                    }
+
+                    break;
+                }
+            }
 
             return item.serialize();
         },
@@ -355,6 +381,34 @@ const init = async () =>
             if (!retrievedClass)
             {
                 throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            switch (user.data.type)
+            {
+                case "student":
+                {
+                    const student = await Student.retrieve(user.data.email) as Student;
+
+                    if (student.data.class !== retrievedClass.data.name)
+                    {
+                        throw Boom.forbidden();
+                    }
+
+                    break;
+                }
+                case "teacher":
+                {
+                    const teacher = await Teacher.retrieve(user.data.email) as Teacher;
+
+                    if (!(await teacher.teachesIn(retrievedClass.data.name)))
+                    {
+                        throw Boom.forbidden();
+                    }
+
+                    break;
+                }
             }
 
             const items = await CalendarItem.for(retrievedClass, request.query.from, request.query.to);

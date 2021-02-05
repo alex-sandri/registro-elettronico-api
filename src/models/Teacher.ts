@@ -92,4 +92,14 @@ export default class Teacher extends User implements ISerializable
 
         return this;
     }
+
+    public async teachesIn(teacherClass: string): Promise<boolean>
+    {
+        const result = await Database.client.query(
+            "select * from teachings where teacher = $1 and class = $2",
+            [ this.data.email, teacherClass ],
+        );
+
+        return result.rowCount > 0;
+    }
 }
