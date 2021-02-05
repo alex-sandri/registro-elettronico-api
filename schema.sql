@@ -113,12 +113,15 @@ create table "calendar_items"
     "content" varchar(200) not null,
     "author" varchar(255) not null,
     "class" varchar(30) not null,
+    "created" timestamp not null default current_timestamp,
+    "lastModified" timestamp not null default current_timestamp,
 
     primary key ("id"),
 
     foreign key ("author") references "users" on update cascade on delete cascade,
     foreign key ("class") references "classes" on update cascade on delete cascade,
 
-    check ("start" >= current_timestamp),
+    check ("start" >= "created"),
     check ("end" > "start")
+    check ("lastModified" >= "created")
 );

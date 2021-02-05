@@ -17,6 +17,8 @@ interface ICalendarItem extends ICreateCalendarItem
 {
     id: string;
     author: string;
+    created: Date;
+    lastModified: Date;
 }
 
 export interface ISerializedCalendarItem
@@ -29,6 +31,8 @@ export interface ISerializedCalendarItem
     content: string;
     author: ISerializedUser;
     class: ISerializedClass;
+    created: string;
+    lastModified: string;
 }
 
 export class CalendarItem implements ISerializable
@@ -50,6 +54,8 @@ export class CalendarItem implements ISerializable
             content: this.data.content,
             author: await user!.serialize(),
             class: await itemClass!.serialize(),
+            created: this.data.created.toISOString(),
+            lastModified: this.data.lastModified.toISOString(),
         };
     }
 
