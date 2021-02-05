@@ -2,6 +2,8 @@ create extension "pgcrypto";
 
 create type usertype as enum ('admin', 'student', 'teacher');
 
+create type calendar_item_type as enum ('general', 'test', 'event', 'info', 'important');
+
 create domain grade as numeric(4, 2) not null check(value between 0 and 10) check(value % 0.25 = 0);
 
 create table "classes"
@@ -99,4 +101,24 @@ create table "sessions"
     foreign key ("user") references "users" on update cascade on delete cascade,
 
     check("expires" > current_timestamp)
+);
+
+create table "calendar_items"
+(
+    "id" uuid not null default gen_random_uuid(),
+    "type" calendar_item_type not null,
+    "start" timestamp not null,
+    "end" timestamp not null,
+    "title" varchar(50) not null,
+    "content" varchar(200) not null,
+    "author" varchar(255) not null,
+    "class" varchar(30) not null,
+
+    primary key ("id"),
+
+    foreign key ("author") references "users" on update cascade on delete cascade,
+    foreign key ("class") references "classes" on update cascade on delete cascade,
+
+    check ("start" >= current_timestamp),
+    check ("end" > "start")
 );
