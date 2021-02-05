@@ -268,6 +268,9 @@ const init = async () =>
         path: "/calendar",
         options: {
             tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
             validate: {
                 payload: CALENDAR_ITEM_CREATE_SCHEMA,
             },
