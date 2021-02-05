@@ -1,5 +1,6 @@
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
+import Class from "./Class";
 import User, { ISerializedUser } from "./User";
 
 interface ICreateCalendarItem
@@ -74,11 +75,11 @@ export class CalendarItem implements ISerializable
         return new CalendarItem(result.rows[0]);
     }
 
-    public static async list(from: Date, to: Date): Promise<CalendarItem[]>
+    public static async for(itemClass: Class, from: Date, to: Date): Promise<CalendarItem[]>
     {
         const result = await Database.client.query(
-            "select * from calendar_items where start >= $1 and start <= $2",
-            [ from.toISOString(), to.toISOString() ],
+            "select * from calendar_items where class = $1 and start >= $2 and start <= $3",
+            [ itemClass.data.name, from.toISOString(), to.toISOString() ],
         );
 
         return result.rows.map(_ => new CalendarItem(_));

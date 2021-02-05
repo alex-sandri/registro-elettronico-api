@@ -24,6 +24,7 @@ import {
     ADMIN_UPDATE_SCHEMA,
     CLASS_CREATE_SCHEMA,
     CLASS_SCHEMA,
+    DATETIME_SCHEMA,
     EMAIL_SCHEMA,
     GRADE_CREATE_SCHEMA,
     GRADE_SCHEMA,
@@ -49,6 +50,7 @@ import {
     GET_STUDENT_HANDLER,
     GET_TEACHER_HANDLER
 } from "./config/Handlers";
+import { CalendarItem } from "./models/CalendarItem";
 
 const pkg = require("../package.json");
 
@@ -229,6 +231,58 @@ const init = async () =>
 
     server.route({
         method: "GET",
+        path: "/calendar/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher", "student" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+            },
+            response: {
+                schema: CALENDAR_ITEM_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const item = await CalendarItem.retrieve(request.params.id);
+
+            if (!item)
+            {
+                throw Boom.notFound();
+            }
+
+            // TODO: Check permissions
+
+            return item.serialize();
+        },
+    });
+
+    server.route({
+        method: "POST",
+        path: "/calendar",
+        options: {
+            tags: [ "api" ],
+            validate: {
+                payload: CALENDAR_ITEM_CREATE_SCHEMA,
+            },
+            response: {
+                schema: ADMIN_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const item = await CalendarItem.create(request.payload as any);
+
+            return item.serialize();
+        },
+    });
+
+    server.route({
+        method: "GET",
         path: "/classes",
         options: {
             tags: [ "api" ],
@@ -266,6 +320,39 @@ const init = async () =>
             }
 
             return retrievedClass.serialize();
+        },
+    });
+
+    server.route({
+        method: "GET",
+        path: "/classes/{id}/calendar",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher", "student" ],
+            },
+            validate: {
+                query: Joi.object({
+                    from: DATETIME_SCHEMA.required(),
+                    to: DATETIME_SCHEMA.required(),
+                }),
+            },
+            response: {
+                schema: Joi.array().items(CALENDAR_ITEM_SCHEMA).required().label("Calendar Items"),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const retrievedClass = await Class.retrieve(request.params.id);
+
+            if (!retrievedClass)
+            {
+                throw Boom.notFound();
+            }
+
+            const items = await CalendarItem.for(retrievedClass, request.query.from, request.query.to);
+
+            return Promise.all(items.map(_ => _.serialize()));
         },
     });
 
