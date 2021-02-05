@@ -6,6 +6,14 @@ create type calendar_item_type as enum ('general', 'test', 'event', 'info', 'imp
 
 create domain grade as numeric(4, 2) not null check(value between 0 and 10) check(value % 0.25 = 0);
 
+create function trigger_update_last_modified()
+returns trigger as $$
+begin
+  new.lastModified = current_timestamp;
+  return new;
+end;
+$$ language plpgsql;
+
 create table "classes"
 (
     "name" varchar(30) not null,
@@ -122,6 +130,11 @@ create table "calendar_items"
     foreign key ("class") references "classes" on update cascade on delete cascade,
 
     check ("start" >= "created"),
-    check ("end" > "start")
+    check ("end" > "start"),
     check ("lastModified" >= "created")
 );
+
+create trigger update_last_modified
+before update on "calendar_items"
+for each row
+execute procedure trigger_update_last_modified();
