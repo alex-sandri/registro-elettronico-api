@@ -106,7 +106,7 @@ export const STUDENT_UPDATE_SCHEMA = USER_UPDATE_SCHEMA.keys({
 
 export const CALENDAR_ITEM_CREATE_SCHEMA = Joi.object({
     type: CALENDAR_ITEM_TYPE_SCHEMA.required(),
-    start: DATETIME_SCHEMA.required(),
+    start: DATETIME_SCHEMA.min("now").required(),
     end: DATETIME_SCHEMA.greater(Joi.ref("start")).required(),
     title: Joi.string().required(),
     content: Joi.string().required(),
