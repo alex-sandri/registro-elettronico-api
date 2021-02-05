@@ -100,6 +100,10 @@ export const STUDENT_UPDATE_SCHEMA = USER_UPDATE_SCHEMA.keys({
     class: Joi.string(),
 });
 
+export const CALENDAR_ITEM_CREATE_SCHEMA = Joi.object({
+    // TODO
+});
+
 // --------------------------------
 // RESPONSE SCHEMAS
 // --------------------------------
@@ -208,3 +212,9 @@ export const STUDENT_REPORT_SCHEMA = Joi
             .required(),
     })
     .label("Student Report");
+
+export const CALENDAR_ITEM_SCHEMA = Joi
+    .object({
+        // TODO
+    })
+    .label("Calendar Item");
