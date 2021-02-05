@@ -53,7 +53,7 @@ export class CalendarItem implements ISerializable
     public static async create(data: ICreateCalendarItem, author: User): Promise<CalendarItem>
     {
         const result = await Database.client.query(
-            "insert into calendar_items (type, start, end, title, content, author, class) values ($1, $2, $3, $4, $5, $6, $7) returning *",
+            `insert into calendar_items ("type", "start", "end", "title", "content", "author", "class") values ($1, $2, $3, $4, $5, $6, $7) returning *`,
             [ data.type, data.start.toISOString(), data.end.toISOString(), data.title, data.content, author.data.email, data.class ],
         );
 
