@@ -10,13 +10,13 @@ interface ICreateCalendarItem
     end: Date;
     title: string;
     content: string;
-    author: string;
     class: string;
 }
 
 interface ICalendarItem extends ICreateCalendarItem
 {
     id: string;
+    author: string;
 }
 
 export interface ISerializedCalendarItem
@@ -50,11 +50,11 @@ export class CalendarItem implements ISerializable
         };
     }
 
-    public static async create(data: ICreateCalendarItem): Promise<CalendarItem>
+    public static async create(data: ICreateCalendarItem, author: User): Promise<CalendarItem>
     {
         const result = await Database.client.query(
             "insert into calendar_items (type, start, end, title, content, author, class) values ($1, $2, $3, $4, $5, $6, $7) returning *",
-            [ data.type, data.start.toISOString(), data.end.toISOString(), data.title, data.content, data.author, data.class ],
+            [ data.type, data.start.toISOString(), data.end.toISOString(), data.title, data.content, author.data.email, data.class ],
         );
 
         return new CalendarItem(result.rows[0]);

@@ -110,7 +110,6 @@ export const CALENDAR_ITEM_CREATE_SCHEMA = Joi.object({
     end: DATETIME_SCHEMA.greater(Joi.ref("start")).required(),
     title: Joi.string().required(),
     content: Joi.string().required(),
-    author: EMAIL_SCHEMA.required(),
     class: Joi.string().required(),
 });
 

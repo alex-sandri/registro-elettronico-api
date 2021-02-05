@@ -280,7 +280,9 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const item = await CalendarItem.create(request.payload as any);
+            const author = request.auth.credentials.user as User;
+
+            const item = await CalendarItem.create(request.payload as any, author);
 
             return item.serialize();
         },
