@@ -9,7 +9,7 @@ create domain grade as numeric(4, 2) not null check(value between 0 and 10) chec
 create function trigger_update_last_modified()
 returns trigger as $$
 begin
-  new.lastModified = current_timestamp;
+  new."lastModified" = current_timestamp;
   return new;
 end;
 $$ language plpgsql;
