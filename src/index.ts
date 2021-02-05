@@ -341,7 +341,7 @@ const init = async () =>
             validate: {
                 query: Joi.object({
                     from: DATETIME_SCHEMA.required(),
-                    to: DATETIME_SCHEMA.required(),
+                    to: DATETIME_SCHEMA.greater(Joi.ref("from")).required(),
                 }),
             },
             response: {
