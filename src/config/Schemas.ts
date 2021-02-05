@@ -113,6 +113,14 @@ export const CALENDAR_ITEM_CREATE_SCHEMA = Joi.object({
     class: Joi.string().required(),
 });
 
+export const CALENDAR_ITEM_UPDATE_SCHEMA = Joi.object({
+    type: CALENDAR_ITEM_TYPE_SCHEMA,
+    start: DATETIME_SCHEMA.min("now"),
+    end: DATETIME_SCHEMA.greater(Joi.ref("start")),
+    title: Joi.string(),
+    content: Joi.string(),
+});
+
 // --------------------------------
 // RESPONSE SCHEMAS
 // --------------------------------

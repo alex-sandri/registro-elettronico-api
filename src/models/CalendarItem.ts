@@ -13,6 +13,15 @@ interface ICreateCalendarItem
     class: string;
 }
 
+interface IUpdateCalendarItem
+{
+    type?: "general" | "test" | "event" | "info" | "important";
+    start?: Date;
+    end?: Date;
+    title?: string;
+    content?: string;
+}
+
 interface ICalendarItem extends ICreateCalendarItem
 {
     id: string;
@@ -82,6 +91,22 @@ export class CalendarItem implements ISerializable
         }
 
         return new CalendarItem(result.rows[0]);
+    }
+
+    public async update(data: IUpdateCalendarItem): Promise<CalendarItem>
+    {
+        this.data.type = data.type ?? this.data.type;
+        this.data.start = data.start ?? this.data.start;
+        this.data.end = data.end ?? this.data.end;
+        this.data.title = data.title ?? this.data.title;
+        this.data.content = data.content ?? this.data.content;
+
+        await Database.client.query(
+            `update calendar_items "type" = $1, "start" = $2, "end" = $3, "title" = $4, "content" = $5 where "id" = $6`,
+            [ this.data.type, this.data.start.toISOString(), this.data.end.toISOString(), this.data.title, this.data.content, this.data.id ],
+        );
+
+        return this;
     }
 
     public static async for(itemClass: Class, from: Date, to: Date): Promise<CalendarItem[]>

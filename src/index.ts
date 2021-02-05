@@ -24,6 +24,7 @@ import {
     ADMIN_UPDATE_SCHEMA,
     CALENDAR_ITEM_CREATE_SCHEMA,
     CALENDAR_ITEM_SCHEMA,
+    CALENDAR_ITEM_UPDATE_SCHEMA,
     CLASS_CREATE_SCHEMA,
     CLASS_SCHEMA,
     DATETIME_SCHEMA,
@@ -309,6 +310,46 @@ const init = async () =>
             const author = request.auth.credentials.user as User;
 
             const item = await CalendarItem.create(request.payload as any, author);
+
+            return item.serialize();
+        },
+    });
+
+    server.route({
+        method: "PUT",
+        path: "/calendar/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+                payload: CALENDAR_ITEM_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: CALENDAR_ITEM_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const item = await CalendarItem.retrieve(request.params.id);
+
+            if (!item)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.email !== item.data.author)
+            {
+                throw Boom.forbidden();
+            }
+
+            await item.update(request.payload as any);
 
             return item.serialize();
         },
