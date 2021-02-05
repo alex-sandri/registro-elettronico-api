@@ -15,6 +15,10 @@ export const UUID_SCHEMA = Joi.string().uuid({ version: "uuidv4" });
 export const DATE_SCHEMA = Joi.extend(JoiDate).date().utc().format("YYYY-MM-DD");
 export const DATETIME_SCHEMA = Joi.extend(JoiDate).date().utc().format("YYYY-MM-DDTHH:mm:ss.SSSZ");
 
+export const USER_TYPE_SCHEMA = Joi.string().valid("admin", "student", "teacher");
+
+export const CALENDAR_ITEM_TYPE_SCHEMA = Joi.string().valid("general", "test", "event", "info", "important");
+
 // --------------------------------
 // REQUEST SCHEMAS
 // --------------------------------
@@ -101,7 +105,13 @@ export const STUDENT_UPDATE_SCHEMA = USER_UPDATE_SCHEMA.keys({
 });
 
 export const CALENDAR_ITEM_CREATE_SCHEMA = Joi.object({
-    // TODO
+    type: CALENDAR_ITEM_TYPE_SCHEMA.required(),
+    start: DATETIME_SCHEMA.required(),
+    end: DATETIME_SCHEMA.required(),
+    title: Joi.string().required(),
+    content: Joi.string().required(),
+    author: EMAIL_SCHEMA.required(),
+    class: Joi.string().required(),
 });
 
 // --------------------------------
@@ -110,9 +120,7 @@ export const CALENDAR_ITEM_CREATE_SCHEMA = Joi.object({
 
 export const USER_SCHEMA = Joi
     .object({
-        type: Joi.string()
-            .valid("admin", "student", "teacher")
-            .required(),
+        type: USER_TYPE_SCHEMA.required(),
         firstName: Joi.string()
             .required(),
         lastName: Joi.string()
@@ -187,7 +195,7 @@ export const GRADE_SCHEMA = Joi
 export const SESSION_SCHEMA = Joi
     .object({
         id: UUID_SCHEMA.required(),
-        type: Joi.string().valid("admin", "student", "teacher").required(),
+        type: USER_TYPE_SCHEMA.required(),
         user: USER_SCHEMA.required(),
         expires: DATETIME_SCHEMA.required(),
     })
@@ -215,6 +223,13 @@ export const STUDENT_REPORT_SCHEMA = Joi
 
 export const CALENDAR_ITEM_SCHEMA = Joi
     .object({
-        // TODO
+        id: UUID_SCHEMA.required(),
+        type: CALENDAR_ITEM_TYPE_SCHEMA.required(),
+        start: DATETIME_SCHEMA.required(),
+        end: DATETIME_SCHEMA.required(),
+        title: Joi.string().required(),
+        content: Joi.string().required(),
+        author: USER_SCHEMA.required(),
+        class: CLASS_SCHEMA.required(),
     })
     .label("Calendar Item");
