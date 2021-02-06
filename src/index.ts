@@ -607,6 +607,42 @@ const init = async () =>
     });
 
     server.route({
+        method: "DELETE",
+        path: "/demerits/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const demerit = await Demerit.retrieve(request.params.id);
+
+            if (!demerit)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.type === "teacher" && user.data.email !== demerit.data.author)
+            {
+                throw Boom.forbidden();
+            }
+
+            await demerit.delete();
+
+            return h.response();
+        },
+    });
+
+    server.route({
         method: "POST",
         path: "/grades",
         options: {
