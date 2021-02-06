@@ -134,6 +134,20 @@ create table "calendar_items"
     check ("lastModified" >= "created")
 );
 
+create table "demerits"
+(
+    "id" uuid not null default gen_random_uuid(),
+    "content" varchar(200) not null,
+    "author" varchar(255) not null,
+    "student" varchar(255) not null,
+    "created" timestamp not null default current_timestamp,
+
+    primary key ("id"),
+
+    foreign key ("author") references "users" on update cascade on delete cascade,
+    foreign key ("student") references "students" on update cascade on delete cascade
+);
+
 create trigger update_last_modified
 before update on "calendar_items"
 for each row
