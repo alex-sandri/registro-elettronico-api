@@ -11,6 +11,13 @@ interface ICreateLesson
     duration: number;
 }
 
+interface IUpdateLesson
+{
+    description?: string;
+    hour?: number;
+    duration?: number;
+}
+
 interface ILesson extends ICreateLesson
 {
     id: string;
@@ -55,6 +62,20 @@ export class Lesson implements ISerializable
         );
 
         return new Lesson(result.rows[0]);
+    }
+
+    public async update(data: IUpdateLesson): Promise<Lesson>
+    {
+        this.data.description = data.description ?? this.data.description;
+        this.data.hour = data.hour ?? this.data.hour;
+        this.data.duration = data.duration ?? this.data.duration;
+
+        await Database.client.query(
+            `update lessons set "description" = $1, "hour" = $2, "duration" = $3, where "id" = $6`,
+            [ this.data.description, this.data.hour, this.data.duration, this.data.id ],
+        );
+
+        return this;
     }
 
     public static async retrieve(id: string): Promise<Lesson | null>
