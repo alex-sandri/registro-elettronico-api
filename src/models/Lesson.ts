@@ -1,11 +1,14 @@
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
+import Class, { ISerializedClass } from "./Class";
 import Subject, { ISerializedSubject } from "./Subject";
 import Teacher, { ISerializedTeacher } from "./Teacher";
+import User from "./User";
 
 interface ICreateLesson
 {
     subject: string;
+    class: string;
     description: string;
     hour: number;
     duration: number;
@@ -29,6 +32,7 @@ export interface ISerializedLesson
     id: string;
     teacher: ISerializedTeacher;
     subject: ISerializedSubject;
+    class: ISerializedClass;
     description: string;
     hour: number;
     duration: number;
@@ -43,22 +47,26 @@ export class Lesson implements ISerializable
     {
         const teacher = await Teacher.retrieve(this.data.teacher) as Teacher;
         const subject = await Subject.retrieve(this.data.subject) as Subject;
+        const lessonClass = await Subject.retrieve(this.data.class) as Class;
 
         return {
             id: this.data.id,
             teacher: await teacher.serialize(),
             subject: await subject.serialize(),
+            class: await lessonClass.serialize(),
             description: this.data.description,
             hour: this.data.hour,
             duration: this.data.duration,
         };
     }
 
-    public static async create(data: ICreateLesson, teacher: Teacher): Promise<Lesson>
+    public static async create(data: ICreateLesson, teacher: User): Promise<Lesson>
     {
+        // TODO: Check if the teacher can add a lesson in 'class' for 'subject'
+
         const result = await Database.client.query(
-            `insert into lessons ("subject", "description", "hour", "duration", "teacher") values ($1, $2, $3, $4, $5) returning *`,
-            [ data.subject, data.description, data.hour, data.duration, teacher.data.email ],
+            `insert into lessons ("subject", "class", "description", "hour", "duration", "teacher") values ($1, $2, $3, $4, $5, $6) returning *`,
+            [ data.subject, data.class, data.description, data.hour, data.duration, teacher.data.email ],
         );
 
         return new Lesson(result.rows[0]);

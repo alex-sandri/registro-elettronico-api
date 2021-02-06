@@ -152,6 +152,7 @@ create table "lessons"
 (
     "id" uuid not null default gen_random_uuid(),
     "subject" varchar(30) not null,
+    "class" varchar(30) not null,
     "description" varchar(255) not null,
     "hour" int not null,
     "duration" int not null,
@@ -160,6 +161,7 @@ create table "lessons"
     primary key ("id"),
 
     foreign key ("subject") references "subjects" on update cascade on delete cascade,
+    foreign key ("class") references "classes" on update cascade on delete cascade,
     foreign key ("teacher") references "teachers" on update cascade on delete cascade,
 
     check ("hour" >= 1),
