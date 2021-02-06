@@ -126,6 +126,20 @@ export const DEMERIT_CREATE_SCHEMA = Joi.object({
     student: EMAIL_SCHEMA.required(),
 });
 
+export const LESSON_CREATE_SCHEMA = Joi.object({
+    subject: Joi.string().required(),
+    class: Joi.string().required(),
+    description: Joi.string().required(),
+    hour: Joi.number().min(1).required(),
+    duration: Joi.number().min(1).max(6).required(),
+});
+
+export const LESSON_UPDATE_SCHEMA = Joi.object({
+    description: Joi.string(),
+    hour: Joi.number().min(1),
+    duration: Joi.number().min(1).max(6),
+});
+
 // --------------------------------
 // RESPONSE SCHEMAS
 // --------------------------------
@@ -257,3 +271,15 @@ export const DEMERIT_SCHEMA = Joi
         created: DATETIME_SCHEMA.required(),
     })
     .label("Demerit");
+
+export const LESSON_SCHEMA = Joi
+    .object({
+        id: UUID_SCHEMA.required(),
+        teacher: TEACHER_SCHEMA.required(),
+        subject: SUBJECT_SCHEMA.required(),
+        class: CLASS_SCHEMA.required(),
+        description: Joi.string().required(),
+        hour: Joi.number().min(1).required(),
+        duration: Joi.number().min(1).max(6).required(),
+    })
+    .label("Lesson");
