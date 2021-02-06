@@ -62,9 +62,31 @@ export class Lesson implements ISerializable
 
     public static async create(data: ICreateLesson, teacher: User): Promise<Lesson>
     {
-        // TODO: Check if the teacher can add a lesson in 'class' for 'subject'
+        const db = Database.client;
 
-        const result = await Database.client.query(
+        if (!await Class.retrieve(data.class))
+        {
+            throw new Error(`The class '${data.class}' does not exist`);
+        }
+
+        if (!await Subject.retrieve(data.subject))
+        {
+            throw new Error(`The subject '${data.subject}' does not exist`);
+        }
+        else
+        {
+            const result = await db.query(
+                "select * from teachings where class = $1 and teacher = $2 and subject = $3",
+                [ data.class, teacher.data.email, data.subject ],
+            );
+
+            if (result.rowCount === 0)
+            {
+                throw new Error(`'${data.subject}' is not taught by '${teacher.data.email}' in '${data.class}'`)
+            }
+        }
+
+        const result = await db.query(
             `insert into lessons ("subject", "class", "description", "hour", "duration", "teacher") values ($1, $2, $3, $4, $5, $6) returning *`,
             [ data.subject, data.class, data.description, data.hour, data.duration, teacher.data.email ],
         );
