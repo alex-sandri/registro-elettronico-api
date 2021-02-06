@@ -165,8 +165,8 @@ create table "lessons"
     foreign key ("class") references "classes" on update cascade on delete cascade,
     foreign key ("teacher") references "teachers" on update cascade on delete cascade,
 
-    check ("date" <= current_date)
-    check ("hour" >= 1),
+    check ("date" <= current_date),
+    check ("hour" between 1 and 10),
     check ("duration" between 1 and 6)
 );
 
