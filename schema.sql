@@ -148,6 +148,24 @@ create table "demerits"
     foreign key ("student") references "students" on update cascade on delete cascade
 );
 
+create table "lessons"
+(
+    "id" uuid not null default gen_random_uuid(),
+    "subject" varchar(30) not null,
+    "description" varchar(255) not null,
+    "hour" int not null,
+    "duration" int not null,
+    "teacher" varchar(255) not null,
+
+    primary key ("id"),
+
+    foreign key ("subject") references "subjects" on update cascade on delete cascade,
+    foreign key ("teacher") references "teachers" on update cascade on delete cascade,
+
+    check ("hour" >= 1),
+    check ("duration" between 1 and 6)
+);
+
 create trigger update_last_modified
 before update on "calendar_items"
 for each row
