@@ -545,6 +545,31 @@ const init = async () =>
 
     server.route({
         method: "POST",
+        path: "/demerits",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
+            validate: {
+                payload: DEMERIT_CREATE_SCHEMA,
+            },
+            response: {
+                schema: DEMERIT_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const author = request.auth.credentials.user as User;
+
+            const demerit = await Demerit.create(request.payload as any, author);
+
+            return demerit.serialize();
+        },
+    });
+
+    server.route({
+        method: "POST",
         path: "/grades",
         options: {
             tags: [ "api" ],
