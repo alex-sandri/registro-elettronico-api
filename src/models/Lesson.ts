@@ -5,13 +5,12 @@ import Subject, { ISerializedSubject } from "./Subject";
 import Teacher, { ISerializedTeacher } from "./Teacher";
 import User from "./User";
 
-// TODO: Add date
-
 interface ICreateLesson
 {
     subject: string;
     class: string;
     description: string;
+    date: Date;
     hour: number;
     duration: number;
 }
@@ -89,8 +88,8 @@ export class Lesson implements ISerializable
         }
 
         const result = await db.query(
-            `insert into lessons ("subject", "class", "description", "hour", "duration", "teacher") values ($1, $2, $3, $4, $5, $6) returning *`,
-            [ data.subject, data.class, data.description, data.hour, data.duration, teacher.data.email ],
+            `insert into lessons ("subject", "class", "description", "date", "hour", "duration", "teacher") values ($1, $2, $3, $4, $5, $6, $7) returning *`,
+            [ data.subject, data.class, data.description, data.date.toISOString(), data.hour, data.duration, teacher.data.email ],
         );
 
         return new Lesson(result.rows[0]);
