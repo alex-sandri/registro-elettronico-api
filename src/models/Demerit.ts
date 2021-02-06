@@ -33,7 +33,7 @@ export class Demerit implements ISerializable
     public async serialize(): Promise<ISerializedDemerit>
     {
         const author = await User.retrieve(this.data.author) as User;
-        const student = await User.retrieve(this.data.author) as Student;
+        const student = await Student.retrieve(this.data.student) as Student;
 
         return {
             id: this.data.id,
