@@ -5,6 +5,8 @@ import Subject, { ISerializedSubject } from "./Subject";
 import Teacher, { ISerializedTeacher } from "./Teacher";
 import User from "./User";
 
+// TODO: Add date
+
 interface ICreateLesson
 {
     subject: string;
