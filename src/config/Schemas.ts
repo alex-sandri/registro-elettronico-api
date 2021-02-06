@@ -130,7 +130,7 @@ export const LESSON_CREATE_SCHEMA = Joi.object({
     subject: Joi.string().required(),
     class: Joi.string().required(),
     description: Joi.string().required(),
-    date: DATE_SCHEMA.required(),
+    date: DATE_SCHEMA.max("now").required(),
     hour: Joi.number().min(1).required(),
     duration: Joi.number().min(1).max(6).required(),
 });
