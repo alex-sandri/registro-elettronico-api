@@ -54,6 +54,7 @@ import {
     GET_TEACHER_HANDLER
 } from "./config/Handlers";
 import { CalendarItem } from "./models/CalendarItem";
+import { Demerit } from "./models/Demerit";
 
 const pkg = require("../package.json");
 
@@ -685,6 +686,45 @@ const init = async () =>
             },
         },
         handler: GET_STUDENT_HANDLER,
+    });
+
+    server.route({
+        method: "GET",
+        path: "/students/{id}/demerits",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher", "student" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
+            },
+            response: {
+                schema: Joi.array().items(DEMERIT_SCHEMA).required().label("Demerits"),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const student = await Student.retrieve(request.params.id);
+
+            if (!student)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.type === "student" && student.data.email !== user.data.email)
+            {
+                throw Boom.forbidden();
+            }
+
+            const demerits = await Demerit.for(student);
+
+            return Promise.all(demerits.map(_ => _.serialize()));
+        },
     });
 
     server.route({
