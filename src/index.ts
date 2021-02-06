@@ -57,6 +57,7 @@ import {
 } from "./config/Handlers";
 import { CalendarItem } from "./models/CalendarItem";
 import { Demerit } from "./models/Demerit";
+import { Lesson } from "./models/Lesson";
 
 const pkg = require("../package.json");
 
@@ -391,6 +392,64 @@ const init = async () =>
             await item.delete();
 
             return h.response();
+        },
+    });
+
+    server.route({
+        method: "GET",
+        path: "/lessons/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher", "student" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+            },
+            response: {
+                schema: LESSON_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const lesson = await Lesson.retrieve(request.params.id);
+
+            if (!lesson)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            switch (user.data.type)
+            {
+                case "student":
+                {
+                    const student = await Student.retrieve(user.data.email) as Student;
+
+                    if (student.data.class !== lesson.data.class)
+                    {
+                        throw Boom.forbidden();
+                    }
+
+                    break;
+                }
+                case "teacher":
+                {
+                    const teacher = await Teacher.retrieve(user.data.email) as Teacher;
+
+                    if (!(await teacher.teachesIn(lesson.data.class)))
+                    {
+                        throw Boom.forbidden();
+                    }
+
+                    break;
+                }
+            }
+
+            return lesson.serialize();
         },
     });
 
