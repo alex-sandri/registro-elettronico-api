@@ -47,7 +47,7 @@ export class Lesson implements ISerializable
     {
         const teacher = await Teacher.retrieve(this.data.teacher) as Teacher;
         const subject = await Subject.retrieve(this.data.subject) as Subject;
-        const lessonClass = await Subject.retrieve(this.data.class) as Class;
+        const lessonClass = await Class.retrieve(this.data.class) as Class;
 
         return {
             id: this.data.id,
