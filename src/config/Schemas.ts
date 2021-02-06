@@ -121,6 +121,11 @@ export const CALENDAR_ITEM_UPDATE_SCHEMA = Joi.object({
     content: Joi.string(),
 });
 
+export const DEMERIT_CREATE_SCHEMA = Joi.object({
+    content: Joi.string().required(),
+    student: EMAIL_SCHEMA.required(),
+});
+
 // --------------------------------
 // RESPONSE SCHEMAS
 // --------------------------------
