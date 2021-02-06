@@ -662,6 +662,61 @@ const init = async () =>
 
     server.route({
         method: "GET",
+        path: "/classes/{id}/lessons",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher", "student" ],
+            },
+            response: {
+                schema: Joi.array().items(LESSON_SCHEMA).required().label("Lessons"),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const retrievedClass = await Class.retrieve(request.params.id);
+
+            if (!retrievedClass)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            switch (user.data.type)
+            {
+                case "student":
+                {
+                    const student = await Student.retrieve(user.data.email) as Student;
+
+                    if (student.data.class !== retrievedClass.data.name)
+                    {
+                        throw Boom.forbidden();
+                    }
+
+                    break;
+                }
+                case "teacher":
+                {
+                    const teacher = await Teacher.retrieve(user.data.email) as Teacher;
+
+                    if (!await teacher.teachesIn(retrievedClass.data.name))
+                    {
+                        throw Boom.forbidden();
+                    }
+
+                    break;
+                }
+            }
+
+            const lessons = await Lesson.for(retrievedClass);
+
+            return Promise.all(lessons.map(_ => _.serialize()));
+        },
+    });
+
+    server.route({
+        method: "GET",
         path: "/classes/{id}/students",
         options: {
             tags: [ "api" ],
