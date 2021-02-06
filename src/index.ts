@@ -545,6 +545,43 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/demerits/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher", "student" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+            },
+            response: {
+                schema: DEMERIT_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const demerit = await Demerit.retrieve(request.params.id);
+
+            if (!demerit)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.type === "student" && user.data.email !== demerit.data.student)
+            {
+                throw Boom.forbidden();
+            }
+
+            return demerit.serialize();
+        },
+    });
+
+    server.route({
         method: "POST",
         path: "/demerits",
         options: {
