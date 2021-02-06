@@ -242,3 +242,13 @@ export const CALENDAR_ITEM_SCHEMA = Joi
         lastModified: DATETIME_SCHEMA.required(),
     })
     .label("Calendar Item");
+
+export const DEMERIT_SCHEMA = Joi
+    .object({
+        id: UUID_SCHEMA.required(),
+        content: Joi.string().required(),
+        author: USER_SCHEMA.required(),
+        student: STUDENT_SCHEMA.required(),
+        created: DATETIME_SCHEMA.required(),
+    })
+    .label("Demerit");
