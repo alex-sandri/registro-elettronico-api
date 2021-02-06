@@ -454,6 +454,31 @@ const init = async () =>
     });
 
     server.route({
+        method: "POST",
+        path: "/lessons",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "teacher" ],
+            },
+            validate: {
+                payload: LESSON_CREATE_SCHEMA,
+            },
+            response: {
+                schema: LESSON_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const teacher = request.auth.credentials.user as User;
+
+            const lesson = await Lesson.create(request.payload as any, teacher);
+
+            return lesson.serialize();
+        },
+    });
+
+    server.route({
         method: "GET",
         path: "/classes",
         options: {
