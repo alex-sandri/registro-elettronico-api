@@ -130,4 +130,16 @@ export class Lesson implements ISerializable
             [ this.data.id ],
         );
     }
+
+    public static async for(lessonClass: Class): Promise<Lesson[]>
+    {
+        const db = Database.client;
+
+        const result = await db.query(
+            "select * from lessons where class = $1",
+            [ lessonClass.data.name ],
+        );
+
+        return result.rows.map(_ => new Lesson(_));
+    }
 }
