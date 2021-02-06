@@ -479,6 +479,46 @@ const init = async () =>
     });
 
     server.route({
+        method: "PUT",
+        path: "/lessons/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+                payload: LESSON_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: LESSON_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const lesson = await Lesson.retrieve(request.params.id);
+
+            if (!lesson)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.type === "teacher" && user.data.email !== lesson.data.teacher)
+            {
+                throw Boom.forbidden();
+            }
+
+            await lesson.update(request.payload as any);
+
+            return lesson.serialize();
+        },
+    });
+
+    server.route({
         method: "GET",
         path: "/classes",
         options: {
