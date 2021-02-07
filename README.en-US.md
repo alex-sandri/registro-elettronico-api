@@ -1,5 +1,7 @@
 # Electronic Class Register API
 
+*Read this in other languages: [English](README.en-US.md), [Italiano](README.md).*
+
 ## Requirements
 - [`Node.js`](https://nodejs.org/)
 - [`PostgreSQL`](https://www.postgresql.org/)

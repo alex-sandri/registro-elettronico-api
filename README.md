@@ -1,5 +1,7 @@
 # API Registro Elettronico
 
+*Read this in other languages: [English](README.en-US.md), [Italiano](README.md).*
+
 ## Requisiti
 - [`Node.js`](https://nodejs.org/)
 - [`PostgreSQL`](https://www.postgresql.org/)
