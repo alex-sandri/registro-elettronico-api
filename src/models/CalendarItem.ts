@@ -3,9 +3,11 @@ import Database from "../utilities/Database";
 import Class, { ISerializedClass } from "./Class";
 import User, { ISerializedUser } from "./User";
 
+type TCalendarItemType = "general" | "test" | "event" | "info" | "important";
+
 interface ICreateCalendarItem
 {
-    type: "general" | "test" | "event" | "info" | "important";
+    type: TCalendarItemType;
     start: Date;
     end: Date;
     title: string;
@@ -15,7 +17,7 @@ interface ICreateCalendarItem
 
 interface IUpdateCalendarItem
 {
-    type?: "general" | "test" | "event" | "info" | "important";
+    type?: TCalendarItemType;
     start?: Date;
     end?: Date;
     title?: string;
@@ -33,7 +35,7 @@ interface ICalendarItem extends ICreateCalendarItem
 export interface ISerializedCalendarItem
 {
     id: string;
-    type: "general" | "test" | "event" | "info" | "important";
+    type: TCalendarItemType;
     start: string;
     end: string;
     title: string;
