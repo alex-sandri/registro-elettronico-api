@@ -19,6 +19,8 @@ export const USER_TYPE_SCHEMA = Joi.string().valid("admin", "student", "teacher"
 
 export const CALENDAR_ITEM_TYPE_SCHEMA = Joi.string().valid("general", "test", "event", "info", "important");
 
+export const ABSENCE_TYPE_SCHEMA = Joi.string().valid("absence", "late", "short-delay", "early-exit");
+
 // --------------------------------
 // REQUEST SCHEMAS
 // --------------------------------
@@ -285,3 +287,18 @@ export const LESSON_SCHEMA = Joi
         duration: Joi.number().min(1).max(6).required(),
     })
     .label("Lesson");
+
+export const ABSENCE_SCHEMA = Joi
+    .object({
+        id: UUID_SCHEMA.required(),
+        type: ABSENCE_TYPE_SCHEMA.required(),
+        from: DATETIME_SCHEMA.required(),
+        to: DATETIME_SCHEMA.required(),
+        description: Joi.string().required(),
+        justified: Joi.boolean().required(),
+        author: USER_SCHEMA.required(),
+        student: STUDENT_SCHEMA.required(),
+        created: DATETIME_SCHEMA.required(),
+        lastModified: DATETIME_SCHEMA.required(),
+    })
+    .label("Absence");
