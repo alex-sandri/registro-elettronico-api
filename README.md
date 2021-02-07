@@ -1,31 +1,31 @@
 # API Registro Elettronico
 
-## Requirements
+## Requisiti
 - [`Node.js`](https://nodejs.org/)
 - [`PostgreSQL`](https://www.postgresql.org/)
 
-## First steps
+## Primi passi
 
-### Create the DB
-Use [`schema.sql`](schema.sql) to create the required tables.
+### Crea il DB
+Usa [`schema.sql`](schema.sql) per creare le tabelle necessarie.
 
-### Create the first ADMIN user
-In the `users` table add a new entry with the required fields and type `admin`.
+### Crea il primo utente AMMINISTRATORE
+Nella tabella `users` aggiungi una nuova riga con tutti i dati necessari ed inserisci nel campo `type` il valore `admin`.
 
-For the password field use the Node.js CLI to hash the password with this command:
+Per il campo `password` usa la CLI di Node.js per ottenere la hash della password con questo comando:
 ```javascript
 require("bcrypt").hashSync("PASSWORD", 15)
 ```
-Replace `PASSWORD` with a strong password to prevent unauthorized access.\
-__COPY ONLY THE STRING INSIDE THE QUOTATION MARKS__
+Sostituisci `PASSWORD` con una password forte per prevenire accessi non autorizzati.\
+__COPIA SOLTANTO LA STRINGA ALL'INTERNO DELLE VIRGOLETTE__
 
-### Set environment variables
-Create a file named `.env` and set the following variables:
+### Imposta le variabili di ambiente
+Crea un file chiamato `.env` e imposta le seguenti variabili:
 
 - `DATABASE_URL`:
-    The URL used to connect to the DB\
-    Use this format: `postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA`
-    and replace `USER`, `PASSWORD`, `HOST`, `PORT`, `DATABASE` and `SCHEMA` according to your DB configuration.
+    L'URL usato per la connessione al DB\
+    Utilizza questo formato: `postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA`
+    e sostituisci `USER`, `PASSWORD`, `HOST`, `PORT`, `DATABASE` e `SCHEMA` in base alla configurazione del tuo DB.
 
-### Install the dependencies
-Run `npm i`.
+### Installa le dipendenze
+Esegui `npm i`.
