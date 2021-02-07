@@ -35,6 +35,7 @@ export interface ISerializedLesson
     subject: ISerializedSubject;
     class: ISerializedClass;
     description: string;
+    date: string;
     hour: number;
     duration: number;
 }
@@ -56,6 +57,7 @@ export class Lesson implements ISerializable
             subject: await subject.serialize(),
             class: await lessonClass.serialize(),
             description: this.data.description,
+            date: this.data.date.toISOString().split("T")[0],
             hour: this.data.hour,
             duration: this.data.duration,
         };

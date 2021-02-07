@@ -280,6 +280,7 @@ export const LESSON_SCHEMA = Joi
         subject: SUBJECT_SCHEMA.required(),
         class: CLASS_SCHEMA.required(),
         description: Joi.string().required(),
+        date: DATE_SCHEMA.required(),
         hour: Joi.number().min(1).required(),
         duration: Joi.number().min(1).max(6).required(),
     })
