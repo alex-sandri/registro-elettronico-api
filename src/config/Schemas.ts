@@ -143,6 +143,18 @@ export const LESSON_UPDATE_SCHEMA = Joi.object({
     duration: Joi.number().min(1).max(6),
 });
 
+export const ABSENCE_CREATE_SCHEMA = Joi.object({
+    type: ABSENCE_TYPE_SCHEMA.required(),
+    from: DATETIME_SCHEMA.required(),
+    to: DATETIME_SCHEMA.required(),
+    description: Joi.string().required(),
+    student: Joi.string().required(),
+});
+
+export const ABSENCE_UPDATE_SCHEMA = Joi.object({
+    justified: Joi.boolean(),
+});
+
 // --------------------------------
 // RESPONSE SCHEMAS
 // --------------------------------
