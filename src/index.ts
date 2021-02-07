@@ -28,6 +28,7 @@ import {
     CLASS_CREATE_SCHEMA,
     CLASS_SCHEMA,
     DATETIME_SCHEMA,
+    DATE_SCHEMA,
     DEMERIT_CREATE_SCHEMA,
     DEMERIT_SCHEMA,
     EMAIL_SCHEMA,
@@ -668,6 +669,12 @@ const init = async () =>
             auth: {
                 scope: [ "admin", "teacher", "student" ],
             },
+            validate: {
+                query: Joi.object({
+                    from: DATE_SCHEMA,
+                    to: DATE_SCHEMA.min(Joi.ref("from")),
+                }),
+            },
             response: {
                 schema: Joi.array().items(LESSON_SCHEMA).required().label("Lessons"),
             },
@@ -709,7 +716,7 @@ const init = async () =>
                 }
             }
 
-            const lessons = await Lesson.for(retrievedClass);
+            const lessons = await Lesson.for(retrievedClass, request.query.from, request.query.to);
 
             return Promise.all(lessons.map(_ => _.serialize()));
         },

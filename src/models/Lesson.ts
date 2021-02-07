@@ -134,14 +134,28 @@ export class Lesson implements ISerializable
         );
     }
 
-    public static async for(lessonClass: Class): Promise<Lesson[]>
+    public static async for(lessonClass: Class, from?: Date, to?: Date): Promise<Lesson[]>
     {
         const db = Database.client;
 
-        const result = await db.query(
-            "select * from lessons where class = $1",
-            [ lessonClass.data.name ],
-        );
+        let query = "select * from lessons where class = $1";
+        let values = [ lessonClass.data.name ];
+
+        let i = 1;
+
+        if (from)
+        {
+            query += ` and "date" >= $${++i}`;
+            values.push(from.toISOString());
+        }
+
+        if (to)
+        {
+            query += ` and "date" <= $${++i}`;
+            values.push(to.toISOString());
+        }
+
+        const result = await db.query(query, values);
 
         return result.rows.map(_ => new Lesson(_));
     }
