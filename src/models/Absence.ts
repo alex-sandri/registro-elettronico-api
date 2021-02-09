@@ -1,5 +1,3 @@
-import { differenceInDays } from "date-fns";
-
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
 import Student, { ISerializedStudent } from "./Student";
@@ -10,7 +8,8 @@ type TAbsenceType = "absence" | "late" | "short-delay" | "early-exit";
 interface ICreateAbsence
 {
     type: TAbsenceType;
-    day: Date;
+    from: Date;
+    to: Date;
     description: string;
     student: string;
 }
@@ -18,19 +17,6 @@ interface ICreateAbsence
 interface IUpdateAbsence
 {
     justified?: boolean;
-}
-
-interface IDatabaseAbsence
-{
-    id: string;
-    type: TAbsenceType;
-    day: Date;
-    description: string;
-    justified: boolean;
-    author: string;
-    student: string;
-    created: Date;
-    lastModified: Date;
 }
 
 interface IAbsence
@@ -88,8 +74,8 @@ export class Absence implements ISerializable
     public static async create(data: ICreateAbsence, author: User): Promise<Absence>
     {
         const result = await Database.client.query(
-            `insert into absences ("type", "day", "description", "author", "student") values ($1, $2, $3, $4, $5) returning *`,
-            [ data.type, data.day.toISOString(), data.description, author.data.email, data.student ],
+            `insert into absences ("type", "from", "to", "description", "author", "student") values ($1, $2, $3, $4, $5) returning *`,
+            [ data.type, data.from.toISOString(), data.to.toISOString(), data.description, author.data.email, data.student ],
         );
 
         return new Absence(result.rows[0]);
@@ -127,41 +113,10 @@ export class Absence implements ISerializable
     public static async for(student: Student): Promise<Absence[]>
     {
         const result = await Database.client.query(
-            "select * from absences where student = $1 order by day",
+            "select * from absences where student = $1",
             [ student.data.email ],
         );
 
-        const absences: Absence[] = [];
-
-        result.rows.forEach((row: IDatabaseAbsence) =>
-        {
-            const temp = absences.find(absence =>
-                differenceInDays(row.day, absence.data.to) === 1
-                && row.type === "absence"
-                && absence.data.justified === row.justified
-            );
-
-            if (temp)
-            {
-                temp.data.to = row.day;
-
-                return;
-            }
-
-            absences.push(new Absence({
-                id: row.id,
-                type: row.type,
-                from: row.day,
-                to: row.day,
-                description: row.description,
-                justified: row.justified,
-                author: row.author,
-                student: row.student,
-                created: row.created,
-                lastModified: row.lastModified,
-            }));
-        });
-
-        return absences;
+        return result.rows.map(_ => new Absence(_));
     }
 }

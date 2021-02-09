@@ -176,7 +176,8 @@ create table "absences"
 (
     "id" uuid not null default gen_random_uuid(),
     "type" absence_type not null,
-    "day" date not null,
+    "from" date not null,
+    "to" date not null,
     "description" varchar(100) not null,
     "justified" boolean not null default false,
     "author" varchar(255) not null,
@@ -189,7 +190,8 @@ create table "absences"
     foreign key ("author") references "users" on update cascade on delete cascade,
     foreign key ("student") references "students" on update cascade on delete cascade,
 
-    check ("day" <= current_date),
+    check ("from" <= "to"),
+    check ("to" <= current_date),
     check ("lastModified" >= "created")
 );
 

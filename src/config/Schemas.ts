@@ -133,7 +133,8 @@ export const LESSON_UPDATE_SCHEMA = Joi.object({
 
 export const ABSENCE_CREATE_SCHEMA = Joi.object({
     type: ABSENCE_TYPE_SCHEMA.required(),
-    day: DATE_SCHEMA.max("now").required(),
+    from: DATE_SCHEMA.max(Joi.ref("to")).required(),
+    to: DATE_SCHEMA.max("now").required(),
     description: Joi.string().allow("").required(),
     student: Joi.string().required(),
 });
