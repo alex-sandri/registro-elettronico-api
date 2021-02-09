@@ -1143,6 +1143,45 @@ const init = async () =>
 
     server.route({
         method: "GET",
+        path: "/students/{id}/absences",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher", "student" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: EMAIL_SCHEMA.required(),
+                }),
+            },
+            response: {
+                schema: Joi.array().items(ABSENCE_SCHEMA).required().label("Absences"),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const student = await Student.retrieve(request.params.id);
+
+            if (!student)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.type === "student" && student.data.email !== user.data.email)
+            {
+                throw Boom.forbidden();
+            }
+
+            const absences = await Absence.for(student);
+
+            return Promise.all(absences.map(_ => _.serialize()));
+        },
+    });
+
+    server.route({
+        method: "GET",
         path: "/students/{id}/demerits",
         options: {
             tags: [ "api" ],
