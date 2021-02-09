@@ -73,7 +73,7 @@ export class Absence implements ISerializable
     public static async create(data: ICreateAbsence, author: User): Promise<Absence>
     {
         const result = await Database.client.query(
-            `insert into absences ("type", "from", "to", "description", "author", "student") values ($1, $2, $3, $4, $5) returning *`,
+            `insert into absences ("type", "day", "description", "author", "student") values ($1, $2, $3, $4, $5) returning *`,
             [ data.type, data.day.toISOString(), data.description, author.data.email, data.student ],
         );
 
