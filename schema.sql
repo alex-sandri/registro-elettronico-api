@@ -192,6 +192,7 @@ create table "absences"
 
     check ("from" <= "to"),
     check ("to" <= current_date),
+    check ("from" = "to" or "type" = 'absence'),
     check ("lastModified" >= "created")
 );
 
