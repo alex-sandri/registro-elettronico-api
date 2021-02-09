@@ -8,8 +8,7 @@ type TAbsenceType = "absence" | "late" | "short-delay" | "early-exit";
 interface ICreateAbsence
 {
     type: TAbsenceType;
-    from: Date;
-    to: Date;
+    day: Date;
     description: string;
     student: string;
 }
@@ -32,8 +31,7 @@ export interface ISerializedAbsence
 {
     id: string;
     type: TAbsenceType;
-    from: string;
-    to: string;
+    day: string;
     description: string;
     justified: boolean;
     author: ISerializedUser;
@@ -55,8 +53,7 @@ export class Absence implements ISerializable
         return {
             id: this.data.id,
             type: this.data.type,
-            from: this.data.from.toISOString(),
-            to: this.data.to.toISOString(),
+            day: this.data.day.toISOString(),
             description: this.data.description,
             justified: this.data.justified,
             author: await author.serialize(),
@@ -69,8 +66,8 @@ export class Absence implements ISerializable
     public static async create(data: ICreateAbsence, author: User): Promise<Absence>
     {
         const result = await Database.client.query(
-            `insert into absences ("type", "from", "to", "description", "author", "student") values ($1, $2, $3, $4, $5, $6) returning *`,
-            [ data.type, data.from.toISOString(), data.to.toISOString(), data.description, author.data.email, data.student ],
+            `insert into absences ("type", "day", "description", "author", "student") values ($1, $2, $3, $4, $5) returning *`,
+            [ data.type, data.day.toISOString(), data.description, author.data.email, data.student ],
         );
 
         return new Absence(result.rows[0]);

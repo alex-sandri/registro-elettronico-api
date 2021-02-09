@@ -145,8 +145,7 @@ export const LESSON_UPDATE_SCHEMA = Joi.object({
 
 export const ABSENCE_CREATE_SCHEMA = Joi.object({
     type: ABSENCE_TYPE_SCHEMA.required(),
-    from: DATETIME_SCHEMA.required(),
-    to: DATETIME_SCHEMA.required(),
+    day: DATE_SCHEMA.required(),
     description: Joi.string().required(),
     student: Joi.string().required(),
 });
@@ -304,8 +303,8 @@ export const ABSENCE_SCHEMA = Joi
     .object({
         id: UUID_SCHEMA.required(),
         type: ABSENCE_TYPE_SCHEMA.required(),
-        from: DATETIME_SCHEMA.required(),
-        to: DATETIME_SCHEMA.required(),
+        from: DATE_SCHEMA.required(),
+        to: DATE_SCHEMA.required(),
         description: Joi.string().required(),
         justified: Joi.boolean().required(),
         author: USER_SCHEMA.required(),
