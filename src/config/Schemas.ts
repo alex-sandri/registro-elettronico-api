@@ -296,7 +296,6 @@ export const ABSENCE_SCHEMA = Joi
         to: DATE_SCHEMA.required(),
         description: Joi.string().allow("").required(),
         justified: Joi.boolean().required(),
-        author: USER_SCHEMA.required(),
         student: STUDENT_SCHEMA.required(),
         created: DATETIME_SCHEMA.required(),
         lastModified: DATETIME_SCHEMA.required(),

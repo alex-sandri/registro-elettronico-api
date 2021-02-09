@@ -1,7 +1,6 @@
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
 import Student, { ISerializedStudent } from "./Student";
-import User, { ISerializedUser } from "./User";
 
 type TAbsenceType = "absence" | "late" | "short-delay" | "early-exit";
 
@@ -27,7 +26,6 @@ interface IAbsence
     to: Date;
     description: string;
     justified: boolean;
-    author: string;
     student: string;
     created: Date;
     lastModified: Date;
@@ -41,7 +39,6 @@ export interface ISerializedAbsence
     to: string;
     description: string;
     justified: boolean;
-    author: ISerializedUser;
     student: ISerializedStudent;
     created: string;
     lastModified: string;
@@ -54,7 +51,6 @@ export class Absence implements ISerializable
 
     public async serialize(): Promise<ISerializedAbsence>
     {
-        const author = await User.retrieve(this.data.author) as User;
         const student = await Student.retrieve(this.data.student) as Student;
 
         return {
@@ -64,18 +60,17 @@ export class Absence implements ISerializable
             to: this.data.to.toISOString().split("T")[0],
             description: this.data.description,
             justified: this.data.justified,
-            author: await author.serialize(),
             student: await student.serialize(),
             created: this.data.created.toISOString(),
             lastModified: this.data.lastModified.toISOString(),
         };
     }
 
-    public static async create(data: ICreateAbsence, author: User): Promise<Absence>
+    public static async create(data: ICreateAbsence): Promise<Absence>
     {
         const result = await Database.client.query(
-            `insert into absences ("type", "from", "to", "description", "author", "student") values ($1, $2, $3, $4, $5) returning *`,
-            [ data.type, data.from.toISOString(), data.to.toISOString(), data.description, author.data.email, data.student ],
+            `insert into absences ("type", "from", "to", "description", "student") values ($1, $2, $3, $4, $5) returning *`,
+            [ data.type, data.from.toISOString(), data.to.toISOString(), data.description, data.student ],
         );
 
         return new Absence(result.rows[0]);

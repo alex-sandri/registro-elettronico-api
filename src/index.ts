@@ -233,9 +233,7 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const teacher = request.auth.credentials.user as User;
-
-            const absence = await Absence.create(request.payload as any, teacher);
+            const absence = await Absence.create(request.payload as any);
 
             return absence.serialize();
         },
@@ -270,9 +268,15 @@ const init = async () =>
 
             const user = request.auth.credentials.user as User;
 
-            if (user.data.type === "teacher" && user.data.email !== absence.data.author)
+            if (user.data.type === "teacher")
             {
-                throw Boom.forbidden();
+                const teacher = await Teacher.retrieve(user.data.email) as Teacher;
+                const student = await Student.retrieve(absence.data.student) as Student;
+
+                if (!(await teacher.teachesIn(student.data.class)))
+                {
+                    throw Boom.forbidden();
+                }
             }
 
             await absence.update(request.payload as any);
