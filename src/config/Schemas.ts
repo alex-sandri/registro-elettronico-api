@@ -31,8 +31,7 @@ export const SESSION_CREATE_SCHEMA = Joi.object({
 });
 
 export const CLASS_CREATE_SCHEMA = Joi.object({
-    name: Joi.string()
-        .required(),
+    name: Joi.string().required(),
 });
 
 export const GRADE_CREATE_SCHEMA = Joi.object({
@@ -42,21 +41,15 @@ export const GRADE_CREATE_SCHEMA = Joi.object({
         .multiple(0.25)
         .required(),
     timestamp: DATETIME_SCHEMA.max("now").required(),
-    description: Joi.string()
-        .allow("")
-        .required(),
+    description: Joi.string().allow("").required(),
     student: EMAIL_SCHEMA.required(),
-    subject: Joi.string()
-        .required(),
+    subject: Joi.string().required(),
     teacher: EMAIL_SCHEMA.required(),
 });
 
 export const SUBJECT_CREATE_SCHEMA = Joi.object({
-    name: Joi.string()
-        .required(),
-    description: Joi.string()
-        .allow("")
-        .required(),
+    name: Joi.string().required(),
+    description: Joi.string().allow("").required(),
 });
 
 export const SUBJECT_UPDATE_SCHEMA = Joi.object({
@@ -66,17 +59,13 @@ export const SUBJECT_UPDATE_SCHEMA = Joi.object({
 
 export const TEACHING_CREATE_SCHEMA = Joi.object({
     teacher: EMAIL_SCHEMA.required(),
-    class: Joi.string()
-        .required(),
-    subject: Joi.string()
-        .required(),
+    class: Joi.string().required(),
+    subject: Joi.string().required(),
 });
 
 export const USER_CREATE_SCHEMA = Joi.object({
-    firstName: Joi.string()
-        .required(),
-    lastName: Joi.string()
-        .required(),
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
     email: EMAIL_SCHEMA.required(),
     password: PASSWORD_SCHEMA.required(),
     birthday: DATE_SCHEMA.max("now").required(),
@@ -98,8 +87,7 @@ export const TEACHER_CREATE_SCHEMA = USER_CREATE_SCHEMA;
 export const TEACHER_UPDATE_SCHEMA = USER_UPDATE_SCHEMA;
 
 export const STUDENT_CREATE_SCHEMA = USER_CREATE_SCHEMA.keys({
-    class: Joi.string()
-        .required(),
+    class: Joi.string().required(),
 });
 
 export const STUDENT_UPDATE_SCHEMA = USER_UPDATE_SCHEMA.keys({
@@ -146,7 +134,7 @@ export const LESSON_UPDATE_SCHEMA = Joi.object({
 export const ABSENCE_CREATE_SCHEMA = Joi.object({
     type: ABSENCE_TYPE_SCHEMA.required(),
     day: DATE_SCHEMA.required(),
-    description: Joi.string().required(),
+    description: Joi.string().allow("").required(),
     student: Joi.string().required(),
 });
 
