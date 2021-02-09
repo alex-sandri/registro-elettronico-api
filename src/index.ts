@@ -19,6 +19,7 @@ import Admin from "./models/Admin";
 import Database from "./utilities/Database";
 import User from "./models/User";
 import {
+    ABSENCE_CREATE_SCHEMA,
     ABSENCE_SCHEMA,
     ADMIN_CREATE_SCHEMA,
     ADMIN_SCHEMA,
@@ -209,6 +210,31 @@ const init = async () =>
                     break;
                 }
             }
+
+            return absence.serialize();
+        },
+    });
+
+    server.route({
+        method: "POST",
+        path: "/absences",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "teacher" ],
+            },
+            validate: {
+                payload: ABSENCE_CREATE_SCHEMA,
+            },
+            response: {
+                schema: ABSENCE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const teacher = request.auth.credentials.user as User;
+
+            const absence = await Absence.create(request.payload as any, teacher);
 
             return absence.serialize();
         },
