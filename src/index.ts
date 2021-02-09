@@ -21,6 +21,7 @@ import User from "./models/User";
 import {
     ABSENCE_CREATE_SCHEMA,
     ABSENCE_SCHEMA,
+    ABSENCE_UPDATE_SCHEMA,
     ADMIN_CREATE_SCHEMA,
     ADMIN_SCHEMA,
     ADMIN_UPDATE_SCHEMA,
@@ -235,6 +236,46 @@ const init = async () =>
             const teacher = request.auth.credentials.user as User;
 
             const absence = await Absence.create(request.payload as any, teacher);
+
+            return absence.serialize();
+        },
+    });
+
+    server.route({
+        method: "PUT",
+        path: "/absences/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+                payload: ABSENCE_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: ABSENCE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const absence = await Absence.retrieve(request.params.id);
+
+            if (!absence)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            if (user.data.type === "teacher" && user.data.email !== absence.data.author)
+            {
+                throw Boom.forbidden();
+            }
+
+            await absence.update(request.payload as any);
 
             return absence.serialize();
         },
