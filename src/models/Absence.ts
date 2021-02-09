@@ -18,11 +18,16 @@ interface IUpdateAbsence
     justified?: boolean;
 }
 
-interface IAbsence extends ICreateAbsence
+interface IAbsence
 {
     id: string;
+    type: TAbsenceType;
+    from: Date;
+    to: Date;
+    description: string;
     justified: boolean;
     author: string;
+    student: string;
     created: Date;
     lastModified: Date;
 }
@@ -31,7 +36,8 @@ export interface ISerializedAbsence
 {
     id: string;
     type: TAbsenceType;
-    day: string;
+    from: string;
+    to: string;
     description: string;
     justified: boolean;
     author: ISerializedUser;
@@ -53,7 +59,8 @@ export class Absence implements ISerializable
         return {
             id: this.data.id,
             type: this.data.type,
-            day: this.data.day.toISOString(),
+            from: this.data.from.toISOString(),
+            to: this.data.to.toISOString(),
             description: this.data.description,
             justified: this.data.justified,
             author: await author.serialize(),
@@ -66,7 +73,7 @@ export class Absence implements ISerializable
     public static async create(data: ICreateAbsence, author: User): Promise<Absence>
     {
         const result = await Database.client.query(
-            `insert into absences ("type", "day", "description", "author", "student") values ($1, $2, $3, $4, $5) returning *`,
+            `insert into absences ("type", "from", "to", "description", "author", "student") values ($1, $2, $3, $4, $5) returning *`,
             [ data.type, data.day.toISOString(), data.description, author.data.email, data.student ],
         );
 
