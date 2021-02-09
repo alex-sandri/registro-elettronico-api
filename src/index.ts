@@ -19,6 +19,7 @@ import Admin from "./models/Admin";
 import Database from "./utilities/Database";
 import User from "./models/User";
 import {
+    ABSENCE_SCHEMA,
     ADMIN_CREATE_SCHEMA,
     ADMIN_SCHEMA,
     ADMIN_UPDATE_SCHEMA,
@@ -62,6 +63,7 @@ import {
 import { CalendarItem } from "./models/CalendarItem";
 import { Demerit } from "./models/Demerit";
 import { Lesson } from "./models/Lesson";
+import { Absence } from "./models/Absence";
 
 const pkg = require("../package.json");
 
@@ -151,6 +153,65 @@ const init = async () =>
         }
 
         return h.continue;
+    });
+
+    server.route({
+        method: "GET",
+        path: "/absences/{id}",
+        options: {
+            tags: [ "api" ],
+            auth: {
+                scope: [ "admin", "teacher", "student" ],
+            },
+            validate: {
+                params: Joi.object({
+                    id: UUID_SCHEMA.required(),
+                }),
+            },
+            response: {
+                schema: ABSENCE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const absence = await Absence.retrieve(request.params.id);
+
+            if (!absence)
+            {
+                throw Boom.notFound();
+            }
+
+            const user = request.auth.credentials.user as User;
+
+            switch (user.data.type)
+            {
+                case "student":
+                {
+                    const student = await Student.retrieve(user.data.email) as Student;
+
+                    if (student.data.email !== absence.data.student)
+                    {
+                        throw Boom.forbidden();
+                    }
+
+                    break;
+                }
+                case "teacher":
+                {
+                    const teacher = await Teacher.retrieve(user.data.email) as Teacher;
+                    const student = await Student.retrieve(absence.data.student) as Student;
+
+                    if (!(await teacher.teachesIn(student.data.class)))
+                    {
+                        throw Boom.forbidden();
+                    }
+
+                    break;
+                }
+            }
+
+            return absence.serialize();
+        },
     });
 
     server.route({
