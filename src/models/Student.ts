@@ -142,7 +142,7 @@ export default class Student extends User implements ISerializable
         const db = Database.client;
 
         const absences = await db.query(
-            "select t.id, count(a.*) from absence_types as t left outer join (select type from absences where student = $1) as a on t.id = a.type group by t.id",
+            "select t.id as type, count(a.*) as count from absence_types as t left outer join (select type from absences where student = $1) as a on t.id = a.type group by t.id",
             [ this.data.email ],
         );
 
