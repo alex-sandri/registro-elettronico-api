@@ -180,14 +180,12 @@ create table "absences"
     "to" date not null,
     "description" varchar(100) not null,
     "justified" boolean not null default false,
-    "author" varchar(255) not null,
     "student" varchar(255) not null,
     "created" timestamp not null default current_timestamp,
     "lastModified" timestamp not null default current_timestamp,
 
     primary key ("id"),
 
-    foreign key ("author") references "users" on update cascade on delete cascade,
     foreign key ("student") references "students" on update cascade on delete cascade,
 
     check ("from" <= "to"),
