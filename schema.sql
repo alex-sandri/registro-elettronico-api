@@ -233,7 +233,7 @@ insert into "calendar_item_types" values
     ('general'),
     ('test'),
     ('event'),
-    ('info')
+    ('info'),
     ('important');
 
 insert into "user_types" values
