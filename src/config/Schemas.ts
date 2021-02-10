@@ -231,17 +231,6 @@ export const TEACHING_SCHEMA = Joi
     })
     .label("Teaching");
 
-export const STUDENT_REPORT_SCHEMA = Joi
-    .object({
-        grades: Joi.array()
-            .items(Joi.object({
-                subject: Joi.string().required(),
-                average: Joi.number().min(0).max(10).required(),
-            }))
-            .required(),
-    })
-    .label("Student Report");
-
 export const CALENDAR_ITEM_SCHEMA = Joi
     .object({
         id: UUID_SCHEMA.required(),
@@ -293,3 +282,15 @@ export const ABSENCE_SCHEMA = Joi
         lastModified: DATETIME_SCHEMA.required(),
     })
     .label("Absence");
+
+export const STUDENT_REPORT_SCHEMA = Joi
+    .object({
+        absences: Joi.array().items(ABSENCE_SCHEMA).required(),
+        grades: Joi.array()
+            .items(Joi.object({
+                subject: Joi.string().required(),
+                average: Joi.number().min(0).max(10).required(),
+            }))
+            .required(),
+    })
+    .label("Student Report");

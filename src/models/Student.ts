@@ -1,5 +1,6 @@
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
+import { Absence, ISerializedAbsence } from "./Absence";
 import Class, { ISerializedClass } from "./Class";
 import User, { ISerializedUser, IUpdateUser, IUser } from "./User";
 
@@ -128,7 +129,13 @@ export default class Student extends User implements ISerializable
         return result.rows.map(_ => new Student(_));
     }
 
-    public async report(): Promise<{ grades: { subject: string; average: number; }[] }>
+    public async report(): Promise<{
+        absences: ISerializedAbsence[];
+        grades: {
+            subject: string;
+            average: number;
+        }[];
+    }>
     {
         const db = Database.client;
 
@@ -137,7 +144,10 @@ export default class Student extends User implements ISerializable
             [ this.data.email ],
         );
 
+        const absences = await Absence.for(this);
+
         return {
+            absences: await Promise.all(absences.map(_ => _.serialize())),
             grades: result.rows.map(row =>
             {
                 row.average = parseFloat(row.average);
