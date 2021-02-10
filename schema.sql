@@ -1,9 +1,5 @@
 create extension "pgcrypto";
 
-create type usertype as enum ('admin', 'student', 'teacher');
-
-create type calendar_item_type as enum ('general', 'test', 'event', 'info', 'important');
-
 create domain grade as numeric(4, 2) not null check(value between 0 and 10) check(value % 0.25 = 0);
 
 create function trigger_update_last_modified()
@@ -21,9 +17,16 @@ create table "classes"
     primary key ("name")
 );
 
+create table "user_types"
+(
+    "id" varchar(30) not null,
+
+    primary key ("id")
+);
+
 create table "users"
 (
-    "type" usertype not null,
+    "type" varchar(30) not null,
     "firstName" varchar(30) not null,
     "lastName" varchar(30) not null,
     "email" varchar(255) not null,
@@ -31,6 +34,8 @@ create table "users"
     "birthday" date not null,
 
     primary key ("email"),
+
+    foreign key ("type") references "user_types" on update cascade on delete cascade,
 
     check ("birthday" < current_date)
 );
@@ -111,10 +116,17 @@ create table "sessions"
     check("expires" > current_timestamp)
 );
 
+create table "calendar_item_types"
+(
+    "id" varchar(30) not null,
+
+    primary key ("id")
+);
+
 create table "calendar_items"
 (
     "id" uuid not null default gen_random_uuid(),
-    "type" calendar_item_type not null,
+    "type" varchar(30) not null,
     "start" timestamp not null,
     "end" timestamp not null,
     "title" varchar(50) not null,
@@ -126,6 +138,7 @@ create table "calendar_items"
 
     primary key ("id"),
 
+    foreign key ("type") references "calendar_item_types" on update cascade on delete cascade,
     foreign key ("author") references "users" on update cascade on delete cascade,
     foreign key ("class") references "classes" on update cascade on delete cascade,
 
@@ -215,3 +228,15 @@ insert into "absence_types" values
     ('late'),
     ('short-delay'),
     ('early-exit');
+
+insert into "calendar_item_types" values
+    ('general'),
+    ('test'),
+    ('event'),
+    ('info')
+    ('important');
+
+insert into "user_types" values
+    ('admin'),
+    ('student'),
+    ('teacher');
