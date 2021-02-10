@@ -2,7 +2,7 @@ import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
 import Student, { ISerializedStudent } from "./Student";
 
-type TAbsenceType = "absence" | "late" | "short-delay" | "early-exit";
+export type TAbsenceType = "absence" | "late" | "short-delay" | "early-exit";
 
 interface ICreateAbsence
 {

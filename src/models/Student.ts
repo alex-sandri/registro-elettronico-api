@@ -1,6 +1,6 @@
 import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
-import { Absence, ISerializedAbsence } from "./Absence";
+import { TAbsenceType } from "./Absence";
 import Class, { ISerializedClass } from "./Class";
 import User, { ISerializedUser, IUpdateUser, IUser } from "./User";
 
@@ -130,7 +130,9 @@ export default class Student extends User implements ISerializable
     }
 
     public async report(): Promise<{
-        absences: ISerializedAbsence[];
+        absences: {
+            [ key in TAbsenceType ]: number;
+        }[];
         grades: {
             subject: string;
             average: number;
@@ -139,20 +141,23 @@ export default class Student extends User implements ISerializable
     {
         const db = Database.client;
 
-        const result = await db.query(
+        const absences = await db.query(
+            "select t.id, count(a.*) from absence_types as t left outer join (select type from absences where student = $1) as a on t.id = a.type group by t.id",
+            [ this.data.email ],
+        );
+
+        const grades = await db.query(
             "select subject, round(avg(value), 2) as average from grades where student = $1 group by subject",
             [ this.data.email ],
         );
 
-        const absences = await Absence.for(this);
-
         return {
-            absences: await Promise.all(absences.map(_ => _.serialize())),
-            grades: result.rows.map(row =>
+            absences: absences.rows,
+            grades: grades.rows.map(_ =>
             {
-                row.average = parseFloat(row.average);
+                _.average = parseFloat(_.average);
 
-                return row;
+                return _;
             }),
         };
     }

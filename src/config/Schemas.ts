@@ -293,7 +293,12 @@ export const ABSENCE_SCHEMA = Joi
 
 export const STUDENT_REPORT_SCHEMA = Joi
     .object({
-        absences: Joi.array().items(ABSENCE_SCHEMA).required(),
+        absences:  Joi.array()
+            .items(Joi.object({
+                type: ABSENCE_TYPE_SCHEMA.required(),
+                count: Joi.number().min(0).required(),
+            }))
+            .required(),
         grades: Joi.array()
             .items(Joi.object({
                 subject: Joi.string().required(),
