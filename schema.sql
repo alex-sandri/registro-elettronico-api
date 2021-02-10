@@ -4,8 +4,6 @@ create type usertype as enum ('admin', 'student', 'teacher');
 
 create type calendar_item_type as enum ('general', 'test', 'event', 'info', 'important');
 
-create type absence_type as enum ('absence', 'late', 'short-delay', 'early-exit');
-
 create domain grade as numeric(4, 2) not null check(value between 0 and 10) check(value % 0.25 = 0);
 
 create function trigger_update_last_modified()
@@ -172,10 +170,17 @@ create table "lessons"
     check ("duration" between 1 and 6)
 );
 
+create table "absence_types"
+(
+    "id" varchar(30) not null,
+
+    primary key ("id")
+);
+
 create table "absences"
 (
     "id" uuid not null default gen_random_uuid(),
-    "type" absence_type not null,
+    "type" varchar(30) not null,
     "from" date not null,
     "to" date not null,
     "description" varchar(100) not null,
@@ -186,6 +191,7 @@ create table "absences"
 
     primary key ("id"),
 
+    foreign key ("type") references "absence_types" on update cascade on delete cascade,
     foreign key ("student") references "students" on update cascade on delete cascade,
 
     check ("from" <= "to"),
@@ -203,3 +209,9 @@ create trigger "update_last_modified"
 before update on "absences"
 for each row
 execute procedure trigger_update_last_modified();
+
+insert into "absence_types" values
+    ('absence'),
+    ('late'),
+    ('short-delay'),
+    ('early-exit');
