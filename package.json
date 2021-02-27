@@ -9,7 +9,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.1.0",
